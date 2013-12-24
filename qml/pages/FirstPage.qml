@@ -49,12 +49,16 @@ Page {
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
+                text: "About"
+                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+            }
+            MenuItem {
                 text: "Info"
                 onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
             }
             MenuItem {
-                text: "About"
-                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+                text: "Refresh"
+                onClicked: { modelQuestion.clear();  Askbot.get_questions(modelQuestion); }
             }
         }
 
