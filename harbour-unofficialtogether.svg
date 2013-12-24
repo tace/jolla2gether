@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="86"
+   height="86"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="harbour-unofficialtogether.png"
+   inkscape:export-filename="/home/mikael/MyStuff/src/harbour-unofficialtogether/harbour-unofficialtogether.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3789-6">
+      <stop
+         style="stop-color:#0a75c2;stop-opacity:1;"
+         offset="0"
+         id="stop3791-0" />
+      <stop
+         style="stop-color:#064572;stop-opacity:1;"
+         offset="1"
+         id="stop3793-4" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3789-6"
+       id="linearGradient3922"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="reflect"
+       x1="45"
+       y1="10"
+       x2="45"
+       y2="80"
+       gradientTransform="matrix(0.95555556,0,0,0.95555556,0,4)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="33.710098"
+     inkscape:cy="36.776055"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="true"
+     inkscape:window-width="2560"
+     inkscape:window-height="1379"
+     inkscape:window-x="-2"
+     inkscape:window-y="38"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true"
+     inkscape:snap-global="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2985"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Ebene"
+     style="display:inline"
+     transform="translate(0,-4)">
+    <path
+       style="fill:url(#linearGradient3922);fill-opacity:1;stroke:none;display:inline"
+       d="M 43,4 C 19.251756,4 0,23.251756 0,47 L 0,87.790278 C 0,89.01865 0.98134982,90 2.2097222,90 L 43,90 C 66.748244,90 86,70.748244 86,47 86,23.251756 66.748244,4 43,4 z"
+       id="rect3059"
+       inkscape:connector-curvature="0" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot2988"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Sans;font-style:normal;font-weight:normal;font-size:40px;line-height:125%;letter-spacing:0px;word-spacing:0px"><flowRegion
+         id="flowRegion2990"><rect
+           id="rect2992"
+           width="49.497475"
+           height="48.436813"
+           x="16.263456"
+           y="15.819652" /></flowRegion><flowPara
+         id="flowPara2994"></flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:19.15407562px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="-28.137297"
+       y="42.593266"
+       id="text2996"
+       sodipodi:linespacing="125%"
+       transform="matrix(0.61394519,-0.41662776,0.75680685,1.1152352,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan2998"
+         x="-28.137297"
+         y="42.593266"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:UnDinaru;-inkscape-font-specification:UnDinaru">Unofficial</tspan><tspan
+         sodipodi:role="line"
+         x="-28.137297"
+         y="66.535858"
+         id="tspan3000"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:UnDinaru;-inkscape-font-specification:UnDinaru">Together</tspan></text>
+  </g>
+</svg>
