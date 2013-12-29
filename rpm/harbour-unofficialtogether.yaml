@@ -1,6 +1,6 @@
 Name: harbour-unofficialtogether
 Summary: Jolla Together unoffical app
-Version: 0.1
+Version: 0.2
 Release: 1
 Group: Qt/Qt
 URL: http://example.org/
@@ -27,3 +27,4 @@ Files:
 - /usr/share/harbour-unofficialtogether
 - /usr/share/applications
 - /usr/share/icons/hicolor/86x86/apps
+PkgBR: []

@@ -35,7 +35,10 @@ ApplicationWindow
 {
     property bool urlLoading: false
     property string siteURL: ""
-    property string version: "0.0.1"
+    property string version: "0.0.2"
+    property string license: "None"
+    property string appicon: "qrc:/harbour-unofficialtogether.png"
+    property string appname: "Jolla Together(Unofficial)"
     initialPage: Component { FirstPage { } }
     cover: undefined //Qt.resolvedUrl("cover/CoverPage.qml")
     ProgressCircle {

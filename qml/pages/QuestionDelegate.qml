@@ -17,6 +17,7 @@ Item {
         Label {
             text: "bar"
         }
+
         Label {
             text: "bas"
         }

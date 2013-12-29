@@ -36,6 +36,7 @@ function get_questions(model)
                 for (var index in qs)
                 {
                     var ginfo = qs[index]
+                    console.log(ginfo.title)
                     model.append({"title" : ginfo.title, "url" : ginfo.url})
                 }
             }

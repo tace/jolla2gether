@@ -24,7 +24,9 @@ OTHER_FILES += qml/harbour-unofficialtogether.qml \
     qml/pages/InfoPage.qml \
     harbour-unofficialtogether.png \
     harbour-unofficialtogether.svg \
-    qml/pages/WebView.qml
+    qml/pages/WebView.qml \
+    qml/pages/CreditsModel.qml \
+    qml/pages/LicensePage.qml
 
 
 js.files = js
