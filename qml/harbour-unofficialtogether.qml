@@ -31,14 +31,28 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "pages"
+import "../js/askbot.js" as Askbot
 ApplicationWindow
 {
     property bool urlLoading: false
-    property string siteURL: ""
+    property string siteURL: "https://together.jolla.com/account/signin/?next=/"
     property string version: "0.0.2"
-    property string license: "None"
+    property string license: "GPL v2.0"
     property string appicon: "qrc:/harbour-unofficialtogether.png"
     property string appname: "Jolla Together(Unofficial)"
+
+
+    ListModel
+    {
+        id: modelQuestions
+    }
+
+    function refresh()
+    {
+        modelQuestions.clear()
+        Askbot.get_questions(modelQuestions)
+    }
+
     initialPage: Component { FirstPage { } }
     cover: undefined //Qt.resolvedUrl("cover/CoverPage.qml")
     ProgressCircle {
@@ -57,6 +71,8 @@ ApplicationWindow
             running: urlLoading
         }
     }
+
+    Component.onCompleted: refresh()
 }
 
 

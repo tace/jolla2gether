@@ -27,6 +27,12 @@ Page {
                 // delegate request.url here
             }
         }
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Questions")
+                onClicked: pageStack.navigateBack()
+            }
+        }
     }
 }
 

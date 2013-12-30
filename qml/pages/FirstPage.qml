@@ -34,9 +34,13 @@ import "../../js/askbot.js" as Askbot
 Page {
     id: pageFirst
     allowedOrientations: Orientation.All
-    ListModel
-    {
-        id: modelQuestion
+
+    Timer {
+        /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
+        interval: 100
+        repeat: false
+        running: true
+        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml")); } //pageStack.navigateForward(); }
     }
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
@@ -49,16 +53,20 @@ Page {
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
-                text: "About"
+                text: qsTr("About")
                 onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
             }
             MenuItem {
-                text: "Info"
+                text: qsTr("Login")
+                onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
+            }
+            MenuItem {
+                text: qsTr("Info")
                 onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
             }
             MenuItem {
-                text: "Refresh"
-                onClicked: { modelQuestion.clear();  Askbot.get_questions(modelQuestion); }
+                text: qsTr("Refresh")
+                onClicked: { refresh(); }
             }
         }
 
@@ -69,15 +77,10 @@ Page {
             anchors.right: parent.right
             anchors.leftMargin: Theme.paddingMedium
             anchors.rightMargin: Theme.paddingMedium
-            model: modelQuestion
+            model: modelQuestions
             delegate: QuestionDelegate { id: questionDelegate }
 
         }
-    }
-    Component.onCompleted:
-    {
-        modelQuestion.clear()
-        Askbot.get_questions(modelQuestion)
     }
 }
 

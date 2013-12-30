@@ -1,34 +1,32 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-Item {
+ListItem {
     anchors.left: ListView.left
     anchors.right: ListView.right
     width: ListView.view.width
-    height: Theme.itemSizeSmall
+//    height: Theme.itemSizeSmall
+    contentHeight: Theme.itemSizeSmall
+    onClicked: { siteURL = url; pageStack.navigateForward(); }
 
-    Column{
-        anchors.fill: parent
-        Label {
-            font.pixelSize: Theme.fontSizeSmall
-            text: title
-        }
-
-/*
-        Label {
-            text: "bar"
-        }
-
-        Label {
-            text: "bas"
-        }
-        Label {
-            text: "cap"
-        }
-*/
+    Text {
+        id: textTitle
+        font.pixelSize: Theme.fontSizeMedium
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: Theme.paddingSmall
+        anchors.rightMargin: Theme.paddingSmall
+        width: parent.width
+        color: Theme.primaryColor
+        text: title
     }
-    MouseArea
-    {
-        anchors.fill: parent
-        onClicked: { siteURL = url; pageStack.push(Qt.resolvedUrl("WebView.qml")); }
+    Text {
+        id: textComment
+        anchors.top: textTitle.bottom
+        anchors.right: parent.right
+        anchors.rightMargin: Theme.paddingSmall
+//        width: 120
+        text: "Answers "+answers
+        font.pixelSize: Theme.fontSizeSmall
+        color: Theme.primaryColor
     }
 }

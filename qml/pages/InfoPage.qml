@@ -13,14 +13,14 @@ Page {
     {
         id: modelInfo
     }
+    PageHeader {
+        title: "Jolla Together Info"
+    }
     Column
     {
-        anchors.fill: parent
+        anchors.centerIn: parent
         anchors.leftMargin: Theme.paddingMedium
         anchors.rightMargin: Theme.paddingMedium
-        PageHeader {
-            title: "Jolla Together Info"
-        }
 
         Repeater {
             model: modelInfo
