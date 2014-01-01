@@ -40,48 +40,55 @@ Page {
         interval: 100
         repeat: false
         running: true
-        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml")); } //pageStack.navigateForward(); }
+        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"));  }
     }
-    // To enable PullDownMenu, place our content in a SilicaFlickable
-    SilicaFlickable {
-        PageHeader {
-            id: header
-            title: "Jolla Together (unofficialapp)"
-        }
-        anchors.fill: parent
 
-        // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("About")
-                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Login")
-                onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
-            }
-            MenuItem {
-                text: qsTr("Info")
-                onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Refresh")
-                onClicked: { refresh(); }
-            }
-        }
+    PageHeader {
+        id: header
+        title: "Jolla Together (unofficialapp)"
+    }
+
+    // To enable PullDownMenu, place our content in a SilicaFlickable
+//    SilicaFlickable {
 
         SilicaListView{
-            anchors.top: header.bottom
+            anchors.fill: parent
+//            width: Screen.width
+ //           height: Screen.height
+            header: Item { height: header.height; width: parent.width; }
+
+            // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
+            PullDownMenu {
+                MenuItem {
+                    text: qsTr("About")
+                    onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+                }
+                MenuItem {
+                    text: qsTr("Login")
+                    onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
+                }
+                MenuItem {
+                    text: qsTr("Info")
+                    onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
+                }
+                MenuItem {
+                    text: qsTr("Refresh")
+                    onClicked: { refresh(); }
+                }
+            }
+            /*
+            anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.leftMargin: Theme.paddingMedium
             anchors.rightMargin: Theme.paddingMedium
+            */
             model: modelQuestions
             delegate: QuestionDelegate { id: questionDelegate }
 
         }
-    }
+  //  }
 }
 
 
