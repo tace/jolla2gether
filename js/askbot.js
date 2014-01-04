@@ -104,6 +104,7 @@ function get_questions_httpReq(model, query_params)
                                    "view_count" : ginfo.view_count,
                                    "votes" : ginfo.score,
                                    "tags" : ginfo.tags,
+                                   "created" : getTimeDurationAsString(ginfo.added_at),
                                    "updated" : getTimeDurationAsString(ginfo.last_activity_at),
                                  })
                 }
@@ -127,10 +128,17 @@ function secondsToString(seconds)
     var numseconds = Math.floor(((seconds % 86400) % 3600) % 60);
 
     var value = "";
-    if (numdays > 0) { value = value + numdays + "d " }
-    if (numhours > 0) { value = value + numhours + "h " }
-    if (numminutes > 0) { value = value + numminutes + "min " }
-    if (numseconds > 0) { value = value + numseconds + "sec " }
+    var onlySeconds = true
+    if (numdays > 0) { value = value + numdays + "d "; onlySeconds = false; }
+    if (numhours > 0) { value = value + numhours + "h "; onlySeconds = false; }
+    if (numminutes > 0) { value = value + numminutes + "min "; onlySeconds = false; }
+    // Leave seconds away to save space, except if only seconds
+    if (onlySeconds) {
+        if (numseconds > 0) { value = "now" }
+    }
+    else {
+        value = value + "ago"
+    }
     return value;
 }
 

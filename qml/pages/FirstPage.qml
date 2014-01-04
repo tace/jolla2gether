@@ -40,7 +40,7 @@ Page {
         interval: 100
         repeat: false
         running: true
-        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml")); } //pageStack.navigateForward(); }
+        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml")); }
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
@@ -60,7 +60,6 @@ Page {
             height: Theme.itemSizeSmall  // Default is Theme.itemSizeLarge
             _titleItem.font.pixelSize: Theme.fontSizeMedium  // Default is pixelSize: Theme.fontSizeLarge
             title: "Jolla Together (unofficialapp)"
-            // SearchField To be added or to listview
         }
 
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
@@ -108,18 +107,21 @@ Page {
                 onClicked: { get_questions(pagesCount) }
             }
         }
-        SilicaListView{
+
+        SilicaListView {
             id: questionListView
-            clip: true //  to have the out of view items clipped nicely.
+            pressDelay: 0
             anchors.top: header.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.leftMargin: Theme.paddingMedium
-            anchors.rightMargin: Theme.paddingMedium
+            anchors.leftMargin: Theme.paddingSmall
+            anchors.rightMargin: Theme.paddingSmall
+            clip: true //  to have the out of view items clipped nicely.
+
             model: modelQuestions
             delegate: QuestionDelegate { id: questionDelegate }
-            VerticalScrollDecorator {}
+            HorizontalScrollDecorator { flickable: questionListView }
         }
     }
 }
