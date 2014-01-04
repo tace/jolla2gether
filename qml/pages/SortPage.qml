@@ -4,7 +4,6 @@ import Sailfish.Silica 1.0
 Page {
     id: sortPage
     anchors.fill: parent
-    allowedOrientations: Orientation.All
     property string sort_ACTIVITY:      "activity"
     property string sort_AGE:           "age"
     property string sort_ANSWERS:       "answers"
@@ -111,7 +110,16 @@ Page {
             verticalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
         }
-
+        TextSwitch {
+            id: sortDescSwitch
+            text: "Descending (Default)"
+            automaticCheck: false
+            checked: (sortingOrder == sort_ORDER_DESC) ? true : false
+            onClicked: {
+                sortingOrder = sort_ORDER_DESC
+                toggleSortOrderSwitchesState()
+            }
+        }
         TextSwitch {
             id: sortAscSwitch
             text: "Ascending"
@@ -122,15 +130,16 @@ Page {
                 toggleSortOrderSwitchesState()
             }
         }
-        TextSwitch {
-            id: sortDescSwitch
-            text: "Descending (Default)"
-            automaticCheck: false
-            checked: (sortingOrder == sort_ORDER_DESC) ? true : false
-            onClicked: {
-                sortingOrder = sort_ORDER_DESC
-                toggleSortOrderSwitchesState()
-            }
+
+        Label {
+            font.pixelSize: Theme.fontSizeExtraSmall
+            //anchors.horizontalCenter: parent.horizontalCenter
+            //horizontalAlignment: Text.AlignHCenter
+            //verticalAlignment: Text.AlignHCenter
+            color: "red"
+            width: sortPage.width
+            wrapMode: Text.Wrap
+            text: qsTr("Note: Sorting is global among all questions and selected sorting persists untill it's changed from this page")
         }
     }
 
