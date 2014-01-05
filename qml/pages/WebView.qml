@@ -12,10 +12,13 @@ Page {
         height: page.orientation == Orientation.Portrait ? 960 : 540
         onLoadingChanged:
         {
-            if (loadRequest.status == WebView.LoadStartedStatus)
+            if (loadRequest.status === WebView.LoadStartedStatus)
                 urlLoading = true;
             else
                 urlLoading = false;
+            if (loadRequest.status === WebView.LoadSucceededStatus) {
+                urlLoading = false;
+            }
         }
         onNavigationRequested: {
             // detect URL scheme prefix, most likely an external link

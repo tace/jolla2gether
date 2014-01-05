@@ -55,6 +55,18 @@ function get_questions(model, page, params) {
         }
     }
 
+    // searchCriteria is global and defined in main.qml
+    // Order keeps persistent ones set.
+    if (searchCriteria !== "") {
+        if (isFirstParam) {
+            query_params = query_params + "query=" + searchCriteria
+        }
+        else {
+            query_params = query_params + "&query=" + searchCriteria
+        }
+        isFirstParam = false
+    }
+
     // sortingCriteria and sortingOrder are global and defined in main.qml
     // Order keeps persistent ones set.
     if (sortingCriteria !== "") {
@@ -66,6 +78,7 @@ function get_questions(model, page, params) {
         else {
             query_params = query_params + "&sort=" + sortingCriteria + sortOrder
         }
+        isFirstParam = false
     }
 
     // Clean before fetching new values to these inside get_questions_httpReq()
@@ -79,6 +92,7 @@ function get_questions_httpReq(model, query_params)
 {
     var xhr = new XMLHttpRequest();
     var url = "https://together.jolla.com//api/v1/questions/" + query_params
+    console.log(url)
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function()
     {
@@ -91,6 +105,10 @@ function get_questions_httpReq(model, query_params)
                 // Pick global count values (non-page related)
                 pagesCount = response.pages;
                 questionsCount = response.count;
+                // Fix currentpage if got less pages
+                if (pagesCount < currentPage) {
+                    currentPage = pagesCount
+                }
 
                 // Pick question related data
                 var qs = response.questions;
@@ -137,7 +155,7 @@ function secondsToString(seconds)
         if (numseconds > 0) { value = "now" }
     }
     else {
-        value = value + "ago"
+        value = value + "ago "
     }
     return value;
 }

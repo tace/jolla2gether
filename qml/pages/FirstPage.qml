@@ -81,6 +81,10 @@ Page {
                 onClicked: pageStack.push(Qt.resolvedUrl("SortPage.qml"))
             }
             MenuItem {
+                text: qsTr("Search...")
+                onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"))
+            }
+            MenuItem {
                 text: qsTr("Refresh")
                 onClicked: { refresh(currentPage); }
             }

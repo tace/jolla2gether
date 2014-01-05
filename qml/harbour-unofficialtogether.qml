@@ -48,6 +48,9 @@ ApplicationWindow
     property string sortingCriteria: "";
     property string sortingOrder: "";
 
+    // Search
+    property string searchCriteria: ""
+
     ListModel
     {
         id: modelQuestions
