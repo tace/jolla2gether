@@ -37,18 +37,18 @@ Page {
         Label {
             width: parent.width-70
             font.pixelSize: Theme.fontSizeSmall
-            text: "Select sorting type"
             anchors.horizontalCenter: parent.horizontalCenter
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
+            text: qsTr("Select sorting type")
         }
         TextSwitch {
             id: activitySwitch
-            text: "Activity (Default)"
             automaticCheck: false
             checked: (sortingCriteria == sort_ACTIVITY) ? true : false
             description: "Sort questions by most/least recently updated (=having activity)"
+            text: qsTr("Activity (Default)")
             onClicked: {
                 sortingCriteria = sort_ACTIVITY
                 toggleSortTypeSwitchesState()
@@ -56,10 +56,10 @@ Page {
         }
         TextSwitch {
             id: dateSwitch
-            text: "Date"
             automaticCheck: false
             checked: (sortingCriteria == sort_AGE) ? true : false
             description: "Sort questions by question creation date"
+            text: qsTr("Date")
             onClicked: {
                 sortingCriteria = sort_AGE
                 toggleSortTypeSwitchesState()
@@ -68,10 +68,10 @@ Page {
         }
         TextSwitch {
             id: answersSwitch
-            text: "Answers"
             automaticCheck: false
             checked: (sortingCriteria == sort_ANSWERS) ? true : false
             description: "Sort questions by amount of answers"
+            text: qsTr("Answers")
             onClicked: {
                 sortingCriteria = sort_ANSWERS
                 toggleSortTypeSwitchesState()
@@ -79,10 +79,10 @@ Page {
         }
         TextSwitch {
             id: votesSwitch
-            text: "Votes"
             automaticCheck: false
             checked: (sortingCriteria == sort_VOTES) ? true : false
             description: "Sort questions by amount of votes"
+            text: qsTr("Votes")
             onClicked: {
                 sortingCriteria = sort_VOTES
                 toggleSortTypeSwitchesState()
@@ -104,17 +104,17 @@ Page {
         Label {
             width: parent.width-70
             font.pixelSize: Theme.fontSizeSmall
-            text: "Select sort order"
             anchors.horizontalCenter: parent.horizontalCenter
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
+            text: qsTr("Select sort order")
         }
         TextSwitch {
             id: sortDescSwitch
-            text: "Descending (Default)"
             automaticCheck: false
             checked: (sortingOrder == sort_ORDER_DESC) ? true : false
+            text: qsTr("Descending (Default)")
             onClicked: {
                 sortingOrder = sort_ORDER_DESC
                 toggleSortOrderSwitchesState()
@@ -122,9 +122,9 @@ Page {
         }
         TextSwitch {
             id: sortAscSwitch
-            text: "Ascending"
             automaticCheck: false
             checked: (sortingOrder == sort_ORDER_ASC) ? true : false
+            text: qsTr("Ascending")
             onClicked: {
                 sortingOrder = sort_ORDER_ASC
                 toggleSortOrderSwitchesState()
@@ -133,9 +133,6 @@ Page {
 
         Label {
             font.pixelSize: Theme.fontSizeExtraSmall
-            //anchors.horizontalCenter: parent.horizontalCenter
-            //horizontalAlignment: Text.AlignHCenter
-            //verticalAlignment: Text.AlignHCenter
             color: "red"
             width: sortPage.width
             wrapMode: Text.Wrap

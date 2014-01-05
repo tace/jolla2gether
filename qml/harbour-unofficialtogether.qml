@@ -45,7 +45,7 @@ ApplicationWindow
     property int pagesCount;
     property int currentPage: 1;
     property int questionsCount;
-    property string sortingCriteria: "";
+    property string sortingCriteria: SortPage.sort_ACTIVITY;
     property string sortingOrder: "";
 
     // Search
