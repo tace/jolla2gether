@@ -9,7 +9,7 @@ Page {
 
         PageHeader {
             id: header
-            title: "Search questions"
+            title: qsTr("Questions search criteria")
         }
 
         SearchField {

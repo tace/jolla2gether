@@ -45,8 +45,15 @@ ApplicationWindow
     property int pagesCount;
     property int currentPage: 1;
     property int questionsCount;
-    property string sortingCriteria: SortPage.sort_ACTIVITY;
-    property string sortingOrder: "";
+    // Sorting
+    property string sort_ACTIVITY:      "activity"
+    property string sort_AGE:           "age"
+    property string sort_ANSWERS:       "answers"
+    property string sort_VOTES:         "votes"
+    property string sort_ORDER_ASC:     "asc"
+    property string sort_ORDER_DESC:    "desc"
+    property string sortingCriteria: sort_ACTIVITY;
+    property string sortingOrder: sort_ORDER_DESC;
 
     // Search
     property string searchCriteria: ""
