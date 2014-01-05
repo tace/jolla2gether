@@ -54,6 +54,10 @@ function get_questions(model, page, params) {
             isFirstParam = false
         }
     }
+    else {
+        // If no page given to query it's always first page, so corrent currentPage varible
+        currentPage = 1
+    }
 
     // searchCriteria is global and defined in main.qml
     // Order keeps persistent ones set.
