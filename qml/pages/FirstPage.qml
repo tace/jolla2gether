@@ -31,6 +31,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../../js/askbot.js" as Askbot
+
 Page {
     id: pageFirst
     allowedOrientations: Orientation.All

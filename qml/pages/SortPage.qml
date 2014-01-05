@@ -4,16 +4,29 @@ import Sailfish.Silica 1.0
 Page {
     id: sortPage
     anchors.fill: parent
+    // orientation did not work ok for this page?
+    //allowedOrientations: Orientation.All
 
     SilicaFlickable
     {
         anchors.fill: parent
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Apply")
+                onClicked: {
+                    refresh() // reload model to first page
+                    pageStack.pop()
+                }
+            }
+        }
+
         Column {
             id: sortTypeColumn
-            //spacing: 1
+            spacing: 1
             anchors.fill: parent
-            //anchors.leftMargin: Theme.paddingMedium
-            //anchors.rightMargin: Theme.paddingMedium
+            anchors.leftMargin: Theme.paddingMedium
+            anchors.rightMargin: Theme.paddingMedium
             PageHeader {
                 title: qsTr("Questions sorting criteria")
             }
@@ -29,6 +42,7 @@ Page {
                 }
                 height: 3
                 width: parent.width-64
+
             }
             Label {
                 width: parent.width-70
@@ -43,7 +57,7 @@ Page {
                 id: activitySwitch
                 automaticCheck: false
                 checked: (sortingCriteria == sort_ACTIVITY) ? true : false
-                description: "Sort questions by most/least recently updated (=having activity)"
+                description: qsTr("Sort questions by most/least recently updated (=having activity)")
                 text: qsTr("Activity (Default)")
                 onClicked: {
                     sortingCriteria = sort_ACTIVITY
@@ -54,7 +68,7 @@ Page {
                 id: dateSwitch
                 automaticCheck: false
                 checked: (sortingCriteria == sort_AGE) ? true : false
-                description: "Sort questions by question creation date"
+                description: qsTr("Sort questions by question creation date")
                 text: qsTr("Date")
                 onClicked: {
                     sortingCriteria = sort_AGE
@@ -66,7 +80,7 @@ Page {
                 id: answersSwitch
                 automaticCheck: false
                 checked: (sortingCriteria == sort_ANSWERS) ? true : false
-                description: "Sort questions by amount of answers"
+                description: qsTr("Sort questions by amount of answers")
                 text: qsTr("Answers")
                 onClicked: {
                     sortingCriteria = sort_ANSWERS
@@ -77,13 +91,14 @@ Page {
                 id: votesSwitch
                 automaticCheck: false
                 checked: (sortingCriteria == sort_VOTES) ? true : false
-                description: "Sort questions by amount of votes"
+                description: qsTr("Sort questions by amount of votes")
                 text: qsTr("Votes")
                 onClicked: {
                     sortingCriteria = sort_VOTES
                     toggleSortTypeSwitchesState()
                 }
             }
+
             Rectangle{
                 id: middleRectangle2
                 gradient: Gradient {
@@ -142,11 +157,9 @@ Page {
         dateSwitch.checked = (sortingCriteria == sort_AGE) ? true : false
         answersSwitch.checked = (sortingCriteria == sort_ANSWERS) ? true : false
         votesSwitch.checked = (sortingCriteria == sort_VOTES) ? true : false
-        refresh() // reload model to first page
     }
     function toggleSortOrderSwitchesState() {
         sortAscSwitch.checked = (sortingOrder == sort_ORDER_ASC) ? true : false
         sortDescSwitch.checked = (sortingOrder == sort_ORDER_DESC) ? true : false
-        refresh() // reload model to first page
     }
 }

@@ -3,9 +3,20 @@ import Sailfish.Silica 1.0
 
 Page {
     id: searchPage
+    allowedOrientations: Orientation.All
 
     SilicaFlickable {
         anchors.fill: parent
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Apply")
+                onClicked: {
+                    refresh() // reload model to first page
+                    pageStack.pop()
+                }
+            }
+        }
 
         PageHeader {
             id: header
