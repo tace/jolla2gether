@@ -5,18 +5,15 @@ Page {
     id: searchPage
     allowedOrientations: Orientation.All
 
+    onStatusChanged: {
+        // When leaving page
+        if (status === PageStatus.Deactivating) {
+            refresh() // reload model to first page
+        }
+    }
+
     SilicaFlickable {
         anchors.fill: parent
-
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Apply")
-                onClicked: {
-                    refresh() // reload model to first page
-                    pageStack.pop()
-                }
-            }
-        }
 
         PageHeader {
             id: header

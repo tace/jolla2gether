@@ -7,20 +7,16 @@ Page {
     // orientation did not work ok for this page?
     //allowedOrientations: Orientation.All
 
+    onStatusChanged: {
+        // When leaving page
+        if (status === PageStatus.Deactivating) {
+            refresh() // reload model to first page
+        }
+    }
+
     SilicaFlickable
     {
         anchors.fill: parent
-
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Apply")
-                onClicked: {
-                    refresh() // reload model to first page
-                    pageStack.pop()
-                }
-            }
-        }
-
         Column {
             id: sortTypeColumn
             spacing: 1
