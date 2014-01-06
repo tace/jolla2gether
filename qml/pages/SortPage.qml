@@ -4,13 +4,24 @@ import Sailfish.Silica 1.0
 Page {
     id: sortPage
     anchors.fill: parent
+    property string newSortingCriteria: sortingCriteria
+    property string newSortingOrder: sortingOrder
     // orientation did not work ok for this page?
     //allowedOrientations: Orientation.All
 
+
     onStatusChanged: {
-        // When leaving page
+        // When leaving page change selections only if those are changed
         if (status === PageStatus.Deactivating) {
-            refresh() // reload model to first page
+            if ((newSortingOrder !== sortingOrder) || (newSortingCriteria !== sortingCriteria )) {
+                if (newSortingOrder !== sortingOrder) {
+                    sortingOrder = newSortingOrder
+                }
+                if (newSortingCriteria !== sortingCriteria) {
+                    sortingCriteria = newSortingCriteria
+                }
+                refresh() // reload model to first page
+            }
         }
     }
 
@@ -56,8 +67,8 @@ Page {
                 description: qsTr("Sort questions by most/least recently updated (=having activity)")
                 text: qsTr("Activity (Default)")
                 onClicked: {
-                    sortingCriteria = sort_ACTIVITY
-                    toggleSortTypeSwitchesState()
+                    newSortingCriteria = sort_ACTIVITY
+                    toggleSortTypeSwitchesState(newSortingCriteria)
                 }
             }
             TextSwitch {
@@ -67,8 +78,8 @@ Page {
                 description: qsTr("Sort questions by question creation date")
                 text: qsTr("Date")
                 onClicked: {
-                    sortingCriteria = sort_AGE
-                    toggleSortTypeSwitchesState()
+                    newSortingCriteria = sort_AGE
+                    toggleSortTypeSwitchesState(newSortingCriteria)
                 }
 
             }
@@ -79,8 +90,8 @@ Page {
                 description: qsTr("Sort questions by amount of answers")
                 text: qsTr("Answers")
                 onClicked: {
-                    sortingCriteria = sort_ANSWERS
-                    toggleSortTypeSwitchesState()
+                    newSortingCriteria = sort_ANSWERS
+                    toggleSortTypeSwitchesState(newSortingCriteria)
                 }
             }
             TextSwitch {
@@ -90,8 +101,8 @@ Page {
                 description: qsTr("Sort questions by amount of votes")
                 text: qsTr("Votes")
                 onClicked: {
-                    sortingCriteria = sort_VOTES
-                    toggleSortTypeSwitchesState()
+                    newSortingCriteria = sort_VOTES
+                    toggleSortTypeSwitchesState(newSortingCriteria)
                 }
             }
 
@@ -123,8 +134,8 @@ Page {
                 checked: (sortingOrder == sort_ORDER_DESC) ? true : false
                 text: qsTr("Descending (Default)")
                 onClicked: {
-                    sortingOrder = sort_ORDER_DESC
-                    toggleSortOrderSwitchesState()
+                    newSortingOrder = sort_ORDER_DESC
+                    toggleSortOrderSwitchesState(newSortingOrder)
                 }
             }
             TextSwitch {
@@ -133,8 +144,8 @@ Page {
                 checked: (sortingOrder == sort_ORDER_ASC) ? true : false
                 text: qsTr("Ascending")
                 onClicked: {
-                    sortingOrder = sort_ORDER_ASC
-                    toggleSortOrderSwitchesState()
+                    newSortingOrder = sort_ORDER_ASC
+                    toggleSortOrderSwitchesState(newSortingOrder)
                 }
             }
 
@@ -148,14 +159,14 @@ Page {
         }
     }
 
-    function toggleSortTypeSwitchesState() {
-        activitySwitch.checked = (sortingCriteria == sort_ACTIVITY) ? true : false
-        dateSwitch.checked = (sortingCriteria == sort_AGE) ? true : false
-        answersSwitch.checked = (sortingCriteria == sort_ANSWERS) ? true : false
-        votesSwitch.checked = (sortingCriteria == sort_VOTES) ? true : false
+    function toggleSortTypeSwitchesState(criteria) {
+        activitySwitch.checked = (criteria === sort_ACTIVITY) ? true : false
+        dateSwitch.checked = (criteria === sort_AGE) ? true : false
+        answersSwitch.checked = (criteria === sort_ANSWERS) ? true : false
+        votesSwitch.checked = (criteria === sort_VOTES) ? true : false
     }
-    function toggleSortOrderSwitchesState() {
-        sortAscSwitch.checked = (sortingOrder == sort_ORDER_ASC) ? true : false
-        sortDescSwitch.checked = (sortingOrder == sort_ORDER_DESC) ? true : false
+    function toggleSortOrderSwitchesState(order) {
+        sortAscSwitch.checked = (order === sort_ORDER_ASC) ? true : false
+        sortDescSwitch.checked = (order === sort_ORDER_DESC) ? true : false
     }
 }
