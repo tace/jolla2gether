@@ -4,23 +4,34 @@ import Sailfish.Silica 1.0
 Page {
     id: searchPage
     allowedOrientations: Orientation.All
-    property string newSearchString: ""
+    property string newSearchString: searchCriteria
+    ListModel
+    {
+        id: modelSearchTags
+    }
 
     onStatusChanged: {
         // When leaving page
         if (status === PageStatus.Deactivating) {
+            var reload = false
             if (newSearchString !== searchCriteria) {
                 searchCriteria = newSearchString
-                refresh() // reload model to first page
+                reload = true
             }
+            if (checkIfTagsChanged()) {
+                fillModelFromModel(modelSearchTags, modelSearchTagsGlobal)
+                reload = true
+            }
+            if (reload)
+                refresh() // reload model to first page
         }
     }
-/*
+
     Component.onCompleted: {
-        modelSearchTags.clear()
-        modelSearchTags.append({"tag" : ""})
+        fillModelFromModel(modelSearchTagsGlobal, modelSearchTags)
+        addNewTagItem() // Adds first if no items yet
     }
-*/
+
     SilicaFlickable {
         anchors.fill: parent
 
@@ -28,29 +39,26 @@ Page {
             id: header
             title: qsTr("Questions search criteria")
         }
-/*
+
         Label {
+            id: freeLabel
+            anchors.top: header.bottom
             text: qsTr("Free text criteria")
         }
-*/
         SearchField {
             id: searchBox
-            anchors.top: header.bottom
+            anchors.top: freeLabel.bottom
             placeholderText: qsTr("Search")
             width: parent.width
             text: searchCriteria // Show previous search if exists
-
-            //            EnterKey.onClicked: {
-            //                console.log(searchBox.text)
-            //            }
             onTextChanged: {
-                //console.log(searchBox.text)
                 newSearchString = searchBox.text
             }
         }
 
-/*
         Label {
+            id: tagsLabel
+            anchors.top: searchBox.bottom
             text: qsTr("Tags criteria")
         }
 
@@ -59,13 +67,7 @@ Page {
             width: parent.width
             height: parent.height
             model: modelSearchTags
-            anchors.top : searchBox.bottom
-//            ViewPlaceholder {
-//                id: placeHolder
-//                enabled: tagList.count == 0
-//                text: qsTr("Insert tags here")
-//            }
-
+            anchors.top : tagsLabel.bottom
             VerticalScrollDecorator {}
 
             delegate:
@@ -74,16 +76,11 @@ Page {
                 anchors.left: ListView.left
                 anchors.right: ListView.right
                 width: parent.width
-                height: Theme.itemSizeSmall
-                contentHeight: Theme.itemSizeSmall
-
-//                onClicked: {
-//                    placeHolder.enabled = false
-//                }
+                height: Theme.itemSizeMedium
+                //contentHeight: Theme.itemSizeSmall
 
                 TextField {
                     id: tagText
-                    //text: todo
                     placeholderText: "Enter new tag here"
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -91,21 +88,19 @@ Page {
                     height: clearButton.height
                     anchors.leftMargin: 10
                     focus: true
-                    color: {
-                        if (status == 0) return "white"
-                        else return "gray"
-                    }
+                    // Tric to set texts to list on page load from model. Causes binding loop warning for propery text!
+                    text: modelSearchTags.get(index) ? modelSearchTags.get(index).tag : ""
+
                     onTextChanged: {
                         modelSearchTags.get(index).tag = text
                     }
                     Keys.onEnterPressed: {
-                        modelSearchTags.append({ "tag": ""});
+                        addNewTagItem()
                     }
                     Keys.onReturnPressed: {
-                        modelSearchTags.append({ "tag": ""});
+                        addNewTagItem()
                     }
                 }
-
                 IconButton {
                     id: clearButton
                     anchors {
@@ -115,21 +110,54 @@ Page {
                     width: icon.width
                     height: parent.height
                     icon.source: "image://theme/icon-m-clear"
-
                     enabled: tagText.enabled
-
-                    opacity: tagText.text.length > 0 ? 1 : 0
-                    Behavior on opacity {
-                        FadeAnimation {}
-                    }
-
                     onClicked: {
-                        tagText.text = ""
-                        tagText._editor.forceActiveFocus()
+                        if (modelSearchTags.count === 1) {
+                            modelSearchTags.get(index).tag = ""
+                            tagText.text = ""
+                        }
+                        else
+                            modelSearchTags.remove(index)
                     }
                 }
             }
         }
-        */
+    }
+
+    function fillModelFromModel(source, target){
+        target.clear()
+        for (var i = 0; i < source.count; i++) {
+            target.append(source.get(i))
+        }
+    }
+    function removeEmptyTags(model){
+        for (var i = 0; i < model.count; i++) {
+            if (model.get(i).tag === "")
+                model.remove(i)
+        }
+    }
+    function checkIfTagsChanged() {
+        removeEmptyTags(modelSearchTags)
+        if (modelSearchTags.count !== modelSearchTagsGlobal.count) {
+            return true
+        }
+        for (var i = 0; i < modelSearchTags.count; i++) {
+            if (modelSearchTags.get(i).tag !== modelSearchTagsGlobal.get(i).tag) {
+                return true
+            }
+        }
+        return false
+    }
+
+    function addNewTagItem() {
+        var emptyFound = false
+        for (var i = 0; i < modelSearchTags.count; i++) {
+            if (modelSearchTags.get(i).tag === "") {
+                emptyFound = true
+                break
+            }
+        }
+        if ((!emptyFound) || (modelSearchTags.count === 0))
+            modelSearchTags.append({ "tag": ""});
     }
 }

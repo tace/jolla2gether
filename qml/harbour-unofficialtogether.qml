@@ -57,6 +57,10 @@ ApplicationWindow
 
     // Search
     property string searchCriteria: ""
+    ListModel
+    {
+        id: modelSearchTagsGlobal
+    }
 
     ListModel
     {

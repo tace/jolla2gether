@@ -71,6 +71,25 @@ function get_questions(model, page, params) {
         isFirstParam = false
     }
 
+    //Tag search criteria
+    if (modelSearchTagsGlobal.count > 0) {
+        var tagsCriteria = ""
+        for (var i = 0; i < modelSearchTagsGlobal.count; i++) {
+            if (i === 0)
+                tagsCriteria = modelSearchTagsGlobal.get(i).tag
+            else
+                tagsCriteria = tagsCriteria + "," + modelSearchTagsGlobal.get(i).tag
+        }
+        if (isFirstParam) {
+            query_params = query_params + "tags=" + tagsCriteria
+        }
+        else {
+            query_params = query_params + "&tags=" + tagsCriteria
+        }
+        isFirstParam = false
+    }
+
+
     // sortingCriteria and sortingOrder are global and defined in main.qml
     // Order keeps persistent ones set.
     if (sortingCriteria !== "") {
