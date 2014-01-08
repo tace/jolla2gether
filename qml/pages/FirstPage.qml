@@ -31,9 +31,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../../js/askbot.js" as Askbot
+
 Page {
     id: pageFirst
     allowedOrientations: Orientation.All
+    width: Screen.width
+    height: Screen.height
 
     Timer {
         /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
@@ -43,8 +46,17 @@ Page {
         onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"));  }
     }
 
+    Label {
+        font.pixelSize: Theme.fontSizeExtraSmall
+        anchors.horizontalCenter: parent.horizontalCenter
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignHCenter
+        text: questionsCount + " questions (page " + currentPage + "/" + pagesCount + ")"
+    }
     PageHeader {
         id: header
+            height: Theme.itemSizeSmall  // Default is Theme.itemSizeLarge
+            _titleItem.font.pixelSize: Theme.fontSizeMedium  // Default is pixelSize: Theme.fontSizeLarge
         title: "Jolla Together (unofficialapp)"
     }
 
@@ -52,10 +64,20 @@ Page {
 //    SilicaFlickable {
 
         SilicaListView{
-            anchors.fill: parent
-//            width: Screen.width
- //           height: Screen.height
+            id: questionListView
             header: Item { height: header.height; width: parent.width; }
+            //interactive: !questionListView.flicking
+            pressDelay: 0
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: Theme.paddingSmall
+            anchors.rightMargin: Theme.paddingSmall
+            clip: true //  to have the out of view items clipped nicely.
+
+            model: modelQuestions
+            delegate: QuestionDelegate { id: questionDelegate }
 
             // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
             PullDownMenu {
@@ -72,23 +94,41 @@ Page {
                     onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
                 }
                 MenuItem {
+                    text: qsTr("Sort by...")
+                    onClicked: pageStack.push(Qt.resolvedUrl("SortPage.qml"))
+                }
+                MenuItem {
+                    text: qsTr("Search...")
+                    onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"))
+                }
+                MenuItem {
                     text: qsTr("Refresh")
-                    onClicked: { refresh(); }
+                    onClicked: { refresh(currentPage); }
                 }
             }
             /*
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.leftMargin: Theme.paddingMedium
-            anchors.rightMargin: Theme.paddingMedium
-            */
-            model: modelQuestions
-            delegate: QuestionDelegate { id: questionDelegate }
-
-        }
-  //  }
+             * PushUpMenu to be removed as it's not very usable with listview, to be change to swipes etc.
+             */
+            PushUpMenu {
+                MenuItem {
+                    text: qsTr("Next page")
+                    onClicked: { get_questions(currentPage + 1) }
+                }
+                MenuItem {
+                    text: qsTr("Previous page")
+                    onClicked: { get_questions(currentPage - 1) }
+                }
+                MenuItem {
+                    text: qsTr("Go to first page")
+                    onClicked: { get_questions(1) }
+                }
+                MenuItem {
+                    text: qsTr("Go to last page")
+                    onClicked: { get_questions(pagesCount) }
+                }
+            }
+            HorizontalScrollDecorator { flickable: questionListView }
+    }
 }
 
 

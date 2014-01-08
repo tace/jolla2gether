@@ -1,5 +1,8 @@
 import QtQuick 2.0
 ListModel {
+    ListElement { title: "<u>Maintainers:</u>"}
+    ListElement { title: "mike7b4 <mike@7b4.se> Initial code"}
+    ListElement { title: "tace <> Search/UI"}
     ListElement { title: "<u>Credits to:</u>" }
     ListElement { title: "Jolla for the cool SailfishOS"}
     ListElement { title: "Jolla community"}

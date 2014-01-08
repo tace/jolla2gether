@@ -41,16 +41,38 @@ ApplicationWindow
     property string appicon: "qrc:/harbour-unofficialtogether.png"
     property string appname: "Jolla Together(Unofficial)"
 
+    // Is there a way to make these more local instead of put them here main.qml?
+    property int pagesCount;
+    property int currentPage: 1;
+    property int questionsCount;
+    // Sorting
+    property string sort_ACTIVITY:      "activity"
+    property string sort_AGE:           "age"
+    property string sort_ANSWERS:       "answers"
+    property string sort_VOTES:         "votes"
+    property string sort_ORDER_ASC:     "asc"
+    property string sort_ORDER_DESC:    "desc"
+    property string sortingCriteria: sort_ACTIVITY;
+    property string sortingOrder: sort_ORDER_DESC;
+
+    // Search
+    property string searchCriteria: ""
+    ListModel
+    {
+        id: modelSearchTagsGlobal
+    }
 
     ListModel
     {
         id: modelQuestions
     }
-
-    function refresh()
+    function refresh(page)
     {
-        modelQuestions.clear()
-        Askbot.get_questions(modelQuestions)
+        get_questions(page) // goes to first page if page not given
+    }
+    function get_questions(page, params)
+    {
+        Askbot.get_questions(modelQuestions, page, params)
     }
 
     initialPage: Component { FirstPage { } }
