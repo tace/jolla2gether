@@ -23,7 +23,7 @@ Page {
                 reload = true
             }
             if (reload)
-                refresh() // reload model to first page
+                questionsReloadGlobal = true
         }
     }
 

@@ -35,40 +35,148 @@ import "../../js/askbot.js" as Askbot
 Page {
     id: pageFirst
     allowedOrientations: Orientation.All
-    width: Screen.width
-    height: Screen.height
+    property string browsing: "init"
+    property bool loadQuestions: true
+    property bool onLastPage: false
 
-    Timer {
-        /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
-        interval: 100
-        repeat: false
-        running: true
-        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"));  }
+    //    Timer {
+    //        /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
+    //        interval: 100
+    //        repeat: false
+    //        running: true
+    //        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml")); }
+    //    }
+
+    onStatusChanged: {
+        if (loadQuestions) {
+            if (status === PageStatus.Activating) {
+                if (browsing === "forward") {
+                    onLastPage = get_nextPageQuestions()
+                } else if (browsing === "back") {
+                    get_previousPageQuestions()
+                }
+            }
+            if (status === PageStatus.Active) {
+                if (browsing === "forward") {
+                    if (!onLastPage) {
+                        pageStack.pushAttached(Qt.resolvedUrl("FirstPage.qml"), {browsing: "forward"} )
+                    }
+                    browsing = "back"
+                } else if (browsing === "init") {
+                    reload()
+                }
+            }
+        }
+        else {
+            // Return temporary reload switch back to loading position
+            if (status === PageStatus.Active) {
+                loadQuestions = true
+                // Search/Sorting pages can force reload to initial
+                if (questionsReloadGlobal) {
+                    questionsReloadGlobal = false
+                    gotoFirstPageAndReload()
+                }
+            }
+        }
     }
 
-    Label {
-        font.pixelSize: Theme.fontSizeExtraSmall
-        anchors.horizontalCenter: parent.horizontalCenter
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignHCenter
-        text: questionsCount + " questions (page " + currentPage + "/" + pagesCount + ")"
+    function gotoFirstPageAndReload() {
+        var topPage = pageStack.find(function(page) {
+            return page.browsing === "init";})
+        if (pageStack.currentPage.browsing !== "init") {
+            pageStack.replaceAbove(topPage,
+                                   Qt.resolvedUrl("FirstPage.qml"),
+                                   {browsing: "forward", loadQuestions: false},
+                                   PageStackAction.Immediate)
+            pageStack.navigateBack(PageStackAction.Immediate)
+        }
+        else {
+            reload()
+        }
     }
-    PageHeader {
-        id: header
-            height: Theme.itemSizeSmall  // Default is Theme.itemSizeLarge
-            _titleItem.font.pixelSize: Theme.fontSizeMedium  // Default is pixelSize: Theme.fontSizeLarge
-        title: "Jolla Together (unofficialapp)"
+
+    function reload() {
+        function closure()
+        {
+            return function() {
+                if (pagesCount > 1) {
+                    pageStack.pushAttached(Qt.resolvedUrl("FirstPage.qml"), {browsing: "forward"} )
+                }
+                console.log("called with pagecount: " + pagesCount)
+            }
+        }
+        get_questions(1, "", closure())
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
-//    SilicaFlickable {
+    SilicaFlickable {
+        interactive: !questionListView.flicking
+        pressDelay: 0
+        anchors.fill: parent
+        Label {
+            font.pixelSize: Theme.fontSizeExtraSmall
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignHCenter
+            text: questionsCount + " questions (page " + currentPageNum + "/" + pagesCount + ")"
+        }
+        PageHeader {
+            id: header
+            height: Theme.itemSizeSmall  // Default is Theme.itemSizeLarge
+            _titleItem.font.pixelSize: Theme.fontSizeMedium  // Default is pixelSize: Theme.fontSizeLarge
+            title: "Jolla Together (unofficialapp)"
+        }
 
-        SilicaListView{
+        // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("About")
+                onClicked: { loadQuestions = false; pageStack.push(Qt.resolvedUrl("AboutPage.qml")) }
+            }
+            MenuItem {
+                text: qsTr("Login")
+                //onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
+                onClicked: {
+                    loadQuestions = false;
+                    siteURL = "https://together.jolla.com/account/signin/?next=/";
+                    pageStack.push(Qt.resolvedUrl("WebView.qml"));
+                }
+            }
+            MenuItem {
+                text: qsTr("Info")
+                onClicked: { loadQuestions = false; pageStack.push(Qt.resolvedUrl("InfoPage.qml")) }
+            }
+            MenuItem {
+                text: qsTr("Go to first page")
+                onClicked: {
+                    // For some reason this popAttached does not work even it should?
+                    //var initPage = pageStack.find(function(page) {
+                    //                                return page.browsing === "init";
+                    //                                })
+                    //pageStack.popAttached(initPage)
+                    gotoFirstPageAndReload()
+                }
+            }
+            MenuItem {
+                text: qsTr("Sort by...")
+                // By default do not reload except questionsReloadGlobal is set to true
+                onClicked: { loadQuestions = false; pageStack.push(Qt.resolvedUrl("SortPage.qml")) }
+            }
+            MenuItem {
+                text: qsTr("Search...")
+                // By default do not reload except questionsReloadGlobal is set to true
+                onClicked: { loadQuestions = false; pageStack.push(Qt.resolvedUrl("SearchPage.qml")) }
+            }
+            MenuItem {
+                text: qsTr("Refresh")
+                onClicked: { refresh(currentPageNum); }
+            }
+        }
+
+        SilicaListView {
             id: questionListView
-            header: Item { height: header.height; width: parent.width; }
-            //interactive: !questionListView.flicking
             pressDelay: 0
-            anchors.top: parent.top
+            anchors.top: header.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
@@ -78,56 +186,8 @@ Page {
 
             model: modelQuestions
             delegate: QuestionDelegate { id: questionDelegate }
-
-            // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
-            PullDownMenu {
-                MenuItem {
-                    text: qsTr("About")
-                    onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
-                }
-                MenuItem {
-                    text: qsTr("Login")
-                    onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
-                }
-                MenuItem {
-                    text: qsTr("Info")
-                    onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
-                }
-                MenuItem {
-                    text: qsTr("Sort by...")
-                    onClicked: pageStack.push(Qt.resolvedUrl("SortPage.qml"))
-                }
-                MenuItem {
-                    text: qsTr("Search...")
-                    onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"))
-                }
-                MenuItem {
-                    text: qsTr("Refresh")
-                    onClicked: { refresh(currentPage); }
-                }
-            }
-            /*
-             * PushUpMenu to be removed as it's not very usable with listview, to be change to swipes etc.
-             */
-            PushUpMenu {
-                MenuItem {
-                    text: qsTr("Next page")
-                    onClicked: { get_questions(currentPage + 1) }
-                }
-                MenuItem {
-                    text: qsTr("Previous page")
-                    onClicked: { get_questions(currentPage - 1) }
-                }
-                MenuItem {
-                    text: qsTr("Go to first page")
-                    onClicked: { get_questions(1) }
-                }
-                MenuItem {
-                    text: qsTr("Go to last page")
-                    onClicked: { get_questions(pagesCount) }
-                }
-            }
-            HorizontalScrollDecorator { flickable: questionListView }
+            VerticalScrollDecorator { flickable: questionListView }
+        }
     }
 }
 

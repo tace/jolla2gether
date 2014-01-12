@@ -10,7 +10,8 @@ BackgroundItem  {
    // anchors.rightMargin: Theme.paddingMedium
     contentHeight: Theme.itemSizeSmall
 
-    onClicked: { siteURL = url; pageStack.navigateForward(); }
+    //onClicked: { siteURL = url; pageStack.navigateForward(); }
+    onClicked: { siteURL = url; loadQuestions = false; pageStack.push(Qt.resolvedUrl("WebView.qml")); }
 
     Column{
         anchors.fill: parent

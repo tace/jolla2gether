@@ -31,7 +31,7 @@ function get_info(model)
 //
 // Bit messy should refactor...
 //
-function get_questions(model, page, params) {
+function get_questions(model, page, params, onLoadedCallback) {
     var query_params = "?"
     var isFirstParam = true
     if ((params !== undefined) && (params !== "")) {
@@ -41,22 +41,22 @@ function get_questions(model, page, params) {
     if ((page !== undefined) && (page !== "")) {
         // If overlimit page given just return to first page
         if (page < 1 || page > pagesCount) {
-            currentPage = 1
+            currentPageNum = 1
         }
         else {
+            currentPageNum = page
             if (isFirstParam) {
                 query_params = query_params + "page=" + page
             }
             else {
                 query_params = query_params + "&page=" + page
             }
-            currentPage = page
             isFirstParam = false
         }
     }
     else {
         // If no page given to query it's always first page, so corrent currentPage varible
-        currentPage = 1
+        currentPageNum = 1
     }
 
     // searchCriteria is global and defined in main.qml
@@ -108,13 +108,14 @@ function get_questions(model, page, params) {
     model.clear()
     pagesCount = 0
     questionsCount = 0
-    get_questions_httpReq(model, query_params)
+    get_questions_httpReq(model, query_params, onLoadedCallback)
 }
 
-function get_questions_httpReq(model, query_params)
+function get_questions_httpReq(model, query_params, onLoadedCallback)
 {
     var xhr = new XMLHttpRequest();
     var url = "https://together.jolla.com//api/v1/questions/" + query_params
+    urlLoading = true
     console.log(url)
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function()
@@ -129,8 +130,8 @@ function get_questions_httpReq(model, query_params)
                 pagesCount = response.pages;
                 questionsCount = response.count;
                 // Fix currentpage if got less pages
-                if (pagesCount < currentPage) {
-                    currentPage = pagesCount
+                if (pagesCount < currentPageNum) {
+                    currentPageNum = pagesCount
                 }
 
                 // Pick question related data
@@ -149,8 +150,17 @@ function get_questions_httpReq(model, query_params)
                                    "updated" : getTimeDurationAsString(ginfo.last_activity_at),
                                  })
                 }
+
+                // Data is loaded, call user given callback
+                if (onLoadedCallback)
+                    onLoadedCallback()
             }
-        }
+            else
+            {
+                console.log("Error: " + xhr.status)
+            }
+            urlLoading = false
+        }    
     }
     xhr.timeout = 4000;
     xhr.ontimeout = function () { console.log("Timed out!!!"); }

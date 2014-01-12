@@ -41,10 +41,11 @@ ApplicationWindow
     property string appicon: "qrc:/harbour-unofficialtogether.png"
     property string appname: "Jolla Together(Unofficial)"
 
-    // Is there a way to make these more local instead of put them here main.qml?
-    property int pagesCount;
-    property int currentPage: 1;
-    property int questionsCount;
+    property int pagesCount: 0;
+    property int currentPageNum: 1;
+    property int questionsCount: 0;
+    property bool questionsReloadGlobal: false
+
     // Sorting
     property string sort_ACTIVITY:      "activity"
     property string sort_AGE:           "age"
@@ -52,8 +53,8 @@ ApplicationWindow
     property string sort_VOTES:         "votes"
     property string sort_ORDER_ASC:     "asc"
     property string sort_ORDER_DESC:    "desc"
-    property string sortingCriteria: sort_ACTIVITY;
-    property string sortingOrder: sort_ORDER_DESC;
+    property string sortingCriteria:    sort_ACTIVITY;
+    property string sortingOrder:       sort_ORDER_DESC;
 
     // Search
     property string searchCriteria: ""
@@ -70,9 +71,38 @@ ApplicationWindow
     {
         get_questions(page) // goes to first page if page not given
     }
-    function get_questions(page, params)
+    function get_nextPageQuestions(onLoadedCallback, params)
     {
-        Askbot.get_questions(modelQuestions, page, params)
+        var askedPage = 0
+        var onLastPage = false
+        if (currentPageNum < pagesCount) {
+            askedPage = currentPageNum + 1
+            if (askedPage === pagesCount)
+                onLastPage = true
+        }
+        else {
+            askedPage = currentPageNum
+            onLastPage = true
+        }
+        get_questions(askedPage, params, onLoadedCallback)
+        return onLastPage
+    }
+    function get_previousPageQuestions(onLoadedCallback, params)
+    {
+        var askedPage = 0
+        var onFirstPage = false
+        if (currentPageNum > 1)
+            askedPage = currentPageNum - 1
+        else {
+            askedPage = currentPageNum
+            onFirstPage = true
+        }
+        get_questions(askedPage, params, onLoadedCallback)
+        return onFirstPage
+    }
+    function get_questions(page, params, onLoadedCallback)
+    {
+        Askbot.get_questions(modelQuestions, page, params, onLoadedCallback)
     }
 
     initialPage: Component { FirstPage { } }
@@ -94,7 +124,7 @@ ApplicationWindow
         }
     }
 
-    Component.onCompleted: refresh()
+    //Component.onCompleted: refresh()
 }
 
 

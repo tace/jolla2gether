@@ -37,6 +37,12 @@ Page {
             }
         }
     }
+    onStatusChanged: {
+        if (status === PageStatus.Inactive) {
+            // Just to stop the ProgressCircle animation
+            urlLoading = false
+        }
+    }
 }
 
 
