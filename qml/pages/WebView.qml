@@ -32,8 +32,8 @@ Page {
         }
         PullDownMenu {
             MenuItem {
-                text: qsTr("Questions")
-                onClicked: pageStack.navigateBack()
+                text: qsTr("together.jolla.com main page")
+                onClicked: { siteURL = "https://together.jolla.com/"; }
             }
         }
     }

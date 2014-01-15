@@ -59,6 +59,18 @@ function get_questions(model, page, params, onLoadedCallback) {
         currentPageNum = 1
     }
 
+    // Scope: All (default) or only unanswered questions
+    if (unansweredQuestionsFilter) {
+        if (isFirstParam) {
+            query_params = query_params + "scope=unanswered"
+        }
+        else {
+            query_params = query_params + "&scope=unanswered"
+        }
+        isFirstParam = false
+    }
+
+
     // searchCriteria is global and defined in main.qml
     // Order keeps persistent ones set.
     if (searchCriteria !== "") {
@@ -104,8 +116,7 @@ function get_questions(model, page, params, onLoadedCallback) {
         isFirstParam = false
     }
 
-    // Clean before fetching new values to these inside get_questions_httpReq()
-    model.clear()
+    //model.clear()
     pagesCount = 0
     questionsCount = 0
     get_questions_httpReq(model, query_params, onLoadedCallback)
@@ -139,6 +150,18 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                 for (var index in qs)
                 {
                     var ginfo = qs[index]
+
+                    // Filter out closed questions
+                    if (!closedQuestionsFilter) {
+                        if (ginfo.closed)
+                            continue
+                    }
+                    // Filter out questions with accepted answer
+                    if (!answeredQuestionsFilter) {
+                        if (ginfo.has_accepted_answer)
+                            continue
+                    }
+
                     model.append({"title" : ginfo.title,
                                    "url" : ginfo.url,
                                    "author" : ginfo.author.username,
@@ -146,6 +169,9 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                                    "view_count" : ginfo.view_count,
                                    "votes" : ginfo.score,
                                    "tags" : ginfo.tags,
+                                   "text": ginfo.text,
+                                   "has_accepted_answer": ginfo.has_accepted_answer,
+                                   "closed": ginfo.closed,
                                    "created" : getTimeDurationAsString(ginfo.added_at),
                                    "updated" : getTimeDurationAsString(ginfo.last_activity_at),
                                  })
@@ -166,6 +192,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
     xhr.ontimeout = function () { console.log("Timed out!!!"); }
     xhr.send();
 }
+
 
 function getTimeDurationAsString(seconds) {
     return secondsToString(getCurrentTimeAsSeconds() - seconds)

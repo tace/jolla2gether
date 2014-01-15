@@ -11,7 +11,7 @@ BackgroundItem  {
     contentHeight: Theme.itemSizeSmall
 
     //onClicked: { siteURL = url; pageStack.navigateForward(); }
-    onClicked: { siteURL = url; loadQuestions = false; pageStack.push(Qt.resolvedUrl("WebView.qml")); }
+    onClicked: { siteURL = url; pageStack.push(Qt.resolvedUrl("WebView.qml")); }
 
     Column{
         anchors.fill: parent

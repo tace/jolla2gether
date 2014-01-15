@@ -28,7 +28,8 @@ OTHER_FILES += qml/harbour-unofficialtogether.qml \
     qml/pages/CreditsModel.qml \
     qml/pages/LicensePage.qml \
     qml/pages/SortPage.qml \
-    qml/pages/SearchPage.qml
+    qml/pages/SearchPage.qml \
+    qml/pages/FilterPage.qml
 
 
 js.files = js

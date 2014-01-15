@@ -36,8 +36,6 @@ Page {
     id: pageFirst
     allowedOrientations: Orientation.All
     property string browsing: "init"
-    property bool loadQuestions: true
-    property bool onLastPage: false
 
     //    Timer {
     //        /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
@@ -46,67 +44,6 @@ Page {
     //        running: true
     //        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml")); }
     //    }
-
-    onStatusChanged: {
-        if (loadQuestions) {
-            if (status === PageStatus.Activating) {
-                if (browsing === "forward") {
-                    onLastPage = get_nextPageQuestions()
-                } else if (browsing === "back") {
-                    get_previousPageQuestions()
-                }
-            }
-            if (status === PageStatus.Active) {
-                if (browsing === "forward") {
-                    if (!onLastPage) {
-                        pageStack.pushAttached(Qt.resolvedUrl("FirstPage.qml"), {browsing: "forward"} )
-                    }
-                    browsing = "back"
-                } else if (browsing === "init") {
-                    reload()
-                }
-            }
-        }
-        else {
-            // Return temporary reload switch back to loading position
-            if (status === PageStatus.Active) {
-                loadQuestions = true
-                // Search/Sorting pages can force reload to initial
-                if (questionsReloadGlobal) {
-                    questionsReloadGlobal = false
-                    gotoFirstPageAndReload()
-                }
-            }
-        }
-    }
-
-    function gotoFirstPageAndReload() {
-        var topPage = pageStack.find(function(page) {
-            return page.browsing === "init";})
-        if (pageStack.currentPage.browsing !== "init") {
-            pageStack.replaceAbove(topPage,
-                                   Qt.resolvedUrl("FirstPage.qml"),
-                                   {browsing: "forward", loadQuestions: false},
-                                   PageStackAction.Immediate)
-            pageStack.navigateBack(PageStackAction.Immediate)
-        }
-        else {
-            reload()
-        }
-    }
-
-    function reload() {
-        function closure()
-        {
-            return function() {
-                if (pagesCount > 1) {
-                    pageStack.pushAttached(Qt.resolvedUrl("FirstPage.qml"), {browsing: "forward"} )
-                }
-                console.log("called with pagecount: " + pagesCount)
-            }
-        }
-        get_questions(1, "", closure())
-    }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
@@ -131,48 +68,40 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: qsTr("About")
-                onClicked: { loadQuestions = false; pageStack.push(Qt.resolvedUrl("AboutPage.qml")) }
+                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
             }
             MenuItem {
                 text: qsTr("Login")
                 //onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
                 onClicked: {
-                    loadQuestions = false;
                     siteURL = "https://together.jolla.com/account/signin/?next=/";
                     pageStack.push(Qt.resolvedUrl("WebView.qml"));
                 }
             }
             MenuItem {
                 text: qsTr("Info")
-                onClicked: { loadQuestions = false; pageStack.push(Qt.resolvedUrl("InfoPage.qml")) }
+                onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
             }
             MenuItem {
-                text: qsTr("Go to first page")
-                onClicked: {
-                    // For some reason this popAttached does not work even it should?
-                    //var initPage = pageStack.find(function(page) {
-                    //                                return page.browsing === "init";
-                    //                                })
-                    //pageStack.popAttached(initPage)
-                    gotoFirstPageAndReload()
-                }
+                text: qsTr("Filters")
+                // By default do not reload except questionsReloadGlobal is set to true
+                onClicked: pageStack.push(Qt.resolvedUrl("FilterPage.qml"))
             }
             MenuItem {
                 text: qsTr("Sort by...")
                 // By default do not reload except questionsReloadGlobal is set to true
-                onClicked: { loadQuestions = false; pageStack.push(Qt.resolvedUrl("SortPage.qml")) }
+                onClicked: pageStack.push(Qt.resolvedUrl("SortPage.qml"))
             }
             MenuItem {
                 text: qsTr("Search...")
                 // By default do not reload except questionsReloadGlobal is set to true
-                onClicked: { loadQuestions = false; pageStack.push(Qt.resolvedUrl("SearchPage.qml")) }
+                onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"))
             }
             MenuItem {
                 text: qsTr("Refresh")
-                onClicked: { refresh(currentPageNum); }
+                onClicked: { refresh(); }
             }
         }
-
         SilicaListView {
             id: questionListView
             pressDelay: 0
@@ -187,6 +116,13 @@ Page {
             model: modelQuestions
             delegate: QuestionDelegate { id: questionDelegate }
             VerticalScrollDecorator { flickable: questionListView }
+
+            onMovementEnded: {
+                if(atYEnd) {
+                    console.log("End of list!");
+                    get_nextPageQuestions()
+                }
+            }
         }
     }
 }

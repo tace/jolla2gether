@@ -23,7 +23,7 @@ Page {
                 reload = true
             }
             if (reload)
-                questionsReloadGlobal = true
+                refresh()
         }
     }
 

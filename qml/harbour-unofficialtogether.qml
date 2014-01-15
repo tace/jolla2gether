@@ -44,7 +44,11 @@ ApplicationWindow
     property int pagesCount: 0;
     property int currentPageNum: 1;
     property int questionsCount: 0;
-    property bool questionsReloadGlobal: false
+
+    // Filters
+    property bool closedQuestionsFilter: true
+    property bool answeredQuestionsFilter: true
+    property bool unansweredQuestionsFilter: false
 
     // Sorting
     property string sort_ACTIVITY:      "activity"
@@ -69,36 +73,23 @@ ApplicationWindow
     }
     function refresh(page)
     {
+        modelQuestions.clear()
         get_questions(page) // goes to first page if page not given
     }
-    function get_nextPageQuestions(onLoadedCallback, params)
+    function get_nextPageQuestions(params)
     {
         var askedPage = 0
-        var onLastPage = false
         if (currentPageNum < pagesCount) {
             askedPage = currentPageNum + 1
-            if (askedPage === pagesCount)
-                onLastPage = true
         }
         else {
-            askedPage = currentPageNum
-            onLastPage = true
+            askedPage = pagesCount
         }
-        get_questions(askedPage, params, onLoadedCallback)
-        return onLastPage
-    }
-    function get_previousPageQuestions(onLoadedCallback, params)
-    {
-        var askedPage = 0
-        var onFirstPage = false
-        if (currentPageNum > 1)
-            askedPage = currentPageNum - 1
-        else {
-            askedPage = currentPageNum
-            onFirstPage = true
+        if (currentPageNum === pagesCount) {
+            console.log("no more pages to load!")
         }
-        get_questions(askedPage, params, onLoadedCallback)
-        return onFirstPage
+        else
+            get_questions(askedPage, params)
     }
     function get_questions(page, params, onLoadedCallback)
     {
@@ -124,7 +115,7 @@ ApplicationWindow
         }
     }
 
-    //Component.onCompleted: refresh()
+    Component.onCompleted: refresh()
 }
 
 

@@ -20,7 +20,7 @@ Page {
                 if (newSortingCriteria !== sortingCriteria) {
                     sortingCriteria = newSortingCriteria
                 }
-                questionsReloadGlobal = true
+                refresh()
             }
         }
     }
