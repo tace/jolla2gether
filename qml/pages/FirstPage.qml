@@ -124,6 +124,9 @@ Page {
                 }
             }
         }
+        FancyScroller {
+            flickable: questionListView
+        }
     }
 }
 
