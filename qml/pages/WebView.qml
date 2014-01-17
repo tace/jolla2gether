@@ -4,12 +4,15 @@ import QtWebKit 3.0
 Page {
     id: page
     allowedOrientations: Orientation.All
+    forwardNavigation: false
+    backNavigation: false
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaWebView {
         id: webview
         url: siteURL
         width: page.orientation == Orientation.Portrait ? 540 : 960
         height: page.orientation == Orientation.Portrait ? 960 : 540
+        overridePageStackNavigation: true
         onLoadingChanged:
         {
             if (loadRequest.status === WebView.LoadStartedStatus)
@@ -34,6 +37,10 @@ Page {
             MenuItem {
                 text: qsTr("together.jolla.com main page")
                 onClicked: { siteURL = "https://together.jolla.com/"; }
+            }
+            MenuItem {
+                text: qsTr("Questions")
+                onClicked: { backNavigation = true; pageStack.navigateBack() }
             }
         }
     }
