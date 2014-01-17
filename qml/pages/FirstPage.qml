@@ -71,15 +71,8 @@ Page {
                 onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
             }
             MenuItem {
-                text: qsTr("Login")
-                //onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
-                onClicked: {
-                    siteURL = "https://together.jolla.com/account/signin/?next=/";
-                    pageStack.push(Qt.resolvedUrl("WebView.qml"));
-                }
-            }
-            MenuItem {
                 text: qsTr("Info")
+                visible: false
                 onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
             }
             MenuItem {

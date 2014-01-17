@@ -18,6 +18,7 @@ BackgroundItem  {
         Label {
             font.pixelSize: Theme.fontSizeSmall
             color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
+            font.bold: model.url === siteURL
             text: title
         }
         Row {

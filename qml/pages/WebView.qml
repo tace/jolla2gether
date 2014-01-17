@@ -32,8 +32,29 @@ Page {
         }
         PullDownMenu {
             MenuItem {
+                text: qsTr("Info")
+                onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
+            }
+            MenuItem {
+                text: qsTr("Login")
+                //onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
+                onClicked: {
+                    siteURL = "https://together.jolla.com/account/signin/?next=/";
+                    pageStack.push(Qt.resolvedUrl("WebView.qml"));
+                }
+            }
+            MenuItem {
                 text: qsTr("together.jolla.com main page")
                 onClicked: { siteURL = "https://together.jolla.com/"; }
+            }
+            MenuItem {
+                text: qsTr("Questions")
+                onClicked: {
+                    var was = webview.overridePageStackNavigation
+                    webview.overridePageStackNavigation = true
+                    pageStack.navigateBack()
+                    webview.overridePageStackNavigation = was
+                }
             }
         }
     }

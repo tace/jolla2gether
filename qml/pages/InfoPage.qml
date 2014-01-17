@@ -2,8 +2,9 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../../js/askbot.js" as Askbot
 Page {
-    anchors.fill: parent
     id: infoPage
+    anchors.fill: parent
+    allowedOrientations: Orientation.All
     property int group: 0
     property int users: 0
     property int questions: 0
