@@ -117,6 +117,9 @@ Page {
                 }
             }
         }
+        FancyScroller {
+            flickable: questionListView
+        }
     }
 }
 
