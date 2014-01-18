@@ -35,7 +35,7 @@ import "../js/askbot.js" as Askbot
 ApplicationWindow
 {
     id: myapp
-    property alias pageStack: myapp.pageStack
+//    property alias pageStack: myapp.pageStack
     property bool urlLoading: false
     property string siteURL: "https://together.jolla.com/account/signin/?next=/"
     property string version: "0.0.3"

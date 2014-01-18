@@ -4,8 +4,6 @@ import QtWebKit 3.0
 Page {
     id: page
     allowedOrientations: Orientation.All
-    forwardNavigation: false
-    backNavigation: false
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaWebView {
         id: webview
