@@ -38,9 +38,9 @@ ApplicationWindow
 //    property alias pageStack: myapp.pageStack
     property bool urlLoading: false
     property string siteURL: "https://together.jolla.com/account/signin/?next=/"
-    property string version: "0.0.3"
+    property string version: "0.0.4"
     property string license: "GPL v2.0"
-    property string appicon: "qrc:/harbour-unofficialtogether.png"
+    property string appicon: "qrc:/harbour-unofficialtogether_250px.png"
     property string appname: "Jolla Together(Unofficial)"
 
     property int pagesCount: 0;
