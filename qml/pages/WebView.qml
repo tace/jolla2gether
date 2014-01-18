@@ -17,7 +17,6 @@ Page {
         url: siteURL
         width: page.orientation == Orientation.Portrait ? 540 : 960
         height: page.orientation == Orientation.Portrait ? 960 : 540
-        overridePageStackNavigation: true
         onLoadingChanged:
         {
             if (loadRequest.status === WebView.LoadStartedStatus)
@@ -46,10 +45,8 @@ Page {
             }
             MenuItem {
                 text: qsTr("Login")
-                //onClicked: {siteURL = "https://together.jolla.com/account/signin/?next=/";  pageStack.navigateForward(); }
                 onClicked: {
                     siteURL = "https://together.jolla.com/account/signin/?next=/";
-                    pageStack.push(Qt.resolvedUrl("WebView.qml"));
                 }
             }
             MenuItem {

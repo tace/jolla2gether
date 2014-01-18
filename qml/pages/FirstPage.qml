@@ -35,7 +35,6 @@ import "../../js/askbot.js" as Askbot
 Page {
     id: pageFirst
     allowedOrientations: Orientation.All
-    property string browsing: "init"
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
@@ -69,17 +68,14 @@ Page {
             }
             MenuItem {
                 text: qsTr("Filters")
-                // By default do not reload except questionsReloadGlobal is set to true
                 onClicked: pageStack.push(Qt.resolvedUrl("FilterPage.qml"))
             }
             MenuItem {
                 text: qsTr("Sort by...")
-                // By default do not reload except questionsReloadGlobal is set to true
                 onClicked: pageStack.push(Qt.resolvedUrl("SortPage.qml"))
             }
             MenuItem {
                 text: qsTr("Search...")
-                // By default do not reload except questionsReloadGlobal is set to true
                 onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"))
             }
             MenuItem {
@@ -104,7 +100,6 @@ Page {
 
             onMovementEnded: {
                 if(atYEnd) {
-                    console.log("End of list!");
                     get_nextPageQuestions()
                 }
             }
