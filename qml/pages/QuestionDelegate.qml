@@ -10,7 +10,7 @@ BackgroundItem  {
    // anchors.rightMargin: Theme.paddingMedium
     contentHeight: Theme.itemSizeSmall
 
-    onClicked: { siteURL = url; pageStack.navigateForward(); }
+    onClicked: { siteURL = url; pageStack.navigateBack(); }
 
     Column{
         anchors.fill: parent

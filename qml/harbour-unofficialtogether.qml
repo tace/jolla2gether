@@ -98,7 +98,7 @@ ApplicationWindow
         Askbot.get_questions(modelQuestions, page, params, onLoadedCallback)
     }
 
-    initialPage: Component { FirstPage { } }
+    initialPage: Component { WebView { } }
     cover: undefined //Qt.resolvedUrl("cover/CoverPage.qml")
     ProgressCircle {
         id: progressCircle

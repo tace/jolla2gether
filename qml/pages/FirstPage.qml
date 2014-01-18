@@ -37,14 +37,6 @@ Page {
     allowedOrientations: Orientation.All
     property string browsing: "init"
 
-    Timer {
-           /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
-            interval: 100
-            repeat: false
-            running: true
-            onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml")); }
-    }
-
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
         interactive: !questionListView.flicking

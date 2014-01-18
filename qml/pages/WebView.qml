@@ -5,6 +5,13 @@ Page {
     id: page
     allowedOrientations: Orientation.All
     // To enable PullDownMenu, place our content in a SilicaFlickable
+    Timer {
+           /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
+            interval: 100
+            repeat: false
+            running: true
+            onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("FirstPage.qml")); pageStack.navigateForward() }
+    }
     SilicaWebView {
         id: webview
         url: siteURL
@@ -19,6 +26,7 @@ Page {
                 urlLoading = false;
             if (loadRequest.status === WebView.LoadSucceededStatus) {
                 urlLoading = false;
+                page.forceActiveFocus()
             }
         }
         onNavigationRequested: {
@@ -53,7 +61,7 @@ Page {
                 onClicked: {
                     var was = webview.overridePageStackNavigation
                     webview.overridePageStackNavigation = true
-                    pageStack.navigateBack()
+                    pageStack.navigateForward()
                     webview.overridePageStackNavigation = was
                 }
             }
