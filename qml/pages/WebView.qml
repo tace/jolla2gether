@@ -1,20 +1,17 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtWebKit 3.0
+
 Page {
     id: page
+    property string browseBackText: "Back"
     allowedOrientations: Orientation.All
-    // To enable PullDownMenu, place our content in a SilicaFlickable
-    Timer {
-           /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
-            interval: 100
-            repeat: false
-            running: true
-            onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("FirstPage.qml")); pageStack.navigateForward() }
-    }
+    forwardNavigation: false
+
     SilicaWebView {
         id: webview
         url: siteURL
+        overridePageStackNavigation: true
         width: page.orientation == Orientation.Portrait ? 540 : 960
         height: page.orientation == Orientation.Portrait ? 960 : 540
         onLoadingChanged:
@@ -40,26 +37,13 @@ Page {
         }
         PullDownMenu {
             MenuItem {
-                text: qsTr("Info")
-                onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Login")
-                onClicked: {
-                    siteURL = "https://together.jolla.com/account/signin/?next=/";
-                }
-            }
-            MenuItem {
                 text: qsTr("together.jolla.com main page")
                 onClicked: { siteURL = "https://together.jolla.com/"; }
             }
             MenuItem {
-                text: qsTr("Questions")
+                text: qsTr(browseBackText)
                 onClicked: {
-                    var was = webview.overridePageStackNavigation
-                    webview.overridePageStackNavigation = true
-                    pageStack.navigateForward()
-                    webview.overridePageStackNavigation = was
+                    pageStack.navigateBack()
                 }
             }
         }
@@ -71,5 +55,6 @@ Page {
         }
     }
 }
+
 
 

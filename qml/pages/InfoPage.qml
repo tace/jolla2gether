@@ -1,39 +1,59 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import "../../js/askbot.js" as Askbot
+
 Page {
     id: infoPage
     anchors.fill: parent
     allowedOrientations: Orientation.All
-    property int group: 0
-    property int users: 0
-    property int questions: 0
-    property int answers: 0
-    property int comments: 0
-    ListModel
-    {
-        id: modelInfo
-    }
     PageHeader {
         title: "Jolla Together Info"
     }
-    Column
-    {
+    Rectangle {
+        id: infoRec
         anchors.centerIn: parent
         anchors.leftMargin: Theme.paddingMedium
         anchors.rightMargin: Theme.paddingMedium
-
-        Repeater {
-            model: modelInfo
+        color: "transparent"
+        smooth: true
+        //border.width: 1
+        width: 260
+        height: 230
+        radius: 10
+        Column
+        {
+            id: infoCol
+            anchors.fill: parent
+//            Repeater {
+//                model: infoModel
+//                Label {
+//                    anchors.horizontalCenter: parent.horizontalCenter
+//                    text: item
+//                }
+//            }
             Label {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: item
+                text: "Groups: " + infoModel.groups
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Users: " + infoModel.users
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Questions: " + infoModel.questions
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Answers: " + infoModel.answers
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Comments: " + infoModel.comments
             }
         }
     }
 
     Component.onCompleted: {
-        modelInfo.clear()
-        Askbot.get_info(modelInfo)
+        infoModel.get_info()
     }
 }

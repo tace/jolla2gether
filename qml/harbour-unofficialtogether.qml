@@ -31,75 +31,58 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "pages"
-import "../js/askbot.js" as Askbot
+
 ApplicationWindow
 {
-    id: myapp
-//    property alias pageStack: myapp.pageStack
     property bool urlLoading: false
-    property string siteURL: "https://together.jolla.com/account/signin/?next=/"
-    property string version: "0.0.5"
+    property string siteBaseUrl: "https://together.jolla.com"
+    property string siteURL: siteBaseUrl + "/account/signin/?next=/"
+    property string version: "0.0.6"
     property string license: "GPL v2.0"
     property string appicon: "qrc:/harbour-unofficialtogether_250px.png"
     property string appname: "Jolla Together(Unofficial)"
+    property bool firstPageLoaded: false
 
-    property int pagesCount: 0;
-    property int currentPageNum: 1;
-    property int questionsCount: 0;
-
-    // Filters
-    property bool closedQuestionsFilter: true
-    property bool answeredQuestionsFilter: true
-    property bool unansweredQuestionsFilter: false
-
-    // Sorting
-    property string sort_ACTIVITY:      "activity"
-    property string sort_AGE:           "age"
-    property string sort_ANSWERS:       "answers"
-    property string sort_VOTES:         "votes"
-    property string sort_ORDER_ASC:     "asc"
-    property string sort_ORDER_DESC:    "desc"
-    property string sortingCriteria:    sort_ACTIVITY;
-    property string sortingOrder:       sort_ORDER_DESC;
-
-    // Search
-    property string searchCriteria: ""
-    ListModel
-    {
+    ListModel {
         id: modelSearchTagsGlobal
     }
-
-    ListModel
-    {
-        id: modelQuestions
+    InfoModel {
+        id: infoModel
     }
-    function refresh(page)
-    {
-        modelQuestions.clear()
-        get_questions(page) // goes to first page if page not given
+    QuestionsModel {
+        id: questionsModel
     }
-    function get_nextPageQuestions(params)
-    {
-        var askedPage = 0
-        if (currentPageNum < pagesCount) {
-            askedPage = currentPageNum + 1
-        }
-        else {
-            askedPage = pagesCount
-        }
-        if (currentPageNum === pagesCount) {
-            console.log("no more pages to load!")
-        }
-        else
-            get_questions(askedPage, params)
-    }
-    function get_questions(page, params, onLoadedCallback)
-    {
-        Askbot.get_questions(modelQuestions, page, params, onLoadedCallback)
+    UsersModel {
+        id: usersModel
     }
 
-    initialPage: Component { WebView { } }
-    cover: undefined //Qt.resolvedUrl("cover/CoverPage.qml")
+    QtObject {
+        id: coverProxy
+
+        property string header: "together.jolla.com"
+
+        property string mode_INFO: "info"
+        property string mode_QUESTIONS: "questions"
+        property string mode
+
+        // Questions
+        property string title
+        property int currentQuestion
+        property int questionsCount
+        property int currentPage
+        property int pageCount
+
+        property bool hasNext
+        property bool hasPrevious
+
+        signal start
+        signal refresh
+        signal nextItem
+        signal previousItem
+    }
+
+    initialPage: Component { FirstPage { } }
+    cover: Qt.resolvedUrl("cover/CoverPage.qml")
     ProgressCircle {
         id: progressCircle
         z: 2
@@ -116,8 +99,6 @@ ApplicationWindow
             running: urlLoading
         }
     }
-
-    Component.onCompleted: refresh()
 }
 
 

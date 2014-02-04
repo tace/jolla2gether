@@ -1,22 +1,30 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+
 BackgroundItem  {
     id: background
     anchors.left: ListView.left
     anchors.right: ListView.right
- //   width: ListView.view.width
     height: Theme.itemSizeSmall
-    //x: Theme.paddingMedium
-   // anchors.rightMargin: Theme.paddingMedium
     contentHeight: Theme.itemSizeSmall
 
-    onClicked: { siteURL = url; pageStack.navigateBack(); }
+    onClicked: { siteURL = url; pageStack.navigateForward(); }
+
+    function getTitleColor() {
+        var color = Theme.primaryColor
+        // If item selected either from list or Cover, make color highlighted
+        if (background.highlighted ||
+            (index === coverProxy.currentQuestion - 1)) {
+            color = Theme.highlightColor
+        }
+        return color
+    }
 
     Column{
         anchors.fill: parent
         Label {
             font.pixelSize: Theme.fontSizeSmall
-            color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
+            color: getTitleColor()
             font.bold: model.url === siteURL
             text: title
         }

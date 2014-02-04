@@ -9,12 +9,18 @@ function get_info(model)
             if ( xhr.status == 200)
             {
                 var ginfo = JSON.parse(xhr.responseText);
-                console.log(ginfo)
-                model.append({"item" : "Groups: "+ginfo.groups})
-                model.append({"item" : "Users: "+ginfo.users})
-                model.append({"item" : "Questions: "+ginfo.questions})
-                model.append({"item" : "Answers: "+ginfo.answers})
-                model.append({"item" : "Comments: "+ginfo.comments})
+                model.groups = ginfo.groups
+                model.users = ginfo.users
+                model.questions = ginfo.questions
+                model.answers = ginfo.answers
+                model.comments = ginfo.comments
+//                model.append({"item" : "Groups: "+ginfo.groups})
+//                model.append({"item" : "Users: "+ginfo.users})
+//                model.append({"item" : "Questions: "+ginfo.questions})
+//                model.append({"item" : "Answers: "+ginfo.answers})
+//                model.append({"item" : "Comments: "+ginfo.comments})
+
+                console.log("Info, comments: " + ginfo.comments)
             }
         }
     }
@@ -31,20 +37,17 @@ function get_info(model)
 //
 // Bit messy should refactor...
 //
-function get_questions(model, page, params, onLoadedCallback) {
+function get_questions(model, page, onLoadedCallback) {
     var query_params = "?"
     var isFirstParam = true
-    if ((params !== undefined) && (params !== "")) {
-        query_params = query_params + params
-        isFirstParam = false
-    }
+
     if ((page !== undefined) && (page !== "")) {
         // If overlimit page given just return to first page
-        if (page < 1 || page > pagesCount) {
-            currentPageNum = 1
+        if (page < 1 || page > model.pagesCount) {
+            model.currentPageNum = 1
         }
         else {
-            currentPageNum = page
+            model.currentPageNum = page
             if (isFirstParam) {
                 query_params = query_params + "page=" + page
             }
@@ -56,11 +59,11 @@ function get_questions(model, page, params, onLoadedCallback) {
     }
     else {
         // If no page given to query it's always first page, so corrent currentPage varible
-        currentPageNum = 1
+        model.currentPageNum = 1
     }
 
     // Scope: All (default) or only unanswered questions
-    if (unansweredQuestionsFilter) {
+    if (model.unansweredQuestionsFilter) {
         if (isFirstParam) {
             query_params = query_params + "scope=unanswered"
         }
@@ -73,12 +76,12 @@ function get_questions(model, page, params, onLoadedCallback) {
 
     // searchCriteria is global and defined in main.qml
     // Order keeps persistent ones set.
-    if (searchCriteria !== "") {
+    if (model.searchCriteria !== "") {
         if (isFirstParam) {
-            query_params = query_params + "query=" + searchCriteria
+            query_params = query_params + "query=" + model.searchCriteria
         }
         else {
-            query_params = query_params + "&query=" + searchCriteria
+            query_params = query_params + "&query=" + model.searchCriteria
         }
         isFirstParam = false
     }
@@ -104,21 +107,18 @@ function get_questions(model, page, params, onLoadedCallback) {
 
     // sortingCriteria and sortingOrder are global and defined in main.qml
     // Order keeps persistent ones set.
-    if (sortingCriteria !== "") {
+    if (model.sortingCriteriaQuestions !== "") {
         var sortOrder = ""
-        if (sortingOrder !== "") { sortOrder = "-" + sortingOrder }
+        if (model.sortingOrder !== "") { sortOrder = "-" + model.sortingOrder }
         if (isFirstParam) {
-            query_params = query_params + "sort=" + sortingCriteria + sortOrder
+            query_params = query_params + "sort=" + model.sortingCriteriaQuestions + sortOrder
         }
         else {
-            query_params = query_params + "&sort=" + sortingCriteria + sortOrder
+            query_params = query_params + "&sort=" + model.sortingCriteriaQuestions + sortOrder
         }
         isFirstParam = false
     }
 
-    //model.clear()
-    pagesCount = 0
-    questionsCount = 0
     get_questions_httpReq(model, query_params, onLoadedCallback)
 }
 
@@ -138,11 +138,11 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                 var response =  JSON.parse(xhr.responseText);
 
                 // Pick global count values (non-page related)
-                pagesCount = response.pages;
-                questionsCount = response.count;
+                model.pagesCount = response.pages;
+                model.questionsCount = response.count;
                 // Fix currentpage if got less pages
-                if (pagesCount < currentPageNum) {
-                    currentPageNum = pagesCount
+                if (model.pagesCount < model.currentPageNum) {
+                    model.currentPageNum = model.pagesCount
                 }
 
                 // Pick question related data
@@ -152,12 +152,12 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                     var ginfo = qs[index]
 
                     // Filter out closed questions
-                    if (!closedQuestionsFilter) {
+                    if (!model.closedQuestionsFilter) {
                         if (ginfo.closed)
                             continue
                     }
                     // Filter out questions with accepted answer
-                    if (!answeredQuestionsFilter) {
+                    if (!model.answeredQuestionsFilter) {
                         if (ginfo.has_accepted_answer)
                             continue
                     }
@@ -187,6 +187,100 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
             }
             urlLoading = false
         }    
+    }
+    xhr.timeout = 4000;
+    xhr.ontimeout = function () { console.log("Timed out!!!"); }
+    xhr.send();
+}
+
+
+function get_users(model, page) {
+    var query_params = "?"
+    var isFirstParam = true
+
+    if ((page !== undefined) && (page !== "")) {
+        // If overlimit page given just return to first page
+        if (page < 1 || page > model.pagesCount) {
+            model.currentPageNum = 1
+        }
+        else {
+            model.currentPageNum = page
+            if (isFirstParam) {
+                query_params = query_params + "page=" + page
+            }
+            else {
+                query_params = query_params + "&page=" + page
+            }
+            isFirstParam = false
+        }
+    }
+    else {
+        // If no page given to query it's always first page, so corrent currentPage varible
+        model.currentPageNum = 1
+    }
+
+    // sortingCriteria and sortingOrder are global and defined in main.qml
+    // Order keeps persistent ones set.
+    if (model.sortingCriteriaUsers !== "") {
+        if (isFirstParam) {
+            query_params = query_params + "sort=" + model.sortingCriteriaUsers
+        }
+        else {
+            query_params = query_params + "&sort=" + model.sortingCriteriaUsers
+        }
+        isFirstParam = false
+    }
+
+    model.pagesCount = 0
+    model.usersCount = 0
+    get_users_httpReq(model, query_params)
+}
+
+function get_users_httpReq(model, query_params)
+{
+    var xhr = new XMLHttpRequest();
+    var url = siteBaseUrl + "/api/v1/users/" + query_params
+    urlLoading = true
+    console.log(url)
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function()
+    {
+        if ( xhr.readyState == xhr.DONE)
+        {
+            if ( xhr.status == 200)
+            {
+                var response =  JSON.parse(xhr.responseText);
+
+                // Pick global count values (non-page related)
+                model.pagesCount = response.pages;
+                model.usersCount = response.count;
+                // Fix currentpage if got less pages
+                if (model.pagesCount < model.currentPageNum) {
+                    model.currentPageNum = model.pagesCount
+                }
+
+                // Pick users related data
+                var us = response.users;
+                for (var index in us)
+                {
+                    var uinfo = us[index]
+
+                    model.append({"username" : uinfo.username,
+                                   "reputation" : uinfo.reputation,
+                                   "avatar" : uinfo.avatar,
+                                   "last_seen_at" : getTimeDurationAsString(uinfo.last_seen_at),
+                                   "joined_at" : getTimeDurationAsString(uinfo.joined_at),
+                                   "id" : uinfo.id,
+                                   "url" : siteBaseUrl + "/users/" + uinfo.id + "/" + uinfo.username,
+                                 })
+                }
+            }
+            else
+            {
+                console.log("Error: " + xhr.status)
+            }
+            urlLoading = false
+        }
     }
     xhr.timeout = 4000;
     xhr.ontimeout = function () { console.log("Timed out!!!"); }

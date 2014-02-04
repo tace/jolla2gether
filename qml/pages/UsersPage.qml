@@ -32,78 +32,76 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Page {
-    id: pageFirst
+    id: usersPage
     allowedOrientations: Orientation.All
+
+    Timer {
+           /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
+            interval: 100
+            repeat: false
+            running: true
+            onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"), {browseBackText : "Users"});}
+    }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
+        interactive: !usersListView.flicking
+        pressDelay: 0
         anchors.fill: parent
+        Label {
+            font.pixelSize: Theme.fontSizeExtraSmall
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignHCenter
+            text: usersModel.usersCount +
+                  " users (page " + usersModel.currentPageNum +
+                  "/" + usersModel.pagesCount + ")"
+        }
         PageHeader {
-            title: qsTr("Jolla Together (unofficialapp)")
+            id: header
+            height: Theme.itemSizeSmall  // Default is Theme.itemSizeLarge
+            _titleItem.font.pixelSize: Theme.fontSizeMedium  // Default is pixelSize: Theme.fontSizeLarge
+            title: "Jolla Together (unofficialapp)"
         }
 
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
-                text: qsTr("About")
-                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+                text: qsTr("Search...")
+                onClicked: pageStack.push(Qt.resolvedUrl("SearchUsers.qml"))
             }
             MenuItem {
-                text: qsTr("Login")
-                onClicked: {
-                    siteURL = "https://together.jolla.com/account/signin/?next=/";
-                    pageStack.push(Qt.resolvedUrl("WebView.qml"))
-                }
+                text: qsTr("Sort by...")
+                onClicked: pageStack.push(Qt.resolvedUrl("SortUsers.qml"))
             }
             MenuItem {
-                text: qsTr("Info")
-                onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
+                text: qsTr("Refresh")
+                onClicked: { usersModel.refresh(); }
             }
         }
+        SilicaListView {
+            id: usersListView
+            pressDelay: 0
+            anchors.top: header.bottom
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: Theme.paddingSmall
+            anchors.rightMargin: Theme.paddingSmall
+            clip: true //  to have the out of view items clipped nicely.
 
-        Column {
-            spacing: 20
-            anchors.centerIn: parent
-            anchors.leftMargin: Theme.paddingMedium
-            anchors.rightMargin: Theme.paddingMedium
-            Button {
-                text: "Questions"
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: {
-                    questionsModel.refresh()
-                    pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
+            model: usersModel
+            delegate: UserDelegate { id: userDelegate }
+            VerticalScrollDecorator { flickable: usersListView }
+
+            onMovementEnded: {
+                if(atYEnd) {
+                    usersModel.get_nextPageUsers()
                 }
             }
-            Button {
-                text: "Users"
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: {
-                    usersModel.refresh()
-                    pageStack.push(Qt.resolvedUrl("UsersPage.qml"))
-                }
-            }
         }
-    }
-
-    Connections {
-        target: coverProxy
-
-        onRefresh: {
-            if (coverProxy.mode === coverProxy.mode_INFO)
-                infoModel.get_info()
-        }
-    }
-    onStatusChanged: {
-        if (status === PageStatus.Active) {
-            coverProxy.mode = coverProxy.mode_INFO
-        }
-    }
-
-    Component.onCompleted: {
-        coverProxy.mode = coverProxy.mode_INFO
-        if (!firstPageLoaded) {
-            firstPageLoaded = true
-            infoModel.get_info()
+        FancyScroller {
+            flickable: usersListView
         }
     }
 }

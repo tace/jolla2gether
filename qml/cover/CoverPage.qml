@@ -1,52 +1,214 @@
-/*
-  Copyright (C) 2013 Jolla Ltd.
-  Contact: Thomas Perl <thomas.perl@jollamobile.com>
-  All rights reserved.
-
-  You may use this file under the terms of BSD license as follows:
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of the Jolla Ltd nor the
-      names of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR
-  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 CoverBackground {
-    Label {
-        id: label
-        anchors.centerIn: parent
-        text: "My Cover"
+    id: cover
+
+    onStatusChanged: {
+        if (status === Cover.Activating) {
+            coverProxy.start()
+        }
     }
 
-    CoverActionList {
-        id: coverAction
+    Column {
+        visible: coverProxy.mode === coverProxy.mode_INFO
 
-        CoverAction {
-            iconSource: "image://theme/icon-cover-next"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: Theme.paddingMedium
+        anchors.rightMargin: Theme.paddingMedium
+        width: parent.width
+
+        Item {
+            width: parent.width
+            height: childrenRect.height
+
+            Label {
+                id: headerLabel
+                anchors.horizontalCenter: parent.horizontalCenter
+                truncationMode: TruncationMode.Fade
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
+                text: coverProxy.header
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: headerLabel.bottom
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
+                text: "total number of"
+            }
         }
 
+        Separator {
+            width: parent.width
+            color: Theme.secondaryColor
+        }
+
+        Item {
+            width: 1
+            height: Theme.paddingSmall
+        }
+
+        Label {
+            width: parent.width
+            color: Theme.highlightColor
+            font.pixelSize: Theme.fontSizeSmall
+            text: "Groups: " + infoModel.groups
+        }
+        Label {
+            width: parent.width
+            color: Theme.highlightColor
+            font.pixelSize: Theme.fontSizeSmall
+            text: "Users: " + infoModel.users
+        }
+        Label {
+            width: parent.width
+            color: Theme.highlightColor
+            font.pixelSize: Theme.fontSizeSmall
+            text: "Questions: " + infoModel.questions
+        }
+        Label {
+            width: parent.width
+            color: Theme.highlightColor
+            font.pixelSize: Theme.fontSizeSmall
+            text: "Answers: " + infoModel.answers
+        }
+        Label {
+            width: parent.width
+            color: Theme.highlightColor
+            font.pixelSize: Theme.fontSizeSmall
+            text: "Comments: " + infoModel.comments
+        }
+    }
+
+    Column {
+        visible: coverProxy.mode === coverProxy.mode_QUESTIONS
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: Theme.paddingMedium
+        anchors.rightMargin: Theme.paddingMedium
+        width: parent.width
+
+        Item {
+            width: parent.width
+            height: childrenRect.height
+
+            Label {
+                id: titleLabel
+                anchors.horizontalCenter: parent.horizontalCenter
+                truncationMode: TruncationMode.Fade
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
+                text: coverProxy.header
+            }
+
+            Label {
+                id: questionsLabel
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: titleLabel.bottom
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
+                text: "question: " + coverProxy.currentQuestion + "/" + coverProxy.questionsCount
+            }
+            Label {
+                id: pageLabel
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: questionsLabel.bottom
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
+                text: "pages loaded: " + coverProxy.currentPage + "/" + coverProxy.pageCount
+            }
+        }
+
+        Separator {
+            width: parent.width
+            color: Theme.secondaryColor
+        }
+
+        Item {
+            width: 1
+            height: Theme.paddingSmall
+        }
+
+        Label {
+            width: parent.width
+            color: Theme.highlightColor
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            elide: Text.ElideRight
+            font.pixelSize: Theme.fontSizeSmall
+            maximumLineCount: 6
+            text: coverProxy.title
+        }
+    }
+
+
+    // [previous] and [next]
+    CoverActionList {
+        enabled: coverProxy.hasPrevious &&
+                 coverProxy.hasNext &&
+                 coverProxy.mode === coverProxy.mode_QUESTIONS
+
         CoverAction {
-            iconSource: "image://theme/icon-cover-pause"
+            iconSource: "image://theme/icon-cover-previous"
+            onTriggered: {
+                coverProxy.previousItem();
+            }
+        }
+        CoverAction {
+            iconSource: "image://theme/icon-cover-next"
+            onTriggered: {
+                coverProxy.nextItem();
+            }
+        }
+    }
+
+    // [previous] only
+    CoverActionList {
+        enabled: coverProxy.hasPrevious &&
+                 ! coverProxy.hasNext &&
+                 coverProxy.mode === coverProxy.mode_QUESTIONS
+
+        CoverAction {
+            iconSource: "image://theme/icon-cover-previous"
+            onTriggered: {
+                coverProxy.previousItem();
+            }
+        }
+    }
+
+    // [refresh only]
+    CoverActionList {
+        enabled: ! coverProxy.hasPrevious &&
+                 ! coverProxy.hasNext ||
+                 coverProxy.mode === coverProxy.mode_INFO
+
+        CoverAction {
+            iconSource: "image://theme/icon-cover-refresh"
+            onTriggered: {
+                coverProxy.refresh()
+            }
+        }
+    }
+
+    // [refresh] and [next]
+    CoverActionList {
+        enabled: ! coverProxy.hasPrevious &&
+                 coverProxy.hasNext &&
+                 coverProxy.mode === coverProxy.mode_QUESTIONS
+
+        CoverAction {
+            iconSource: "image://theme/icon-cover-refresh"
+            onTriggered: {
+                coverProxy.refresh()
+            }
+        }
+        CoverAction {
+            iconSource: "image://theme/icon-cover-next"
+            onTriggered: {
+                coverProxy.nextItem();
+            }
         }
     }
 }

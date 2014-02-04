@@ -9,20 +9,20 @@ Page {
         // When leaving page change selections only if those are changed
         if (status === PageStatus.Deactivating) {
             var change = false
-            if (closedSwitch.checked !== closedQuestionsFilter) {
-                closedQuestionsFilter = closedSwitch.checked
+            if (closedSwitch.checked !== questionsModel.closedQuestionsFilter) {
+                questionsModel.closedQuestionsFilter = closedSwitch.checked
                 change = true
             }
-            if (answeredSwitch.checked !== answeredQuestionsFilter) {
-                answeredQuestionsFilter = answeredSwitch.checked
+            if (answeredSwitch.checked !== questionsModel.answeredQuestionsFilter) {
+                questionsModel.answeredQuestionsFilter = answeredSwitch.checked
                 change = true
             }
-            if (unansweredSwitch.checked !== unansweredQuestionsFilter) {
-                unansweredQuestionsFilter = unansweredSwitch.checked
+            if (unansweredSwitch.checked !== questionsModel.unansweredQuestionsFilter) {
+                questionsModel.unansweredQuestionsFilter = unansweredSwitch.checked
                 change = true
             }
             if (change) {
-                refresh()
+                questionsModel.refresh()
             }
         }
     }
@@ -51,7 +51,6 @@ Page {
                 }
                 height: 3
                 width: parent.width-64
-
             }
             Label {
                 width: parent.width-70
@@ -64,21 +63,41 @@ Page {
             }
             TextSwitch {
                 id: closedSwitch
-                checked: closedQuestionsFilter
+                checked: questionsModel.closedQuestionsFilter
                 description: qsTr("List also closed questions")
                 text: qsTr("Closed questions")
             }
             TextSwitch {
                 id: answeredSwitch
-                checked: answeredQuestionsFilter
+                checked: questionsModel.answeredQuestionsFilter
                 description: qsTr("List also questions having accepted answers")
                 text: qsTr("Answered questions")
             }
             TextSwitch {
                 id: unansweredSwitch
-                checked: unansweredQuestionsFilter
+                checked: questionsModel.unansweredQuestionsFilter
                 description: qsTr("List only questions having no answers yet. (Overrides 'Answered questions' selection)")
-                text: qsTr("Only unanswered questions")
+                text: qsTr("Unanswered questions")
+            }
+            Rectangle{
+                id: bottomRec
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#333333" }
+                    GradientStop { position: 1.0; color: "#777777" }
+                }
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                }
+                height: 3
+                width: parent.width-64
+            }
+            Label {
+                font.pixelSize: Theme.fontSizeTiny
+                font.italic: true
+                color: Theme.secondaryHighlightColor
+                width: filterPage.width
+                wrapMode: Text.Wrap
+                text: qsTr("Note: Default selections are listing ALL questions. 'Unanswered questions' filter is global among all questions, but 'Answered/Closed questions' filters are applied only to currently loaded page's questions (API does not support global). All selected filters persists untill changed from this page")
             }
         }
     }

@@ -4,7 +4,7 @@ import Sailfish.Silica 1.0
 Page {
     id: searchPage
     allowedOrientations: Orientation.All
-    property string newSearchString: searchCriteria
+    property string newSearchString: questionsModel.searchCriteria
     ListModel
     {
         id: modelSearchTags
@@ -14,8 +14,8 @@ Page {
         // When leaving page
         if (status === PageStatus.Deactivating) {
             var reload = false
-            if (newSearchString !== searchCriteria) {
-                searchCriteria = newSearchString
+            if (newSearchString !== questionsModel.searchCriteria) {
+                questionsModel.searchCriteria = newSearchString
                 reload = true
             }
             if (checkIfTagsChanged()) {
@@ -23,7 +23,7 @@ Page {
                 reload = true
             }
             if (reload)
-                refresh()
+                questionsModel.refresh()
         }
     }
 
@@ -39,10 +39,20 @@ Page {
             id: header
             title: qsTr("Questions search criteria")
         }
+        Label {
+            id: noteLabel
+            anchors.top: header.bottom
+            font.pixelSize: Theme.fontSizeTiny
+            font.italic: true
+            color: Theme.secondaryHighlightColor
+            width: searchPage.width
+            wrapMode: Text.Wrap
+            text: qsTr("Note: Search criterias are global among all questions and persists untill changed from this page")
+        }
 
         Label {
             id: freeLabel
-            anchors.top: header.bottom
+            anchors.top: noteLabel.bottom
             text: qsTr("Free text criteria")
         }
         SearchField {
@@ -50,9 +60,15 @@ Page {
             anchors.top: freeLabel.bottom
             placeholderText: qsTr("Search")
             width: parent.width
-            text: searchCriteria // Show previous search if exists
+            text: questionsModel.searchCriteria // Show previous search if exists
             onTextChanged: {
                 newSearchString = searchBox.text
+            }
+            Keys.onEnterPressed: {
+                searchPage.forceActiveFocus()
+            }
+            Keys.onReturnPressed: {
+                searchPage.forceActiveFocus()
             }
         }
 
@@ -87,18 +103,21 @@ Page {
                     width: parent.width - clearButton.width
                     height: clearButton.height
                     anchors.leftMargin: 10
-                    focus: true
+                    //focus: true
                     // Tric to set texts to list on page load from model. Causes binding loop warning for propery text!
                     text: modelSearchTags.get(index) ? modelSearchTags.get(index).tag : ""
 
                     onTextChanged: {
                         modelSearchTags.get(index).tag = text
+                        addNewTagItem()
                     }
                     Keys.onEnterPressed: {
                         addNewTagItem()
+                        searchPage.forceActiveFocus()
                     }
                     Keys.onReturnPressed: {
                         addNewTagItem()
+                        searchPage.forceActiveFocus()
                     }
                 }
                 IconButton {

@@ -27,10 +27,18 @@ OTHER_FILES += qml/harbour-unofficialtogether.qml \
     qml/pages/WebView.qml \
     qml/pages/CreditsModel.qml \
     qml/pages/LicensePage.qml \
-    qml/pages/SortPage.qml \
     qml/pages/SearchPage.qml \
     qml/pages/FilterPage.qml \
-    qml/pages/FancyScroller.qml
+    qml/pages/FancyScroller.qml \
+    qml/pages/UsersPage.qml \
+    qml/pages/UserDelegate.qml \
+    qml/pages/QuestionsPage.qml \
+    qml/pages/SortUsers.qml \
+    qml/pages/SortQuestions.qml \
+    qml/pages/SearchUsers.qml \
+    qml/pages/QuestionsModel.qml \
+    qml/pages/UsersModel.qml \
+    qml/pages/InfoModel.qml
 
 
 js.files = js
