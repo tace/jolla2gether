@@ -8,7 +8,11 @@ BackgroundItem  {
     height: Theme.itemSizeSmall
     contentHeight: Theme.itemSizeSmall
 
-    onClicked: { siteURL = url; pageStack.navigateForward(); }
+    onClicked: {
+        questionListView.currentIndex = index
+        siteURL = url;
+        pageStack.navigateForward();
+    }
 
     function getTitleColor() {
         var color = Theme.primaryColor
