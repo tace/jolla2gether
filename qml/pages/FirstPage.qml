@@ -39,7 +39,7 @@ Page {
     SilicaFlickable {
         anchors.fill: parent
         PageHeader {
-            title: qsTr("Jolla Together (unofficialapp)")
+            title: qsTr("Jolla Together")
         }
 
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView

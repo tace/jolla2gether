@@ -39,8 +39,8 @@ ApplicationWindow
     property string siteURL: siteBaseUrl + "/account/signin/?next=/"
     property string version: "0.0.6"
     property string license: "GPL v2.0"
-    property string appicon: "qrc:/harbour-unofficialtogether_250px.png"
-    property string appname: "Jolla Together(Unofficial)"
+    property string appicon: "qrc:/harbour-jolla2gether_250px.png"
+    property string appname: "Jolla Together"
     property bool firstPageLoaded: false
 
     ListModel {
