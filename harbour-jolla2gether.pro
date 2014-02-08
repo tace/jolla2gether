@@ -6,24 +6,24 @@
 #         - desktop icon filename must be changed
 #         - desktop filename must be changed
 #         - icon definition filename in desktop file must be changed
-TARGET = harbour-unofficialtogether
+TARGET = harbour-jolla2gether
 
 CONFIG += sailfishapp webkit
 
-SOURCES += src/harbour-unofficialtogether.cpp
+SOURCES += src/harbour-jolla2gether.cpp
 
-OTHER_FILES += qml/harbour-unofficialtogether.qml \
+OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/cover/CoverPage.qml \
     qml/pages/FirstPage.qml \
-    rpm/harbour-unofficialtogether.spec \
-    rpm/harbour-unofficialtogether.yaml \
-    harbour-unofficialtogether.desktop \
+    rpm/harbour-jolla2gether.spec \
+    rpm/harbour-jolla2gether.yaml \
+    harbour-jolla2gether.desktop \
     js/askbot.js \
     qml/pages/AboutPage.qml \
     qml/pages/QuestionDelegate.qml \
     qml/pages/InfoPage.qml \
-    harbour-unofficialtogether.png \
-    harbour-unofficialtogether.svg \
+    harbour-jolla2gether.png \
+    harbour-jolla2gether.svg \
     qml/pages/WebView.qml \
     qml/pages/CreditsModel.qml \
     qml/pages/LicensePage.qml \
