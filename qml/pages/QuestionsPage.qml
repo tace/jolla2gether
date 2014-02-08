@@ -60,8 +60,7 @@ Page {
         }
         PageHeader {
             id: header
-            _titleItem.font.pixelSize: Theme.fontSizeMedium  // Default is pixelSize: Theme.fontSizeLarge
-            title: "Jolla Together"
+            title: appname
         }
 
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
