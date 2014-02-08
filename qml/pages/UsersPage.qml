@@ -59,7 +59,6 @@ Page {
         }
         PageHeader {
             id: header
-            height: Theme.itemSizeSmall  // Default is Theme.itemSizeLarge
             _titleItem.font.pixelSize: Theme.fontSizeMedium  // Default is pixelSize: Theme.fontSizeLarge
             title: "Jolla Together (unofficialapp)"
         }

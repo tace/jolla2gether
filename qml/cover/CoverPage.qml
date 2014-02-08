@@ -42,6 +42,7 @@ CoverBackground {
 
         Separator {
             width: parent.width
+            horizontalAlignment: Qt.AlignCenter
             color: Theme.secondaryColor
         }
 
@@ -124,6 +125,7 @@ CoverBackground {
 
         Separator {
             width: parent.width
+            horizontalAlignment: Qt.AlignCenter
             color: Theme.secondaryColor
         }
 
