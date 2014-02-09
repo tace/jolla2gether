@@ -56,8 +56,19 @@ Page {
                 }
             }
             MenuItem {
-                text: qsTr("Info")
-                onClicked: pageStack.push(Qt.resolvedUrl("InfoPage.qml"))
+                text: qsTr("Users")
+                onClicked: {
+                    usersModel.refresh()
+                    pageStack.push(Qt.resolvedUrl("UsersPage.qml"))
+                }
+            }
+            MenuItem {
+                text: qsTr("Questions")
+                onClicked:
+                {
+                    questionsModel.refresh()
+                    pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
+                }
             }
         }
 
@@ -66,22 +77,45 @@ Page {
             anchors.centerIn: parent
             anchors.leftMargin: Theme.paddingMedium
             anchors.rightMargin: Theme.paddingMedium
-            Button {
-                text: "Questions"
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: {
-                    questionsModel.refresh()
-                    pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
+            id: infoCol
+            height: Theme.itemSizeLarge * 3
+            Image{
+                source: appicon
+                height: 128
+                width: 128
+                fillMode: Image.PreserveAspectFit
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
                 }
             }
-            Button {
-                text: "Users"
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: {
-                    usersModel.refresh()
-                    pageStack.push(Qt.resolvedUrl("UsersPage.qml"))
-                }
+            Separator {
+               // alignment: Qt.AlignHCenter
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 2
             }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Groups: " + infoModel.groups
+                color: Theme.primaryColor
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Users: " + infoModel.users
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Questions: " + infoModel.questions
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Answers: " + infoModel.answers
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Comments: " + infoModel.comments
+            }
+
         }
     }
 
