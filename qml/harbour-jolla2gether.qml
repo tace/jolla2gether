@@ -41,7 +41,6 @@ ApplicationWindow
     property string license: "GPL v2.0"
     property string appicon: "qrc:/harbour-jolla2gether_250px.png"
     property string appname: "Jolla Together"
-    property bool firstPageLoaded: false
 
     ListModel {
         id: modelSearchTagsGlobal

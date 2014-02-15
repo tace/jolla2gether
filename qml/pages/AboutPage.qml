@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+
 Page {
     CreditsModel {id: credits}
     Column{
@@ -42,8 +43,6 @@ Page {
             anchors.horizontalCenter: parent.horizontalCenter
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
-            //wrapMode: Text.WordWrap
-            //height: Theme.fontSizeMedium * 1 + 20
         }
 
         Repeater{
@@ -66,12 +65,19 @@ Page {
             width: parent.width-64
         }
 
+        Label {
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: Theme.secondaryColor
+            font.pixelSize: Theme.fontSizeTiny
+            text: "https://github.com/tace/jolla2gether"
+        }
+
         Button {
+            id: licenseButton
             width: parent.width-70
             text: "License "+license
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: pageStack.push(Qt.resolvedUrl("LicensePage.qml"))
         }
-
     }
 }

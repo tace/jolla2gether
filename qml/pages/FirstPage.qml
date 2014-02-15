@@ -89,9 +89,9 @@ Page {
                 }
             }
             Separator {
-               // alignment: Qt.AlignHCenter
-                anchors.left: parent.left
-                anchors.right: parent.right
+                width: parent.width
+                horizontalAlignment: Qt.AlignCenter
+                color: Theme.secondaryColor
                 height: 2
             }
             Label {
@@ -130,13 +130,6 @@ Page {
     onStatusChanged: {
         if (status === PageStatus.Active) {
             coverProxy.mode = coverProxy.mode_INFO
-        }
-    }
-
-    Component.onCompleted: {
-        coverProxy.mode = coverProxy.mode_INFO
-        if (!firstPageLoaded) {
-            firstPageLoaded = true
             infoModel.get_info()
         }
     }
