@@ -35,12 +35,37 @@ Page {
     id: questionsPage
     allowedOrientations: Orientation.All
 
-    Timer {
-        /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
-        interval: 100
-        repeat: false
-        running: true
-        onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"), {browseBackText : "Questions"});}
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            attachWebview("Questions")
+        }
+    }
+
+    Connections {
+        target: coverProxy
+        onStart: {
+            changeListItemFromCover(questionListView.currentIndex)
+        }
+        onStop: {
+            // Attach webview back when returning to app from cover
+            attachWebview("Questions")
+        }
+        onRefresh: {
+            var closure = function(x) {
+                return function() {
+                    changeListItemFromCover(x);
+                }
+            };
+            questionsModel.get_questions(questionsModel.currentPageNum, closure(questionListView.currentIndex));
+        }
+        onNextItem: {
+            questionListView.currentIndex = questionListView.currentIndex + 1
+            changeListItemFromCover(questionListView.currentIndex)
+        }
+        onPreviousItem: {
+            questionListView.currentIndex = questionListView.currentIndex - 1
+            changeListItemFromCover(questionListView.currentIndex)
+        }
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
@@ -108,33 +133,6 @@ Page {
         }
     }
 
-    Connections {
-        target: coverProxy
-
-        onStart: {
-            changeListItemFromCover(questionListView.currentIndex)
-        }
-
-        onRefresh: {
-            var closure = function(x) {
-                return function() {
-                    changeListItemFromCover(x);
-                }
-            };
-            questionsModel.get_questions(questionsModel.currentPageNum, closure(questionListView.currentIndex));
-        }
-
-        onNextItem: {
-            questionListView.currentIndex = questionListView.currentIndex + 1
-            changeListItemFromCover(questionListView.currentIndex)
-        }
-
-        onPreviousItem: {
-            questionListView.currentIndex = questionListView.currentIndex - 1
-            changeListItemFromCover(questionListView.currentIndex)
-        }
-    }
-
     function changeListItemFromCover(index) {
 
         // Load more already when on previous last item if fast cover actions
@@ -157,7 +155,6 @@ Page {
     Component.onCompleted: {
         coverProxy.mode = coverProxy.mode_QUESTIONS
     }
-
 }
 
 

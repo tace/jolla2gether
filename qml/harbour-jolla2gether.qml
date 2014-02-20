@@ -36,11 +36,13 @@ ApplicationWindow
 {
     property bool urlLoading: false
     property string siteBaseUrl: "https://together.jolla.com"
-    property string siteURL: siteBaseUrl + "/account/signin/?next=/"
+    property string loginURL: siteBaseUrl + "/account/signin/?next=/"
+    property string siteURL: loginURL
     property string version: "0.0.6"
     property string license: "GPL v2.0"
     property string appicon: "qrc:/harbour-jolla2gether_250px.png"
     property string appname: "Jolla Together"
+    property bool webviewAttached: false
 
     ListModel {
         id: modelSearchTagsGlobal
@@ -75,6 +77,7 @@ ApplicationWindow
         property bool hasPrevious
 
         signal start
+        signal stop
         signal refresh
         signal nextItem
         signal previousItem
@@ -96,6 +99,36 @@ ApplicationWindow
             repeat: true
             onTriggered: progressCircle.value = (progressCircle.value + 0.005) % 1.0
             running: urlLoading
+        }
+    }
+
+    // Make it accepted on Harbour: Save power consumption as WebView seems to be "faulty component" to use?
+    onApplicationActiveChanged: {
+        if (!Qt.application.active) {
+            unattachWebview()
+        }
+    }
+
+    function attachWebview(who) {
+        if (!webviewAttached) {
+            if (siteURL === loginURL)
+                siteURL = siteBaseUrl
+            pageStack.pushAttached(Qt.resolvedUrl("pages/WebView.qml"), {browseBackText : who})
+            webviewAttached = true
+            console.log("WebView attached")
+        }
+    }
+    function unattachWebview() {
+        if (webviewAttached) {
+            if (pageStack.currentPage.pageName === "WebView") {
+                if (siteURL === loginURL)
+                    pageStack.pop()
+                else
+                    pageStack.navigateBack(PageStackAction.Immediate)
+            }
+            pageStack.popAttached()
+            webviewAttached = false
+            console.log("WebView unattached")
         }
     }
 }

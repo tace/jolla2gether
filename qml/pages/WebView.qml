@@ -3,7 +3,8 @@ import Sailfish.Silica 1.0
 import QtWebKit 3.0
 
 Page {
-    id: page
+    id: webviewPage
+    property string pageName: "WebView"
     property string browseBackText: "Back"
     allowedOrientations: Orientation.All
     forwardNavigation: false
@@ -12,8 +13,8 @@ Page {
         id: webview
         url: siteURL
         overridePageStackNavigation: true
-        width: page.orientation == Orientation.Portrait ? 540 : 960
-        height: page.orientation == Orientation.Portrait ? 960 : 540
+        width: webviewPage.orientation === Orientation.Portrait ? 540 : 960
+        height: webviewPage.orientation === Orientation.Portrait ? 960 : 540
         onLoadingChanged:
         {
             if (loadRequest.status === WebView.LoadStartedStatus)
@@ -22,7 +23,7 @@ Page {
                 urlLoading = false;
             if (loadRequest.status === WebView.LoadSucceededStatus) {
                 urlLoading = false;
-                page.forceActiveFocus()
+                webviewPage.forceActiveFocus()
             }
         }
         onNavigationRequested: {
@@ -38,7 +39,7 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: qsTr("together.jolla.com main page")
-                onClicked: { siteURL = "https://together.jolla.com/"; }
+                onClicked: { siteURL = siteBaseUrl; }
             }
             MenuItem {
                 text: qsTr(browseBackText)

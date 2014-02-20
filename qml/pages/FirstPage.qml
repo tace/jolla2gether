@@ -51,8 +51,9 @@ Page {
             MenuItem {
                 text: qsTr("Login")
                 onClicked: {
-                    siteURL = "https://together.jolla.com/account/signin/?next=/";
+                    siteURL = loginURL
                     pageStack.push(Qt.resolvedUrl("WebView.qml"))
+                    webviewAttached = true
                 }
             }
             MenuItem {
@@ -127,10 +128,13 @@ Page {
                 infoModel.get_info()
         }
     }
+
     onStatusChanged: {
         if (status === PageStatus.Active) {
             coverProxy.mode = coverProxy.mode_INFO
             infoModel.get_info()
+            webviewAttached = false
+            urlLoading = false
         }
     }
 }

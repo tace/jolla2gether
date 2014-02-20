@@ -35,12 +35,19 @@ Page {
     id: usersPage
     allowedOrientations: Orientation.All
 
-    Timer {
-           /* For uknown reason, we can't on onCompleted to push the page so this timer used instead */
-            interval: 100
-            repeat: false
-            running: true
-            onTriggered: { pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"), {browseBackText : "Users"});}
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            attachWebview("Users")
+        }
+    }
+
+    Connections {
+        target: coverProxy
+
+        onStop: {
+            // Attach webview back when returning to app from cover
+            attachWebview("Questions")
+        }
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable

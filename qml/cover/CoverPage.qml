@@ -8,6 +8,9 @@ CoverBackground {
         if (status === Cover.Activating) {
             coverProxy.start()
         }
+        if (status === Cover.Inactive) {
+            coverProxy.stop()
+        }
     }
 
     Column {
