@@ -42,6 +42,10 @@ Page {
                 onClicked: { siteURL = siteBaseUrl; }
             }
             MenuItem {
+                text: qsTr("Open link in browser");
+                onClicked: Qt.openUrlExternally(siteURL)
+            }
+            MenuItem {
                 text: qsTr(browseBackText)
                 onClicked: {
                     pageStack.navigateBack()
