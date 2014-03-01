@@ -9,6 +9,8 @@ The fork is done since we decided to rename project also since tace is now lead 
 
 unnofficialtogether shall now be seen as a deadbeaf :)
 
+See development details from wiki https://github.com/tace/jolla2gether/wiki
+
 
 
 
