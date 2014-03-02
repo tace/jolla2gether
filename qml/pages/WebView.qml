@@ -8,6 +8,7 @@ Page {
     property string browseBackText: "Back"
     allowedOrientations: Orientation.All
     forwardNavigation: false
+    backNavigation: false
 
     SilicaWebView {
         id: webview
@@ -38,17 +39,19 @@ Page {
         }
         PullDownMenu {
             MenuItem {
-                text: qsTr("together.jolla.com main page")
-                onClicked: { siteURL = siteBaseUrl; }
+                text: qsTr("Open with default browser")
+                onClicked: Qt.openUrlExternally(siteURL)
             }
             MenuItem {
-                text: qsTr("Open link in browser");
-                onClicked: Qt.openUrlExternally(siteURL)
+                text: qsTr("together.jolla.com main page")
+                onClicked: siteURL = siteBaseUrl
             }
             MenuItem {
                 text: qsTr(browseBackText)
                 onClicked: {
+                    backNavigation = true
                     pageStack.navigateBack()
+                    backNavigation = false
                 }
             }
         }

@@ -50,7 +50,7 @@ Page {
             Label  {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: title
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeTiny
             }
         }
         Rectangle{
@@ -71,13 +71,23 @@ Page {
             font.pixelSize: Theme.fontSizeTiny
             text: "https://github.com/tace/jolla2gether"
         }
-
+        Button {
+            id: releaseNotesButton
+            width: parent.width-100
+            text: "Release notes for version "+version
+            anchors.horizontalCenter: parent.horizontalCenter
+            onClicked: Qt.openUrlExternally("https://github.com/tace/jolla2gether/wiki/ReleaseNotes#wiki-"+version2WikiIndex(version))
+        }
         Button {
             id: licenseButton
-            width: parent.width-70
+            width: parent.width-100
             text: "License "+license
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: pageStack.push(Qt.resolvedUrl("LicensePage.qml"))
         }
+    }
+
+    function version2WikiIndex(version) {
+        return version.replace(/\./g, "")
     }
 }

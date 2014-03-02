@@ -129,6 +129,7 @@ Page {
             }
         }
         FancyScroller {
+            anchors.fill: questionListView
             flickable: questionListView
         }
     }

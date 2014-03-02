@@ -6,12 +6,10 @@ Item {
     property int threshold: 1500
     property bool _activeUp
     property bool _activeDown
-    signal upScrolling
-    signal downScrolling
 
     BackgroundItem {
         visible: opacity > 0
-        y: 40
+        y: 0
         width: flickable.width
         height: Theme.itemSizeLarge
         highlighted: pressed
@@ -25,11 +23,13 @@ Item {
             width: 64
             height: 64
             anchors.right: parent.right
-            anchors.rightMargin: Theme.paddingLarge
+            anchors.rightMargin: Theme.paddingSmall
             anchors.verticalCenter: parent.verticalCenter
             radius: 75
-            color: Theme.highlightBackgroundColor
-            opacity: 0.8
+            color: "transparent"
+            opacity: 1
+            border.width: 1
+            border.color: Theme.primaryColor
             Image {
                 id: upImg
                 anchors.centerIn: parent
@@ -38,13 +38,14 @@ Item {
         }
 
         onPressed: {
+            flickable.cancelFlick();
             flickable.scrollToTop();
         }
     }
 
     BackgroundItem {
         visible: opacity > 0
-        y: flickable.height - 40
+        y: flickable.height - height
         width: flickable.width
         height: Theme.itemSizeLarge
         highlighted: pressed
@@ -58,11 +59,13 @@ Item {
             width: 64
             height: 64
             anchors.right: parent.right
-            anchors.rightMargin: Theme.paddingLarge
+            anchors.rightMargin: Theme.paddingSmall
             anchors.verticalCenter: parent.verticalCenter
             radius: 75
-            color: Theme.highlightBackgroundColor
-            opacity: 0.8
+            color: "transparent"
+            opacity: 1
+            border.width: 1
+            border.color: Theme.primaryColor
             Image {
                 anchors.centerIn: parent
                 source: "image://theme/icon-l-down"
@@ -70,6 +73,7 @@ Item {
         }
 
         onPressed: {
+            flickable.cancelFlick();
             flickable.scrollToBottom();
         }
     }
@@ -94,14 +98,12 @@ Item {
             {
                 _activeUp = true;
                 _activeDown = false;
-                upScrolling();
             }
             else if (target.verticalVelocity > threshold &&
                      target.contentHeight > 3 * target.height)
             {
                 _activeUp = false;
                 _activeDown = true;
-                downScrolling();
             }
             else if (Math.abs(target.verticalVelocity) < 10)
             {
