@@ -123,8 +123,10 @@ ApplicationWindow
             if (pageStack.currentPage.pageName === "WebView") {
                 if (siteURL === loginURL)
                     pageStack.pop()
-                else
+                else {
+                    pageStack.currentPage.backNavigation = true
                     pageStack.navigateBack(PageStackAction.Immediate)
+                }
             }
             pageStack.popAttached()
             webviewAttached = false
