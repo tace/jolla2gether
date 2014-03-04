@@ -8,7 +8,6 @@ Page {
     property string browseBackText: "Back"
     allowedOrientations: Orientation.All
     forwardNavigation: false
-    //backNavigation: false
 
     SilicaWebView {
         id: webview
