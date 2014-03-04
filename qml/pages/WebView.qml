@@ -8,7 +8,7 @@ Page {
     property string browseBackText: "Back"
     allowedOrientations: Orientation.All
     forwardNavigation: false
-    backNavigation: false
+    //backNavigation: false
 
     SilicaWebView {
         id: webview
@@ -57,9 +57,13 @@ Page {
         }
     }
     onStatusChanged: {
+        if (status === PageStatus.Active) {
+            backNavigation = false
+        }
         if (status === PageStatus.Inactive) {
             // Just to stop the ProgressCircle animation
             urlLoading = false
+            backNavigation = true
         }
     }
 }
