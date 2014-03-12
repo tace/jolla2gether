@@ -55,6 +55,10 @@ Page {
             }
         }
     }
+    FancyScrollerForWebView {
+        flickable: webview
+        anchors.fill: webview
+    }
     onStatusChanged: {
         if (status === PageStatus.Active) {
             backNavigation = false
