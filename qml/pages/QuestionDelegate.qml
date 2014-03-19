@@ -6,6 +6,7 @@ BackgroundItem  {
     anchors.left: ListView.left
     anchors.right: ListView.right
     height: Theme.itemSizeSmall
+    width: parent.width
     contentHeight: Theme.itemSizeSmall
 
     onClicked: {
@@ -23,15 +24,25 @@ BackgroundItem  {
         }
         return color
     }
-
     Column{
         anchors.fill: parent
-        Label {
-            font.pixelSize: Theme.fontSizeSmall
-            color: getTitleColor()
-            font.bold: model.url === siteURL
-            text: title
+        Row {
+            Label {
+                font.pixelSize: Theme.fontSizeTiny
+                color: Theme.highlightColor
+                anchors.verticalCenter: titleText.verticalCenter
+                visible: closed
+                text: "[closed] "
+            }
+            Label {
+                id: titleText
+                font.pixelSize: Theme.fontSizeSmall
+                color: getTitleColor()
+                font.bold: model.url === siteURL
+                text: title
+            }
         }
+
         Row {
             Label {
                 id: authorLabel
