@@ -4,7 +4,6 @@ import "../../js/askbot.js" as Askbot
 ListModel {
     id: listModel
 
-    property bool loaded: false
     // Questions counters
     property int pagesCount: 0;
     property int currentPageNum: 1;
@@ -29,10 +28,10 @@ ListModel {
     // Search
     property string searchCriteria: ""
 
-    function refresh(page)
+    function refresh(page, onLoadedCallback)
     {
         clear()
-        get_questions(page) // goes to first page if page not given
+        get_questions(page, onLoadedCallback) // goes to first page if page not given
     }
     function get_nextPageQuestions(params)
     {
@@ -52,7 +51,6 @@ ListModel {
     function get_questions(page, onLoadedCallback)
     {
         Askbot.get_questions(listModel, page, onLoadedCallback)
-        loaded = true
     }
 
 }

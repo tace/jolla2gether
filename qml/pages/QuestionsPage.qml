@@ -53,7 +53,7 @@ Page {
                     changeListItemFromCover(x);
                 }
             };
-            questionsModel.get_questions(questionsModel.currentPageNum, closure(questionListView.currentIndex));
+            questionsModel.refresh(questionsModel.currentPageNum, closure(questionListView.currentIndex))
         }
         onNextItem: {
             questionListView.currentIndex = questionListView.currentIndex + 1
