@@ -33,20 +33,12 @@ import Sailfish.Silica 1.0
 
 Page {
     id: usersPage
+    property string pageName: "Users"
     allowedOrientations: Orientation.All
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
             attachWebview("Users")
-        }
-    }
-
-    Connections {
-        target: coverProxy
-
-        onStop: {
-            // Attach webview back when returning to app from cover
-            attachWebview("Questions")
         }
     }
 
@@ -61,7 +53,7 @@ Page {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
             text: usersModel.usersCount +
-                  " users (page " + usersModel.currentPageNum +
+                  " users (pages loaded " + usersModel.currentPageNum +
                   "/" + usersModel.pagesCount + ")"
         }
         PageHeader {

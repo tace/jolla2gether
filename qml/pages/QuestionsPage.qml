@@ -33,6 +33,7 @@ import Sailfish.Silica 1.0
 
 Page {
     id: questionsPage
+    property string pageName: "Questions"
     allowedOrientations: Orientation.All
 
     onStatusChanged: {
@@ -45,10 +46,6 @@ Page {
         target: coverProxy
         onStart: {
             changeListItemFromCover(questionListView.currentIndex)
-        }
-        onStop: {
-            // Attach webview back when returning to app from cover
-            attachWebview("Questions")
         }
         onRefresh: {
             var closure = function(x) {
@@ -79,7 +76,7 @@ Page {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
             text: questionsModel.questionsCount +
-                  " questions (page " +
+                  " questions (pages loaded " +
                   questionsModel.currentPageNum + "/" +
                   questionsModel.pagesCount + ")"
         }
@@ -122,10 +119,14 @@ Page {
             delegate: QuestionDelegate { id: questionDelegate }
             VerticalScrollDecorator { flickable: questionListView }
 
-            onMovementEnded: {
-                if(atYEnd) {
+//            onMovementEnded: {
+//                if(atYEnd) {
+//                    questionsModel.get_nextPageQuestions()
+//                }
+//            }
+            onAtYEndChanged: {
+                if (atYEnd && contentY >= parent.height)
                     questionsModel.get_nextPageQuestions()
-                }
             }
         }
         FancyScroller {

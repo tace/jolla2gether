@@ -43,6 +43,8 @@ ApplicationWindow
     property string appicon: "qrc:/harbour-jolla2gether_250px.png"
     property string appname: "Jolla Together"
     property bool webviewAttached: false
+    property string webviewBrowseBackText: "Back"
+    property bool webviewWasActiveWhenUnattached: false
 
     ListModel {
         id: modelSearchTagsGlobal
@@ -107,15 +109,30 @@ ApplicationWindow
         if (!Qt.application.active) {
             unattachWebview()
         }
+        else {
+            attachWebview()
+        }
     }
 
     function attachWebview(who) {
         if (!webviewAttached) {
-            if (siteURL === loginURL)
-                siteURL = siteBaseUrl
-            pageStack.pushAttached(Qt.resolvedUrl("pages/WebView.qml"), {browseBackText : who})
-            webviewAttached = true
-            console.log("WebView attached")
+            if (pageStack.currentPage.pageName === "Questions" ||
+                pageStack.currentPage.pageName === "Users") {
+                if (siteURL === loginURL)
+                    siteURL = siteBaseUrl
+                var text = ""
+                if (who !== undefined) {
+                    webviewBrowseBackText = who
+                }
+                pageStack.pushAttached(Qt.resolvedUrl("pages/WebView.qml"), {browseBackText: webviewBrowseBackText})
+                webviewAttached = true
+                // Navigate back to return where user left
+                if (webviewWasActiveWhenUnattached) {
+                    pageStack.navigateForward(PageStackAction.Immediate)
+                    webviewWasActiveWhenUnattached = false
+                }
+                console.log("WebView attached")
+            }
         }
     }
     function unattachWebview() {
@@ -124,8 +141,10 @@ ApplicationWindow
                 if (siteURL === loginURL)
                     pageStack.pop()
                 else {
+                    // Save back browsing text and move away from webview
                     pageStack.currentPage.backNavigation = true
                     pageStack.navigateBack(PageStackAction.Immediate)
+                    webviewWasActiveWhenUnattached = true
                 }
             }
             pageStack.popAttached()
