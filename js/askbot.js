@@ -162,6 +162,23 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                             continue
                     }
 
+                    // Filter out questions having ignored tag
+                    if (ignoredSearchTagsGlobal.count > 0 && ginfo.tags.length > 0) {
+                        var found = false
+                        for (var i = 0; i < ignoredSearchTagsGlobal.count; i++) {
+                            for (var j = 0; j < ginfo.tags.length; j++) {
+                                if (ginfo.tags[j].toLowerCase() === ignoredSearchTagsGlobal.get(i).tag.toLowerCase()) {
+                                    found = true
+                                    break
+                                }
+                            }
+                            if (found)
+                                break
+                        }
+                        if (found)
+                            continue
+                    }
+
                     model.append({"title" : ginfo.title,
                                    "url" : ginfo.url,
                                    "author" : ginfo.author.username,

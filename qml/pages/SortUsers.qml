@@ -3,10 +3,8 @@ import Sailfish.Silica 1.0
 
 Page {
     id: sortPage
-    anchors.fill: parent
+    allowedOrientations: Orientation.All
     property string newSortingCriteria: usersModel.sortingCriteriaUsers
-    // orientation did not work ok for this page?
-    //allowedOrientations: Orientation.All
 
 
     onStatusChanged: {
@@ -19,15 +17,18 @@ Page {
         }
     }
 
-    SilicaFlickable
+    Flickable
     {
-        anchors.fill: parent
+        width: parent.width
+        height: parent.height - Theme.paddingLarge * 3
+        anchors.top: parent.top
+        anchors.topMargin: Theme.paddingLarge * 3
+        contentHeight: sortTypeColumn.height
+
         Column {
             id: sortTypeColumn
-            spacing: 1
-            anchors.fill: parent
-            anchors.leftMargin: Theme.paddingMedium
-            anchors.rightMargin: Theme.paddingMedium
+            spacing: 10
+            width: parent.width
             PageHeader {
                 title: qsTr("Users sorting criteria")
             }
@@ -112,10 +113,14 @@ Page {
             }
 
             Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignHCenter
                 font.pixelSize: Theme.fontSizeTiny
                 font.italic: true
                 color: Theme.secondaryHighlightColor
-                width: sortPage.width
+                width: parent.width - 70
+                height: 250
                 wrapMode: Text.Wrap
                 text: qsTr("Note: Sorting is global among all users and persists untill changed from this page")
             }

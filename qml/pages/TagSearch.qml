@@ -2,9 +2,12 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Page {
-    id: searchPage
+    id: tagSearchPage
     allowedOrientations: Orientation.All
-    property string newSearchString: questionsModel.searchCriteria
+    property int include_MODE: 1
+    property int ignore_MODE: 2
+    property int tagmode: include_MODE
+    property ListModel savedSearchTags
     ListModel
     {
         id: modelSearchTags
@@ -13,23 +16,14 @@ Page {
     onStatusChanged: {
         // When leaving page
         if (status === PageStatus.Deactivating) {
-            var reload = false
-            if (newSearchString !== questionsModel.searchCriteria) {
-                questionsModel.searchCriteria = newSearchString
-                reload = true
+            var changed = saveTags()
+            if (changed) {
+                setTagsChangedStatus(true)
             }
-            if (checkIfTagsChanged()) {
-                fillModelFromModel(modelSearchTags, modelSearchTagsGlobal)
-                reload = true
-            }
-            if (reload)
-                questionsModel.refresh()
         }
     }
-
     Component.onCompleted: {
-        fillModelFromModel(modelSearchTagsGlobal, modelSearchTags)
-        addNewTagItem() // Adds first if no items yet
+        loadTags()
     }
 
     SilicaFlickable {
@@ -37,53 +31,35 @@ Page {
 
         PageHeader {
             id: header
-            title: qsTr("Questions search criteria")
-        }
-        Label {
-            id: noteLabel
-            anchors.top: header.bottom
-            font.pixelSize: Theme.fontSizeTiny
-            font.italic: true
-            color: Theme.secondaryHighlightColor
-            width: searchPage.width
-            wrapMode: Text.Wrap
-            text: qsTr("Note: Search criterias are global among all questions and persists untill changed from this page")
+            title: getPageHeaderText()
         }
 
-        Label {
-            id: freeLabel
-            anchors.top: noteLabel.bottom
-            text: qsTr("Free text criteria")
-        }
-        SearchField {
-            id: searchBox
-            anchors.top: freeLabel.bottom
-            placeholderText: qsTr("Search")
-            width: parent.width
-            text: questionsModel.searchCriteria // Show previous search if exists
-            onTextChanged: {
-                newSearchString = searchBox.text
-            }
-            Keys.onEnterPressed: {
-                searchPage.forceActiveFocus()
-            }
-            Keys.onReturnPressed: {
-                searchPage.forceActiveFocus()
+        PullDownMenu {
+            MenuItem {
+                text: getPullDownMenuText()
+                onClicked: {
+                    //saveTags()
+                    if (tagmode === include_MODE) {
+                        pageStack.replace(Qt.resolvedUrl("TagSearch.qml"),
+                                          {tagmode: ignore_MODE,
+                                           savedSearchTags: ignoredSearchTagsGlobal})
+                    }
+                    if (tagmode === ignore_MODE) {
+                        pageStack.replace(Qt.resolvedUrl("TagSearch.qml"),
+                                          {tagmode: include_MODE,
+                                           savedSearchTags: modelSearchTagsGlobal})
+                    }
+                }
             }
         }
 
-        Label {
-            id: tagsLabel
-            anchors.top: searchBox.bottom
-            text: qsTr("Tags criteria")
-        }
 
         SilicaListView {
             id: tagList
             width: parent.width
             height: parent.height
             model: modelSearchTags
-            anchors.top : tagsLabel.bottom
+            anchors.top : header.bottom
             VerticalScrollDecorator {}
 
             delegate:
@@ -113,11 +89,11 @@ Page {
                     }
                     Keys.onEnterPressed: {
                         addNewTagItem()
-                        searchPage.forceActiveFocus()
+                        tagSearchPage.forceActiveFocus()
                     }
                     Keys.onReturnPressed: {
                         addNewTagItem()
-                        searchPage.forceActiveFocus()
+                        tagSearchPage.forceActiveFocus()
                     }
                 }
                 IconButton {
@@ -143,6 +119,37 @@ Page {
         }
     }
 
+    function setTagsChangedStatus(changed) {
+        if (tagmode === include_MODE)
+            questionsModel.includeTagsChanged = changed
+        if (tagmode === ignore_MODE)
+            questionsModel.ignoreTagsChanged = changed
+    }
+    function getPageHeaderText() {
+        if (tagmode === include_MODE)
+            return qsTr("Include these tags to search")
+        if (tagmode === ignore_MODE)
+            return qsTr("Ignore these tags from search")
+        return "no found"
+    }
+    function getPullDownMenuText() {
+        if (tagmode === include_MODE)
+            return qsTr("Ignored tags")
+        if (tagmode === ignore_MODE)
+            return qsTr("Included tags")
+        return "no found"
+    }
+    function loadTags() {
+        fillModelFromModel(savedSearchTags, modelSearchTags)
+        addNewTagItem() // Adds first if no items yet
+    }
+    function saveTags() {
+        var changed = checkIfTagsChanged()
+        if (changed) {
+            fillModelFromModel(modelSearchTags, savedSearchTags)
+        }
+        return changed
+    }
     function fillModelFromModel(source, target){
         target.clear()
         for (var i = 0; i < source.count; i++) {
@@ -157,11 +164,11 @@ Page {
     }
     function checkIfTagsChanged() {
         removeEmptyTags(modelSearchTags)
-        if (modelSearchTags.count !== modelSearchTagsGlobal.count) {
+        if (modelSearchTags.count !== savedSearchTags.count) {
             return true
         }
         for (var i = 0; i < modelSearchTags.count; i++) {
-            if (modelSearchTags.get(i).tag !== modelSearchTagsGlobal.get(i).tag) {
+            if (modelSearchTags.get(i).tag !== savedSearchTags.get(i).tag) {
                 return true
             }
         }

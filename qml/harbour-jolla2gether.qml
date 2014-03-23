@@ -49,6 +49,9 @@ ApplicationWindow
     ListModel {
         id: modelSearchTagsGlobal
     }
+    ListModel {
+        id: ignoredSearchTagsGlobal
+    }
     InfoModel {
         id: infoModel
     }
@@ -147,7 +150,11 @@ ApplicationWindow
                     webviewWasActiveWhenUnattached = true
                 }
             }
-            pageStack.popAttached()
+            var page = pageStack.find(function(page) {
+                return (page.pageName === "Questions" || page.pageName === "Users")
+            })
+            if (page !== null)
+                pageStack.popAttached(page)
             webviewAttached = false
             console.log("WebView unattached")
         }

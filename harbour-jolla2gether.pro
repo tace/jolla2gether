@@ -27,19 +27,19 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/WebView.qml \
     qml/pages/CreditsModel.qml \
     qml/pages/LicensePage.qml \
-    qml/pages/SearchPage.qml \
-    qml/pages/FilterPage.qml \
     qml/pages/FancyScroller.qml \
     qml/pages/UsersPage.qml \
     qml/pages/UserDelegate.qml \
     qml/pages/QuestionsPage.qml \
     qml/pages/SortUsers.qml \
-    qml/pages/SortQuestions.qml \
     qml/pages/SearchUsers.qml \
     qml/pages/QuestionsModel.qml \
     qml/pages/UsersModel.qml \
     qml/pages/InfoModel.qml \
-    qml/pages/FancyScrollerForWebView.qml
+    qml/pages/FancyScrollerForWebView.qml \
+    js/storage.js \
+    qml/pages/TagSearch.qml \
+    qml/pages/SearchQuestions.qml
 
 
 js.files = js

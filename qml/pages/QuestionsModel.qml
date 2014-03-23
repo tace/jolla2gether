@@ -10,9 +10,12 @@ ListModel {
     property int questionsCount: 0;
 
     // Filters
-    property bool closedQuestionsFilter: true
-    property bool answeredQuestionsFilter: true
-    property bool unansweredQuestionsFilter: false
+    property bool closedQuestionsFilter_DEFAULT: true
+    property bool closedQuestionsFilter: closedQuestionsFilter_DEFAULT
+    property bool answeredQuestionsFilter_DEFAULT: true
+    property bool answeredQuestionsFilter: answeredQuestionsFilter_DEFAULT
+    property bool unansweredQuestionsFilter_DEFAULT: false
+    property bool unansweredQuestionsFilter: unansweredQuestionsFilter_DEFAULT
 
     // Sorting questions
     property string sort_ACTIVITY:      "activity"
@@ -22,11 +25,15 @@ ListModel {
     property string sort_ORDER_ASC:     "asc"
     property string sort_ORDER_DESC:    "desc"
 
-    property string sortingCriteriaQuestions:       sort_ACTIVITY;
-    property string sortingOrder:                   sort_ORDER_DESC;
+    property string sortingCriteriaQuestions_DEFAULT:       sort_ACTIVITY;
+    property string sortingCriteriaQuestions:               sortingCriteriaQuestions_DEFAULT;
+    property string sortingOrder_DEFAULT:                   sort_ORDER_DESC;
+    property string sortingOrder:                           sortingOrder_DEFAULT;
 
     // Search
     property string searchCriteria: ""
+    property bool includeTagsChanged: false
+    property bool ignoreTagsChanged: false
 
     function refresh(page, onLoadedCallback)
     {
