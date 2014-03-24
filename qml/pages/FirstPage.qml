@@ -52,7 +52,7 @@ Page {
                 text: qsTr("Login")
                 onClicked: {
                     siteURL = loginURL
-                    pageStack.push(Qt.resolvedUrl("WebView.qml"))
+                    questionsModel.pushWebviewWithCustomScript()
                     webviewAttached = true
                 }
             }
@@ -116,7 +116,6 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Comments: " + infoModel.comments
             }
-
         }
     }
 

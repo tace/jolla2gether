@@ -4,9 +4,11 @@ import QtWebKit 3.0
 
 Page {
     id: webviewPage
+    allowedOrientations: Orientation.All
     property string pageName: "WebView"
     property string browseBackText: "Back"
-    allowedOrientations: Orientation.All
+    property string customJavaScriptToExecute: ""
+    property var customJavaScriptResultHandler: null
     forwardNavigation: false
 
     SilicaWebView {
@@ -24,6 +26,9 @@ Page {
             if (loadRequest.status === WebView.LoadSucceededStatus) {
                 urlLoading = false;
                 webviewPage.forceActiveFocus()
+            }
+            if (!loading && customJavaScriptToExecute !== "" && loadRequest.status === WebView.LoadSucceededStatus) {
+                webview.experimental.evaluateJavaScript(customJavaScriptToExecute, customJavaScriptResultHandler);
             }
         }
         onNavigationRequested: {

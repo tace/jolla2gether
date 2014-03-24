@@ -62,6 +62,17 @@ function get_questions(model, page, onLoadedCallback) {
         model.currentPageNum = 1
     }
 
+    if (model.userIdSearchCriteria !== "") {
+        if (isFirstParam) {
+            query_params = query_params + "author=" + model.userIdSearchCriteria
+        }
+        else {
+            query_params = query_params + "&author=" + model.userIdSearchCriteria
+        }
+        isFirstParam = false
+    }
+
+
     // Scope: All (default) or only unanswered questions
     if (model.unansweredQuestionsFilter) {
         if (isFirstParam) {

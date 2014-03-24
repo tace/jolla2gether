@@ -65,67 +65,142 @@ Page {
         }
     }
 
-    // To enable PullDownMenu, place our content in a SilicaFlickable
-    SilicaFlickable {
-        interactive: !questionListView.flicking
-        pressDelay: 0
+
+    Drawer {
+        id: infoDrawer
         anchors.fill: parent
-        Label {
-            font.pixelSize: Theme.fontSizeExtraSmall
-            anchors.horizontalCenter: parent.horizontalCenter
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignHCenter
-            text: questionsModel.questionsCount +
-                  " questions (pages loaded " +
-                  questionsModel.currentPageNum + "/" +
-                  questionsModel.pagesCount + ")"
-        }
-        PageHeader {
-            id: header
-            title: appname
+        dock: Dock.Top
+        open: false
+        backgroundSize: drawerView.contentHeight
+
+        function show(text) {
+            infoTextLabel.text = text
+            infoDrawer.open = true
         }
 
-        // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Search/Filter...")
-                onClicked: pageStack.push(Qt.resolvedUrl("SearchQuestions.qml"))
-            }
-            MenuItem {
-                text: qsTr("Refresh")
-                onClicked: { questionsModel.refresh(); }
+        background: SilicaFlickable {
+            id: drawerView
+            anchors.fill: parent
+            contentHeight: 340
+            clip: true
+
+            Item {
+                visible: infoDrawer.open
+                width: parent.width
+                height: parent.height - Theme.itemSizeSmall
+
+                Separator {
+                    width: parent.width
+                    horizontalAlignment: Qt.AlignHCenter
+                    color: Theme.highlightColor
+                }
+
+                Label {
+                    id: infoTextLabel
+                    visible: infoDrawer.open
+                    anchors.centerIn: parent
+                    color: Theme.highlightColor
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeLarge
+                    wrapMode: Text.WordWrap
+                    width: parent.width
+                    height: 100
+                    text: ""
+                }
+                IconButton {
+                    anchors.top: infoTextLabel.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    icon.source: "image://theme/icon-m-close"
+
+                    onClicked: {
+                        infoDrawer.open = false
+                    }
+                }
             }
         }
-        SilicaListView {
-            id: questionListView
+
+        // To enable PullDownMenu, place our content in a SilicaFlickable
+        SilicaFlickable {
+            interactive: !questionListView.flicking
             pressDelay: 0
-            anchors.top: header.bottom
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.leftMargin: Theme.paddingSmall
-            anchors.rightMargin: Theme.paddingSmall
-            clip: true //  to have the out of view items clipped nicely.
+            anchors.fill: parent
+            Label {
+                font.pixelSize: Theme.fontSizeExtraSmall
+                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignHCenter
+                text: questionsModel.questionsCount +
+                      " questions (pages loaded " +
+                      questionsModel.currentPageNum + "/" +
+                      questionsModel.pagesCount + ")"
+            }
+            PageHeader {
+                id: header
+                title: questionsPageHeader
+            }
 
-            model: questionsModel
-            delegate: QuestionDelegate { id: questionDelegate }
-            VerticalScrollDecorator { flickable: questionListView }
+            // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
+            PullDownMenu {
+                MenuItem {
+                    text: qsTr("My/All questions")
+                    onClicked: {
+                        if (questionsModel.userIdSearchCriteria === "") {
+                            if (checkUserIdIsValid()) {
+                                questionsPageHeader = appname + " (My questions)"
+                                questionsModel.refresh()
+                            }
+                            else {
+                                infoDrawer.show(qsTr("Please login from login page to list your own questions!"))
+                            }
+                        }
+                        else {
+                            questionsPageHeader = appname + " (All questions)"
+                            questionsModel.userIdSearchCriteria = ""
+                            questionsModel.refresh()
+                        }
+                    }
+                }
+                MenuItem {
+                    text: qsTr("Search/Filter...")
+                    onClicked: pageStack.push(Qt.resolvedUrl("SearchQuestions.qml"))
+                }
+                MenuItem {
+                    text: qsTr("Refresh")
+                    onClicked: questionsModel.refresh();
+                }
+            }
+            SilicaListView {
+                id: questionListView
+                pressDelay: 0
+                anchors.top: header.bottom
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: Theme.paddingSmall
+                anchors.rightMargin: Theme.paddingSmall
+                clip: true //  to have the out of view items clipped nicely.
 
-//            onMovementEnded: {
-//                if(atYEnd) {
-//                    questionsModel.get_nextPageQuestions()
-//                }
-//            }
-            onAtYEndChanged: {
-                if (atYEnd && contentY >= parent.height)
-                    questionsModel.get_nextPageQuestions()
+                model: questionsModel
+                delegate: QuestionDelegate { id: questionDelegate }
+                VerticalScrollDecorator { flickable: questionListView }
+
+                //            onMovementEnded: {
+                //                if(atYEnd) {
+                //                    questionsModel.get_nextPageQuestions()
+                //                }
+                //            }
+                onAtYEndChanged: {
+                    if (atYEnd && contentY >= parent.height)
+                        questionsModel.get_nextPageQuestions()
+                }
+            }
+            FancyScroller {
+                anchors.fill: questionListView
+                flickable: questionListView
             }
         }
-        FancyScroller {
-            anchors.fill: questionListView
-            flickable: questionListView
-        }
-    }
+    } // Drawer
 
     function changeListItemFromCover(index) {
 
@@ -138,7 +213,7 @@ Page {
         questionListView.positionViewAtIndex(index, ListView.Contain);
         coverProxy.hasPrevious = index > 0;
         coverProxy.hasNext = (index < questionsModel.count - 1) &&
-                             (index < questionsModel.questionsCount - 1)
+                (index < questionsModel.questionsCount - 1)
         coverProxy.currentQuestion = index + 1
         coverProxy.questionsCount = questionsModel.questionsCount
         coverProxy.currentPage = questionsModel.currentPageNum

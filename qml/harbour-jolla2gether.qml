@@ -45,6 +45,7 @@ ApplicationWindow
     property bool webviewAttached: false
     property string webviewBrowseBackText: "Back"
     property bool webviewWasActiveWhenUnattached: false
+    property string questionsPageHeader: appname + "(All questions)"
 
     ListModel {
         id: modelSearchTagsGlobal
@@ -66,7 +67,6 @@ ApplicationWindow
         id: coverProxy
 
         property string header: "together.jolla.com"
-
         property string mode_INFO: "info"
         property string mode_QUESTIONS: "questions"
         property string mode
@@ -117,6 +117,14 @@ ApplicationWindow
         }
     }
 
+    function checkUserIdIsValid() {
+        console.log("Userid: "+questionsModel.ownUserIdValue)
+        if (questionsModel.ownUserIdValue !== "" && questionsModel.ownUserIdValue !== "signin") {
+            questionsModel.userIdSearchCriteria = questionsModel.ownUserIdValue
+            return true
+        }
+        return false
+    }
     function attachWebview(who) {
         if (!webviewAttached) {
             if (pageStack.currentPage.pageName === "Questions" ||
@@ -127,7 +135,7 @@ ApplicationWindow
                 if (who !== undefined) {
                     webviewBrowseBackText = who
                 }
-                pageStack.pushAttached(Qt.resolvedUrl("pages/WebView.qml"), {browseBackText: webviewBrowseBackText})
+                questionsModel.pushWebviewWithCustomScript(true, {browseBackText: webviewBrowseBackText})
                 webviewAttached = true
                 // Navigate back to return where user left
                 if (webviewWasActiveWhenUnattached) {

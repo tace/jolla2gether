@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import "../../js/askbot.js" as Askbot
+import "../../js/custom.js" as Custom
 
 ListModel {
     id: listModel
@@ -32,8 +33,14 @@ ListModel {
 
     // Search
     property string searchCriteria: ""
+    property string ownUserIdValue: ""
+    property string userIdSearchCriteria: ""
     property bool includeTagsChanged: false
     property bool ignoreTagsChanged: false
+
+    // Login
+    property int loginRetryCount: 0
+    property int loginRetryCountMaximum: 3
 
     function refresh(page, onLoadedCallback)
     {
@@ -60,4 +67,44 @@ ListModel {
         Askbot.get_questions(listModel, page, onLoadedCallback)
     }
 
+    function pushWebviewWithCustomScript(attached, props) {
+        var closure = function(result) {
+            questionsModel.ownUserIdValue = result
+        };
+        var properties = {}
+        if (((questionsModel.ownUserIdValue === "" ||
+            questionsModel.ownUserIdValue === "signin") &&
+            loginRetryCount < loginRetryCountMaximum) ||
+            !attached) {
+            var custom_scrip_props = {customJavaScriptToExecute : Custom.get_userId_script(),
+                                      customJavaScriptResultHandler: Custom.get_userId_script_result_handler(closure)}
+            properties = merge(custom_scrip_props, props)
+            loginRetryCount = loginRetryCount + 1
+        }
+        else {
+            properties = props
+        }
+
+        if (attached) {
+            pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"), properties)
+        }
+        else {
+            pageStack.push(Qt.resolvedUrl("WebView.qml"), properties)
+        }
+    }
+
+    function merge() {
+        var obj = {},
+            i = 0,
+            il = arguments.length,
+            key;
+        for (; i < il; i++) {
+            for (key in arguments[i]) {
+                if (arguments[i].hasOwnProperty(key)) {
+                    obj[key] = arguments[i][key];
+                }
+            }
+        }
+        return obj;
+    }
 }
