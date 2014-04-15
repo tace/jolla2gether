@@ -47,6 +47,9 @@ ApplicationWindow
     property bool webviewWasActiveWhenUnattached: false
     property string questionsPageHeader: appname + "(All questions)"
 
+    Settings {
+        id: appSettings
+    }
     ListModel {
         id: modelSearchTagsGlobal
     }
@@ -106,6 +109,7 @@ ApplicationWindow
             running: urlLoading
         }
     }
+
 
     // Make it accepted on Harbour: Save power consumption as WebView seems to be "faulty component" to use?
     onApplicationActiveChanged: {

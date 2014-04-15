@@ -33,7 +33,7 @@
 #endif
 
 #include <sailfishapp.h>
-
+#include "settings.h"
 
 int main(int argc, char *argv[])
 {
@@ -46,6 +46,14 @@ int main(int argc, char *argv[])
     //
     // To display the view, call "show()" (will show fullscreen on device).
 
-    return SailfishApp::main(argc, argv);
+    // return SailfishApp::main(argc, argv);
+
+    QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
+    Settings* settings = new Settings(app.data());
+    QScopedPointer<QQuickView> view(SailfishApp::createView());
+    view->rootContext()->setContextProperty("Settings", settings);
+    view->setSource(SailfishApp::pathTo("qml/harbour-jolla2gether.qml"));
+    view->showFullScreen();
+    return app->exec();
 }
 

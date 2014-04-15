@@ -164,13 +164,17 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
 
                     // Filter out closed questions
                     if (!model.closedQuestionsFilter) {
-                        if (ginfo.closed)
+                        if (ginfo.closed) {
+                            model.questionsCount = model.questionsCount - 1
                             continue
+                        }
                     }
                     // Filter out questions with accepted answer
                     if (!model.answeredQuestionsFilter) {
-                        if (ginfo.has_accepted_answer)
+                        if (ginfo.has_accepted_answer) {
+                            model.questionsCount = model.questionsCount - 1
                             continue
+                        }
                     }
 
                     // Filter out questions having ignored tag
@@ -186,8 +190,10 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                             if (found)
                                 break
                         }
-                        if (found)
+                        if (found) {
+                            model.questionsCount = model.questionsCount - 1
                             continue
+                        }
                     }
 
                     model.append({"title" : ginfo.title,

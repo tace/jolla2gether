@@ -53,9 +53,9 @@ Page {
             MenuItem {
                 text: qsTr(browseBackText)
                 onClicked: {
-                    backNavigation = true
+                    setBackNavigation(true)
                     pageStack.navigateBack()
-                    backNavigation = false
+                    setBackNavigation(false)
                 }
             }
         }
@@ -66,13 +66,18 @@ Page {
     }
     onStatusChanged: {
         if (status === PageStatus.Active) {
-            backNavigation = false
+            setBackNavigation(false)
         }
         if (status === PageStatus.Inactive) {
             // Just to stop the ProgressCircle animation
             urlLoading = false
-            backNavigation = true
+            setBackNavigation(true)
         }
+    }
+
+    function setBackNavigation(flag) {
+        if (!(appSettings.webview_swipe_back_enabled_value && !flag))
+            backNavigation = flag
     }
 }
 
