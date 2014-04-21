@@ -4,8 +4,6 @@ import Sailfish.Silica 1.0
 Page {
     id: settingsPage
     allowedOrientations: Orientation.All
-    property string newTitleSpaceValue: appSettings.qUESTION_LIST_TITLE_SPACE_VALUE
-    property bool newSwipeBackFromWebviewValue: appSettings.webview_swipe_back_enabled_value
 
     SilicaFlickable {
         id: mainFlic
@@ -22,7 +20,7 @@ Page {
             }
 
             SectionHeader {
-                text: qsTr("Questions list presentation")
+                text: qsTr("Question list presentation")
             }
 
             ComboBox {
@@ -40,17 +38,61 @@ Page {
                     MenuItem {
                         text: qsTr("One line (Default)")
                         onClicked: {
-                            newTitleSpaceValue = appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_ONE_LINE
+                            appSettings.qUESTION_LIST_TITLE_SPACE_VALUE = appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_ONE_LINE
                         }
                     }
                     MenuItem {
                        text: qsTr("2 lines")
                        onClicked: {
-                           newTitleSpaceValue = appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_2_LINES
+                           appSettings.qUESTION_LIST_TITLE_SPACE_VALUE = appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_2_LINES
                        }
                     }
                 }
             }
+
+            SectionHeader {
+                text: qsTr("Question search for user's questions")
+            }
+            Label {
+                id: notesubSearchReset
+                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignHCenter
+                font.pixelSize: Theme.fontSizeTiny
+                font.italic: true
+                color: Theme.secondaryHighlightColor
+                width: parent.width
+                height: 150
+                wrapMode: Text.Wrap
+                text: qsTr("Questions of given user can be listed in Users page or Questions page by long pressing list item. With this setting, existing search criteria (if set) can be applied also to users's all questions or resetted. Note that on users's all questions page you can freely change/reset search criteria and it do not affect to original search criteria i.e. when returning back to main questions list the original search criteria is returned.")
+            }
+            ComboBox {
+                id: subSearchReset
+                function set_value(value) {
+                    var val = 0
+                    if (!value)
+                        val = 0
+                    if (value)
+                        val = 1
+                    subSearchReset.currentIndex = val
+                }
+                label: qsTr("Keep/Reset existing search criteria")
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Keep search criteria (Default)")
+                        onClicked: {
+                            appSettings.question_reset_search_on_listing_user_questions_value = false
+                        }
+                    }
+                    MenuItem {
+                       text: qsTr("Reset search criteria")
+                       onClicked: {
+                           appSettings.question_reset_search_on_listing_user_questions_value = true
+                       }
+                    }
+                }
+            }
+
             SectionHeader {
                 text: qsTr("Webview")
             }
@@ -65,18 +107,18 @@ Page {
                         val = 1
                     swipeBackFromWebview.currentIndex = val
                 }
-                label: qsTr("Swipe back from to questions list")
+                label: qsTr("Swipe back to question list")
                 menu: ContextMenu {
                     MenuItem {
                         text: qsTr("Disabled (Default)")
                         onClicked: {
-                            newSwipeBackFromWebviewValue = false
+                            appSettings.webview_swipe_back_enabled_value = false
                         }
                     }
                     MenuItem {
                        text: qsTr("Enabled")
                        onClicked: {
-                           newSwipeBackFromWebviewValue = true
+                           appSettings.webview_swipe_back_enabled_value = true
                        }
                     }
                 }
@@ -84,20 +126,10 @@ Page {
         } // column
     }
 
-    onStatusChanged: {
-        // When leaving page
-        if (status === PageStatus.Deactivating) {
-            if (newTitleSpaceValue !== appSettings.qUESTION_LIST_TITLE_SPACE_VALUE) {
-                appSettings.qUESTION_LIST_TITLE_SPACE_VALUE = newTitleSpaceValue
-            }
-            if (newSwipeBackFromWebviewValue !== appSettings.webview_swipe_back_enabled_value) {
-                appSettings.webview_swipe_back_enabled_value = newSwipeBackFromWebviewValue
-            }
-        }
-    }
     Component.onCompleted: {
         titleSpace.set_value(appSettings.qUESTION_LIST_TITLE_SPACE_VALUE)
         swipeBackFromWebview.set_value(appSettings.webview_swipe_back_enabled_value)
+        subSearchReset.set_value(appSettings.question_reset_search_on_listing_user_questions_value)
     }
 
 }

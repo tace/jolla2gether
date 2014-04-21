@@ -9,6 +9,7 @@ ListModel {
     property int pagesCount: 0;
     property int currentPageNum: 1;
     property int questionsCount: 0;
+    property int listViewCurrentIndex: 0; // To handle list when back to all questions from user's questions
 
     // Filters
     property bool closedQuestionsFilter_DEFAULT: true
@@ -35,12 +36,21 @@ ListModel {
     property string searchCriteria: ""
     property string ownUserIdValue: ""
     property string userIdSearchCriteria: ""
+    property bool userQuestionsAsked: false
     property bool includeTagsChanged: false
     property bool ignoreTagsChanged: false
 
     // Login
     property int loginRetryCount: 0
     property int loginRetryCountMaximum: 3
+
+    // Header
+    property string pageHeader_ALL_QUESTIONS: "All questions"  // Default
+    property string pageHeader_MY_QUESTIONS:  "My questions"
+    property string pageHeader: pageHeader_ALL_QUESTIONS
+
+    // Toggle for all/My questions
+    property bool myQuestionsToggle: false
 
     function refresh(page, onLoadedCallback)
     {
@@ -106,5 +116,77 @@ ListModel {
             }
         }
         return obj;
+    }
+
+    function setUserIdSearchCriteria(userId) {
+        console.log("Userid: "+userId)
+        if (userId !== "" && userId !== "signin") {
+            questionsModel.userIdSearchCriteria = userId
+            return true
+        }
+        return false
+    }
+    function resetUserIdSearchCriteria() {
+        questionsModel.userIdSearchCriteria = ""
+        questionsModel.pageHeader = questionsModel.pageHeader_ALL_QUESTIONS
+    }
+    function resetSearchCriteria() {
+        questionsModel.searchCriteria = ""
+        questionsModel.closedQuestionsFilter = questionsModel.closedQuestionsFilter_DEFAULT
+        questionsModel.answeredQuestionsFilter = questionsModel.answeredQuestionsFilter_DEFAULT
+        questionsModel.unansweredQuestionsFilter = questionsModel.unansweredQuestionsFilter_DEFAULT
+        questionsModel.sortingCriteriaQuestions = questionsModel.sortingCriteriaQuestions_DEFAULT
+        questionsModel.sortingOrder = questionsModel.sortingOrder_DEFAULT
+        modelSearchTagsGlobal.clear()
+        ignoredSearchTagsGlobal.clear()
+    }
+    function cacheModel() {
+        questionsModel.userQuestionsAsked = true
+        copyModel(questionsModel, questionsModelCache)
+
+        // Copy also tags models here
+        copyListModel(modelSearchTagsGlobal, modelSearchTagsGlobalCache)
+        copyListModel(ignoredSearchTagsGlobal, ignoredSearchTagsGlobalCache)
+    }
+    function restoreModel() {
+        copyModel(questionsModelCache, questionsModel)
+        questionsModel.userQuestionsAsked = false
+
+        // Restore tags models
+        copyListModel(modelSearchTagsGlobalCache, modelSearchTagsGlobal)
+        copyListModel(ignoredSearchTagsGlobalCache, ignoredSearchTagsGlobal)
+    }
+    function copyListModel(o, t) {
+        t.clear()
+        for (var i = 0; i < o.count; i++) {
+            t.append(o.get(i))
+        }
+    }
+    function copyModel(p, c) {
+        copyListModel(p, c)
+
+        c.listViewCurrentIndex = p.listViewCurrentIndex
+        c.pagesCount = p.pagesCount;
+        c.currentPageNum = p.currentPageNum;
+        c.questionsCount = p.questionsCount;
+
+        c.closedQuestionsFilter = p.closedQuestionsFilter
+        c.answeredQuestionsFilter = p.answeredQuestionsFilter
+        c.unansweredQuestionsFilter = p.unansweredQuestionsFilter
+
+        c.sortingCriteriaQuestions = p.sortingCriteriaQuestions
+        c.sortingOrder = p.sortingOrder
+
+        c.searchCriteria = p.searchCriteria
+        c.ownUserIdValue = p.ownUserIdValue
+        c.userIdSearchCriteria = p.userIdSearchCriteria
+        c.includeTagsChanged = p.includeTagsChanged
+        c.ignoreTagsChanged = p.ignoreTagsChanged
+
+        c.loginRetryCount = p.loginRetryCount
+
+        c.pageHeader = p.pageHeader
+
+        c.myQuestionsToggle = p.myQuestionsToggle
     }
 }

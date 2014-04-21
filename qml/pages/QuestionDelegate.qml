@@ -7,6 +7,7 @@ ListItem  {
     anchors.right: ListView.right
     width: parent.width
     contentHeight: titleText.lineCount > 1 ? Theme.itemSizeLarge : Theme.itemSizeSmall
+    menu: contextMenu
 
     onClicked: {
         questionListView.currentIndex = index
@@ -162,6 +163,33 @@ ListItem  {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 text: "views"
+            }
+        }
+    }
+    // context menu is activated with long press
+    Component {
+        id: contextMenu
+        ContextMenu {
+            MenuItem {
+                text: qsTr("Copy url")
+                onClicked: clipboard.setText(url)
+            }
+            MenuItem {
+                visible: !userIdSearch  // disable rerursive user selections
+                text: qsTr("All " + author + "'s questions")
+                onClicked: {
+                    questionListView.currentIndex = index
+                    questionsModel.cacheModel()
+
+                    if (appSettings.question_reset_search_on_listing_user_questions_value)
+                        questionsModel.resetSearchCriteria()
+
+                    questionsModel.setUserIdSearchCriteria(author_id)
+                    questionsModel.pageHeader = author + "'s questions"
+                    unattachWebview()
+                    questionsModel.refresh()
+                    pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"), {userIdSearch: true})
+                }
             }
         }
     }

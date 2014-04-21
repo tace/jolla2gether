@@ -30,6 +30,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import jolla2gether 1.0
 import "pages"
 
 ApplicationWindow
@@ -45,22 +46,33 @@ ApplicationWindow
     property bool webviewAttached: false
     property string webviewBrowseBackText: "Back"
     property bool webviewWasActiveWhenUnattached: false
-    property string questionsPageHeader: appname + "(All questions)"
 
     Settings {
         id: appSettings
     }
+    QClipboard{
+         id: clipboard
+     }
     ListModel {
         id: modelSearchTagsGlobal
     }
     ListModel {
         id: ignoredSearchTagsGlobal
     }
+    ListModel {
+        id: modelSearchTagsGlobalCache
+    }
+    ListModel {
+        id: ignoredSearchTagsGlobalCache
+    }
     InfoModel {
         id: infoModel
     }
     QuestionsModel {
         id: questionsModel
+    }
+    QuestionsModel {
+        id: questionsModelCache
     }
     UsersModel {
         id: usersModel
@@ -121,18 +133,9 @@ ApplicationWindow
         }
     }
 
-    function checkUserIdIsValid() {
-        console.log("Userid: "+questionsModel.ownUserIdValue)
-        if (questionsModel.ownUserIdValue !== "" && questionsModel.ownUserIdValue !== "signin") {
-            questionsModel.userIdSearchCriteria = questionsModel.ownUserIdValue
-            return true
-        }
-        return false
-    }
     function attachWebview(who) {
-        if (!webviewAttached) {
-            if (pageStack.currentPage.pageName === "Questions" ||
-                pageStack.currentPage.pageName === "Users") {
+        if (!isWebviewAttached()) {
+            if (onPageAllowedtoAttachWebview()) {
                 if (siteURL === loginURL)
                     siteURL = siteBaseUrl
                 var text = ""
@@ -170,6 +173,25 @@ ApplicationWindow
             webviewAttached = false
             console.log("WebView unattached")
         }
+    }
+    function onPageAllowedtoAttachWebview() {
+        if (pageStack.currentPage.pageName === "Questions" ||
+                pageStack.currentPage.pageName === "Users") {
+            return true
+        }
+        return false
+    }
+    function isWebviewAttached() {
+        if (pageStack.currentPage.pageName === "WebView")
+            return true
+        if (onPageAllowedtoAttachWebview()) {
+            var nextPage = pageStack.nextPage()
+            if (nextPage !== null) {
+                if (nextPage.pageName === "WebView")
+                    return true
+            }
+        }
+        return false
     }
 }
 

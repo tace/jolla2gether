@@ -1,18 +1,18 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-BackgroundItem  {
+ListItem  {
     id: background
     anchors.left: ListView.left
     anchors.right: ListView.right
-    height: Theme.itemSizeSmall
     contentHeight: Theme.itemSizeSmall
+    menu: contextMenu
 
     onClicked: { siteURL = url; pageStack.navigateForward(); }
 
     Column{
         anchors.fill: parent
-        Row {            
+        Row {
             Image {
                 id: userPic
                 width: 80
@@ -78,6 +78,27 @@ BackgroundItem  {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     text: "karma"
+                }
+            }
+        }
+    }
+    // context menu is activated with long press
+    Component {
+        id: contextMenu
+        ContextMenu {
+            MenuItem {
+                text: qsTr("Copy url")
+                onClicked: clipboard.setText(url)
+            }
+            MenuItem {
+                text: qsTr("All " + username + "'s questions")
+                onClicked: {
+                    questionsModel.cacheModel()
+                    questionsModel.setUserIdSearchCriteria(id)
+                    questionsModel.pageHeader = username + "'s questions"
+                    unattachWebview()
+                    questionsModel.refresh()
+                    pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"), {userIdSearch: true})
                 }
             }
         }

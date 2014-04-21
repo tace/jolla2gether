@@ -51,6 +51,10 @@ Page {
                 onClicked: siteURL = siteBaseUrl
             }
             MenuItem {
+                text: qsTr("Copy url")
+                onClicked: clipboard.setText(siteURL)
+            }
+            MenuItem {
                 text: qsTr(browseBackText)
                 onClicked: {
                     setBackNavigation(true)

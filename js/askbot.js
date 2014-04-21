@@ -199,6 +199,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                     model.append({"title" : ginfo.title,
                                    "url" : ginfo.url,
                                    "author" : ginfo.author.username,
+                                   "author_id" : ginfo.author.id,
                                    "answer_count" : ginfo.answer_count,
                                    "view_count" : ginfo.view_count,
                                    "votes" : ginfo.score,

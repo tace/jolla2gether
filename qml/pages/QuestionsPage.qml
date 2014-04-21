@@ -33,16 +33,37 @@ import Sailfish.Silica 1.0
 
 Page {
     id: questionsPage
-    property string pageName: "Questions"
     allowedOrientations: Orientation.All
+    property string pageName: "Questions"
+    property bool userIdSearch: false
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
+            connections.target = coverProxy
+            if (!userIdSearch && questionsModel.userQuestionsAsked) {
+                questionsModel.restoreModel()
+                questionListView.positionViewAtIndex(questionsModel.listViewCurrentIndex, ListView.Center);
+            }
             attachWebview("Questions")
+            coverProxy.mode = coverProxy.mode_QUESTIONS
+        }
+        if (status === PageStatus.Inactive && pageStack.currentPage.pageName !== "WebView") {
+            connections.target = dummyTarget
         }
     }
 
+
+    QtObject {
+        id: dummyTarget
+        property bool hasNext
+        property bool hasPrevious
+        signal start
+        signal refresh
+        signal nextItem
+        signal previousItem
+    }
     Connections {
+        id: connections
         target: coverProxy
         onStart: {
             changeListItemFromCover(questionListView.currentIndex)
@@ -64,7 +85,6 @@ Page {
             changeListItemFromCover(questionListView.currentIndex)
         }
     }
-
 
     Drawer {
         id: infoDrawer
@@ -137,27 +157,31 @@ Page {
             }
             PageHeader {
                 id: header
-                title: questionsPageHeader
+                title: questionsModel.pageHeader
             }
 
             // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
             PullDownMenu {
                 MenuItem {
-                    text: qsTr("My/All questions")
+                    text: qsTr("All questions")
+                    visible: questionsModel.myQuestionsToggle && !userIdSearch
                     onClicked: {
-                        if (questionsModel.userIdSearchCriteria === "") {
-                            if (checkUserIdIsValid()) {
-                                questionsPageHeader = appname + " (My questions)"
-                                questionsModel.refresh()
-                            }
-                            else {
-                                infoDrawer.show(qsTr("Please login from login page to list your own questions!"))
-                            }
+                        questionsModel.resetUserIdSearchCriteria()
+                        questionsModel.refresh()
+                        questionsModel.myQuestionsToggle = false
+                    }
+                }
+                MenuItem {
+                    text: qsTr("My questions")
+                    visible: !questionsModel.myQuestionsToggle && !userIdSearch
+                    onClicked: {
+                        if (questionsModel.setUserIdSearchCriteria(questionsModel.ownUserIdValue)) {
+                            questionsModel.pageHeader = questionsModel.pageHeader_MY_QUESTIONS
+                            questionsModel.refresh()
+                            questionsModel.myQuestionsToggle = true
                         }
                         else {
-                            questionsPageHeader = appname + " (All questions)"
-                            questionsModel.userIdSearchCriteria = ""
-                            questionsModel.refresh()
+                            infoDrawer.show(qsTr("Please login from login page to list your own questions!"))
                         }
                     }
                 }
@@ -182,6 +206,7 @@ Page {
                 clip: true //  to have the out of view items clipped nicely.
 
                 model: questionsModel
+                onCurrentIndexChanged: questionsModel.listViewCurrentIndex = currentIndex
                 delegate: QuestionDelegate { id: questionDelegate }
                 VerticalScrollDecorator { flickable: questionListView }
 
@@ -210,7 +235,7 @@ Page {
                 questionsModel.get_nextPageQuestions()
             }
         }
-        questionListView.positionViewAtIndex(index, ListView.Contain);
+        questionListView.positionViewAtIndex(index, ListView.Center);
         coverProxy.hasPrevious = index > 0;
         coverProxy.hasNext = (index < questionsModel.count - 1) &&
                 (index < questionsModel.questionsCount - 1)
@@ -219,10 +244,6 @@ Page {
         coverProxy.currentPage = questionsModel.currentPageNum
         coverProxy.pageCount = questionsModel.pagesCount
         coverProxy.title = questionsModel.get(index).title;
-    }
-
-    Component.onCompleted: {
-        coverProxy.mode = coverProxy.mode_QUESTIONS
     }
 }
 

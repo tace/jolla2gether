@@ -33,7 +33,9 @@
 #endif
 
 #include <sailfishapp.h>
+
 #include "settings.h"
+#include "QmlClipboardAdapter.h"
 
 int main(int argc, char *argv[])
 {
@@ -52,6 +54,7 @@ int main(int argc, char *argv[])
     Settings* settings = new Settings(app.data());
     QScopedPointer<QQuickView> view(SailfishApp::createView());
     view->rootContext()->setContextProperty("Settings", settings);
+    qmlRegisterType<QmlClipboardAdapter>("jolla2gether", 1, 0, "QClipboard");
     view->setSource(SailfishApp::pathTo("qml/harbour-jolla2gether.qml"));
     view->showFullScreen();
     return app->exec();

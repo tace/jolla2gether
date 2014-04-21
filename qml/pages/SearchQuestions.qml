@@ -17,18 +17,7 @@ Page {
             MenuItem {
                 text: qsTr("Reset search")
                 onClicked: {
-                    questionsModel.searchCriteria = ""
-                    searchBox.text = ""
-
-                    questionsModel.closedQuestionsFilter = questionsModel.closedQuestionsFilter_DEFAULT
-                    questionsModel.answeredQuestionsFilter = questionsModel.answeredQuestionsFilter_DEFAULT
-                    questionsModel.unansweredQuestionsFilter = questionsModel.unansweredQuestionsFilter_DEFAULT
-
-                    sorting.set_value(questionsModel.sortingCriteriaQuestions_DEFAULT)
-                    sortingOrder.set_value(questionsModel.sortingOrder_DEFAULT)
-
-                    modelSearchTagsGlobal.clear()
-                    ignoredSearchTagsGlobal.clear()
+                    resetSearch()
                 }
             }
         }
@@ -254,5 +243,27 @@ Page {
             }
         }
         return change
+    }
+    function resetSearch() {
+        searchBox.text = ""
+        newSearchString = ""
+
+        questionsModel.includeTagsChanged = false
+        questionsModel.ignoreTagsChanged = false
+        if (modelSearchTagsGlobal.count > 0)
+            questionsModel.includeTagsChanged = true
+        if (ignoredSearchTagsGlobal.count > 0)
+            questionsModel.ignoreTagsChanged = true
+        modelSearchTagsGlobal.clear()
+        ignoredSearchTagsGlobal.clear()
+
+        closedSwitch.checked = questionsModel.closedQuestionsFilter_DEFAULT
+        answeredSwitch.checked = questionsModel.answeredQuestionsFilter_DEFAULT
+        unansweredSwitch.checked = questionsModel.unansweredQuestionsFilter_DEFAULT
+
+        newSortingCriteria = questionsModel.sortingCriteriaQuestions_DEFAULT
+        sorting.set_value(questionsModel.sortingCriteriaQuestions_DEFAULT)
+        newSortingOrder = questionsModel.sortingOrder_DEFAULT
+        sortingOrder.set_value(questionsModel.sortingOrder_DEFAULT)
     }
 }

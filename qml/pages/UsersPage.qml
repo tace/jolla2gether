@@ -38,8 +38,12 @@ Page {
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
+            if (questionsModel.userQuestionsAsked) {
+                questionsModel.restoreModel()
+            }
             attachWebview("Users")
         }
+        coverProxy.mode = coverProxy.mode_INFO
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
@@ -58,7 +62,7 @@ Page {
         }
         PageHeader {
             id: header
-            title: appname
+            title: qsTr("Users")
         }
 
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
