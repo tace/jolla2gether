@@ -33,7 +33,10 @@
 #endif
 
 #include <sailfishapp.h>
-
+#include <QScopedPointer>
+#include <QQuickView>
+#include <QGuiApplication>
+#include <QtQuick>
 #include "settings.h"
 #include "QmlClipboardAdapter.h"
 

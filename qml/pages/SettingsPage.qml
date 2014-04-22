@@ -16,7 +16,7 @@ Page {
             width: parent.width
 
             PageHeader {
-                title: qsTr("Jolla2gether settings")
+                title: qsTr("Settings")
             }
 
             SectionHeader {
