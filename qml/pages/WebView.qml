@@ -52,7 +52,7 @@ Page {
             }
             MenuItem {
                 text: qsTr("Copy url")
-                onClicked: clipboard.setText(siteURL)
+                onClicked: appClipboard.setClipboard(siteURL)
             }
             MenuItem {
                 text: qsTr(browseBackText)

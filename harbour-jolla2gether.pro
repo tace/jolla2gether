@@ -40,9 +40,8 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/TagSearch.qml \
     qml/pages/SearchQuestions.qml \
     qml/pages/SettingsPage.qml \
-    qml/pages/Settings.qml
-
-QT += widgets
+    qml/pages/Settings.qml \
+    qml/pages/Clipboard.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}
@@ -51,5 +50,4 @@ RESOURCES += \
     qrc.qrc
 
 HEADERS += \
-    src/settings.h \
-    src/QmlClipboardAdapter.h
+    src/settings.h

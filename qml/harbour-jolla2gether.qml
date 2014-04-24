@@ -30,7 +30,6 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import jolla2gether 1.0
 import "pages"
 
 ApplicationWindow
@@ -50,9 +49,9 @@ ApplicationWindow
     Settings {
         id: appSettings
     }
-    QClipboard{
-         id: clipboard
-     }
+    Clipboard {
+        id: appClipboard
+    }
     ListModel {
         id: modelSearchTagsGlobal
     }

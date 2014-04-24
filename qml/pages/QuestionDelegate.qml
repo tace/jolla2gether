@@ -172,7 +172,7 @@ ListItem  {
         ContextMenu {
             MenuItem {
                 text: qsTr("Copy url")
-                onClicked: clipboard.setText(url)
+                onClicked: appClipboard.setClipboard(url)
             }
             MenuItem {
                 visible: !userIdSearch  // disable rerursive user selections
