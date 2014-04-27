@@ -88,7 +88,7 @@ ListItem  {
         ContextMenu {
             MenuItem {
                 text: qsTr("Copy url")
-                onClicked: appClipboard.setClipboard(url)
+                onClicked: Clipboard.text = url
             }
             MenuItem {
                 text: qsTr("All " + username + "'s questions")

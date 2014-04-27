@@ -40,8 +40,7 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/TagSearch.qml \
     qml/pages/SearchQuestions.qml \
     qml/pages/SettingsPage.qml \
-    qml/pages/Settings.qml \
-    qml/pages/Clipboard.qml
+    qml/pages/Settings.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}

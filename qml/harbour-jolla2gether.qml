@@ -49,9 +49,6 @@ ApplicationWindow
     Settings {
         id: appSettings
     }
-    Clipboard {
-        id: appClipboard
-    }
     ListModel {
         id: modelSearchTagsGlobal
     }
