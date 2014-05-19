@@ -40,7 +40,11 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/TagSearch.qml \
     qml/pages/SearchQuestions.qml \
     qml/pages/SettingsPage.qml \
-    qml/pages/Settings.qml
+    qml/pages/Settings.qml \
+    qml/pages/RescalingRichText.qml \
+    qml/pages/QuestionViewPage.qml \
+    qml/pages/ExternalLinkDialog.qml \
+    js/Markdown.Converter.js
 
 js.files = js
 js.path = /usr/share/$${TARGET}

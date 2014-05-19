@@ -1,3 +1,36 @@
+/*
+  @author: remy sharp / http://remysharp.com
+  @url: http://remysharp.com/2008/04/01/wiki-to-html-using-javascript/
+  @license: Creative Commons License - ShareAlike http://creativecommons.org/licenses/by-sa/3.0/
+  @version: 1.0
+
+  Can extend String or be used stand alone - just change the flag at the top of the script.
+*/
+
+.import "Markdown.Converter.js" as Converter
+
+var converter = new Converter.Markdown.Converter();
+
+//
+// ![image description](/upfiles/13951886327876853.jpg)
+//  changed to ![image description](https://together.jolla.com/upfiles/13951886327876853.jpg)
+//
+function addFullUrltoImageLinks(text, baseUrl) {
+    var imagePattern = /\!\[image description\]\(\/upfiles\/(\S+\.\S{3})\)/gim;
+    return text
+        .replace(imagePattern, '![image description](' + baseUrl + '/upfiles/$1)')
+}
+
+function wiki2Html(text) {
+    //var converter = new Converter.Markdown.Converter();
+    var closure = function(x) {
+        return addFullUrltoImageLinks(x, siteBaseUrl);
+    };
+    converter.hooks.set("preConversion", closure)
+    return converter.makeHtml(text);
+}
+
+
 function get_info(model)
 {
     var xhr = new XMLHttpRequest();
@@ -200,11 +233,12 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                                    "url" : ginfo.url,
                                    "author" : ginfo.author.username,
                                    "author_id" : ginfo.author.id,
+                                   "author_page_url" : siteBaseUrl + "/users/" + ginfo.author.id + "/" + ginfo.author.username,
                                    "answer_count" : ginfo.answer_count,
                                    "view_count" : ginfo.view_count,
                                    "votes" : ginfo.score,
                                    "tags" : ginfo.tags,
-                                   "text": ginfo.text,
+                                   "text": wiki2Html(ginfo.text),
                                    "has_accepted_answer": ginfo.has_accepted_answer,
                                    "closed": ginfo.closed,
                                    "created" : getTimeDurationAsString(ginfo.added_at),
@@ -322,6 +356,43 @@ function get_users_httpReq(model, query_params)
     xhr.send();
 }
 
+//
+// Returns
+//
+// {"username": "tace",
+//  "joined_at": "1388000563",
+//  "answers": 6233,
+//  "reputation": 56,
+//  "avatar": "//www.gravatar.com/avatar/72ac79d84404549ac29ca7f70a8866f0?s=48&amp;d=identicon&amp;r=PG",
+//  "questions": 5660,
+//  "last_seen_at": "1399655072",
+//  "id": 497,
+//  "comments": 29357}
+//
+function get_user(user, userFunc)
+{
+    var xhr = new XMLHttpRequest();
+    var url = siteBaseUrl + "/api/v1/users/" + user + "/"
+    console.log(url)
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function()
+    {
+        if ( xhr.readyState == xhr.DONE)
+        {
+            if ( xhr.status == 200)
+            {
+                userFunc(JSON.parse(xhr.responseText))
+            }
+            else
+            {
+                console.log("Error: " + xhr.status)
+            }
+        }
+    }
+    xhr.timeout = 4000;
+    xhr.ontimeout = function () { console.log("Timed out!!!"); }
+    xhr.send();
+}
 
 function getTimeDurationAsString(seconds) {
     return secondsToString(getCurrentTimeAsSeconds() - seconds)

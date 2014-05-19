@@ -33,7 +33,7 @@ import Sailfish.Silica 1.0
 
 Page {
     id: usersPage
-    property string pageName: "Users"
+    objectName: "Users"
     allowedOrientations: Orientation.All
 
     onStatusChanged: {
@@ -43,7 +43,6 @@ Page {
             }
             attachWebview("Users")
         }
-        coverProxy.mode = coverProxy.mode_INFO
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable

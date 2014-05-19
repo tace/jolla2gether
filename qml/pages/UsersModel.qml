@@ -41,4 +41,22 @@ ListModel {
     {
         Askbot.get_users(listModel, page)
     }
+
+    //
+    // Calls userFunc for given user (id).
+    //
+    // {"username": "tace",
+    //  "joined_at": "1388000563",
+    //  "answers": 6233,
+    //  "reputation": 56,
+    //  "avatar": "//www.gravatar.com/avatar/72ac79d84404549ac29ca7f70a8866f0?s=48&amp;d=identicon&amp;r=PG",
+    //  "questions": 5660,
+    //  "last_seen_at": "1399655072",
+    //  "id": 497,
+    //  "comments": 29357}
+    //
+    function get_user(user, userFunc)
+    {
+        return Askbot.get_user(user, userFunc)
+    }
 }

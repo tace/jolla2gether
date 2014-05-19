@@ -33,8 +33,8 @@ import Sailfish.Silica 1.0
 
 Page {
     id: questionsPage
+    objectName: "Questions"
     allowedOrientations: Orientation.All
-    property string pageName: "Questions"
     property bool userIdSearch: false
 
     onStatusChanged: {
@@ -44,24 +44,9 @@ Page {
                 questionsModel.restoreModel()
                 questionListView.positionViewAtIndex(questionsModel.listViewCurrentIndex, ListView.Center);
             }
-            attachWebview("Questions")
-            coverProxy.mode = coverProxy.mode_QUESTIONS
-        }
-        if (status === PageStatus.Inactive && pageStack.currentPage.pageName !== "WebView") {
-            connections.target = dummyTarget
         }
     }
 
-
-    QtObject {
-        id: dummyTarget
-        property bool hasNext
-        property bool hasPrevious
-        signal start
-        signal refresh
-        signal nextItem
-        signal previousItem
-    }
     Connections {
         id: connections
         target: coverProxy
@@ -85,6 +70,27 @@ Page {
             changeListItemFromCover(questionListView.currentIndex)
         }
     }
+
+    function changeListItemFromCover(index) {
+
+        // Load more already when on previous last item if fast cover actions
+        if (index === (questionsModel.count - 2)) {
+            if (questionsModel.questionsCount > (index + 1)) {
+                questionsModel.get_nextPageQuestions()
+            }
+        }
+        questionListView.positionViewAtIndex(index, ListView.Center);
+        coverProxy.hasPrevious = index > 0;
+        coverProxy.hasNext = (index < questionsModel.count - 1) &&
+                (index < questionsModel.questionsCount - 1)
+        coverProxy.currentQuestion = index + 1
+        coverProxy.questionsCount = questionsModel.questionsCount
+        coverProxy.currentPage = questionsModel.currentPageNum
+        coverProxy.pageCount = questionsModel.pagesCount
+        coverProxy.title = questionsModel.get(index).title;
+        viewPageUpdater.changeViewPage(index)
+    }
+
 
     Drawer {
         id: infoDrawer
@@ -226,25 +232,6 @@ Page {
             }
         }
     } // Drawer
-
-    function changeListItemFromCover(index) {
-
-        // Load more already when on previous last item if fast cover actions
-        if (index === (questionsModel.count - 2)) {
-            if (questionsModel.questionsCount > (index + 1)) {
-                questionsModel.get_nextPageQuestions()
-            }
-        }
-        questionListView.positionViewAtIndex(index, ListView.Center);
-        coverProxy.hasPrevious = index > 0;
-        coverProxy.hasNext = (index < questionsModel.count - 1) &&
-                (index < questionsModel.questionsCount - 1)
-        coverProxy.currentQuestion = index + 1
-        coverProxy.questionsCount = questionsModel.questionsCount
-        coverProxy.currentPage = questionsModel.currentPageNum
-        coverProxy.pageCount = questionsModel.pagesCount
-        coverProxy.title = questionsModel.get(index).title;
-    }
 }
 
 

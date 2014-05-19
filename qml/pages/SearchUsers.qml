@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Page {
+Dialog {
     id: searchPage
     allowedOrientations: Orientation.All
     property string newSearchString: ""
@@ -10,9 +10,10 @@ Page {
     SilicaFlickable {
         anchors.fill: parent
 
-        PageHeader {
-            id: header
-            title: qsTr("User search")
+        DialogHeader {
+            id: header;
+            title: qsTr("User search");
+            acceptText: qsTr("Apply");
         }
 
         SearchField {
@@ -28,15 +29,6 @@ Page {
                 makeSearch()
             }
         }
-        Button {
-            id: serachButton
-            text: "Search"
-            anchors.top: searchBox.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: {
-                makeSearch()
-            }
-        }
 
         Rectangle{
             id: bottomRec
@@ -45,7 +37,7 @@ Page {
                 GradientStop { position: 1.0; color: "#777777" }
             }
             anchors {
-                top: serachButton.bottom
+                top: searchBox.bottom
                 horizontalCenter: parent.horizontalCenter
             }
             height: 3
@@ -60,6 +52,10 @@ Page {
             wrapMode: Text.Wrap
             text: qsTr("Note: User search supported only by web portal (not by API).")
         }
+    }
+
+    onAccepted: {
+        makeSearch()
     }
 
     function makeSearch() {

@@ -1,7 +1,7 @@
 import QtQuick 2.1
 import Sailfish.Silica 1.0
 
-Page {
+Dialog {
     id: searchFilterPage
     allowedOrientations: Orientation.All
     property string newSearchString: questionsModel.searchCriteria
@@ -27,8 +27,10 @@ Page {
             spacing: 2
             width: parent.width
 
-            PageHeader {
-                title: qsTr("Search/Filter questions")
+            DialogHeader {
+                id: header;
+                title: qsTr("Search/Filter questions");
+                acceptText: qsTr("Apply search");
             }
 
             SectionHeader {
@@ -36,6 +38,7 @@ Page {
             }
             SearchField {
                 id: searchBox
+                inputMethodHints: Qt.ImhNone
                 placeholderText: qsTr("Search")
                 width: parent.width
                 text: questionsModel.searchCriteria // Show previous search if exists
@@ -178,21 +181,18 @@ Page {
         }
     }
 
-    onStatusChanged: {
-        // When leaving page
-        if (status === PageStatus.Deactivating) {
-            var reload = false
-            if (searchStringsChanged())
-                reload = true
-            if (tagsChanged())
-                reload = true
-            if (filtersChanged())
-                reload = true
-            if (sortingChanged())
-                reload = true
-            if (reload)
-                questionsModel.refresh()
-        }
+    onAccepted: {
+        var reload = false
+        if (searchStringsChanged())
+            reload = true
+        if (tagsChanged())
+            reload = true
+        if (filtersChanged())
+            reload = true
+        if (sortingChanged())
+            reload = true
+        if (reload)
+            questionsModel.refresh()
     }
 
     Component.onCompleted: {

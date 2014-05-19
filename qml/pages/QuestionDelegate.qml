@@ -8,11 +8,15 @@ ListItem  {
     width: parent.width
     contentHeight: titleText.lineCount > 1 ? Theme.itemSizeLarge : Theme.itemSizeSmall
     menu: contextMenu
+    property var viewPage;
 
     onClicked: {
         questionListView.currentIndex = index
         siteURL = url;
-        pageStack.navigateForward();
+        var props = {
+            "index": questionListView.currentIndex
+        };
+        viewPage = pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
     }
 
     function getTitleColor() {
@@ -112,7 +116,7 @@ ListItem  {
                 font.pixelSize: Theme.fontSizeTiny
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                text: "votes"
+                text: qsTr("votes")
             }
         }
 
@@ -137,7 +141,7 @@ ListItem  {
                 font.pixelSize: Theme.fontSizeTiny
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                text: "answers"
+                text: qsTr("answers")
             }
         }
 
@@ -162,7 +166,7 @@ ListItem  {
                 font.pixelSize: Theme.fontSizeTiny
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                text: "views"
+                text: qsTr("views")
             }
         }
     }

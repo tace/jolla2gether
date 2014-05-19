@@ -4,12 +4,14 @@ import QtWebKit 3.0
 
 Page {
     id: webviewPage
+    objectName: "WebView"
     allowedOrientations: Orientation.All
-    property string pageName: "WebView"
     property string browseBackText: "Back"
     property string customJavaScriptToExecute: ""
     property var customJavaScriptResultHandler: null
+    property bool showUrlLoadingProgressCircle: false
     forwardNavigation: false
+
 
     SilicaWebView {
         id: webview
@@ -20,11 +22,11 @@ Page {
         onLoadingChanged:
         {
             if (loadRequest.status === WebView.LoadStartedStatus)
-                urlLoading = true;
+                setUrlLoadding(true)
             else
-                urlLoading = false;
+                setUrlLoadding(false)
             if (loadRequest.status === WebView.LoadSucceededStatus) {
-                urlLoading = false;
+                setUrlLoadding(false)
                 webviewPage.forceActiveFocus()
             }
             if (!loading && customJavaScriptToExecute !== "" && loadRequest.status === WebView.LoadSucceededStatus) {
@@ -47,8 +49,13 @@ Page {
                 onClicked: Qt.openUrlExternally(siteURL)
             }
             MenuItem {
-                text: qsTr("together.jolla.com main page")
+                text: qsTr("Goto together.jolla.com")
                 onClicked: siteURL = siteBaseUrl
+            }
+            MenuItem {
+                enabled: webview.canGoBack
+                text: qsTr("Back in webview")
+                onClicked: webview.goBack()
             }
             MenuItem {
                 text: qsTr("Copy url")
@@ -66,15 +73,16 @@ Page {
     }
     FancyScrollerForWebView {
         flickable: webview
-        anchors.fill: webview
+        anchors.fill: parent
     }
+
     onStatusChanged: {
         if (status === PageStatus.Active) {
             setBackNavigation(false)
         }
         if (status === PageStatus.Inactive) {
             // Just to stop the ProgressCircle animation
-            urlLoading = false
+            setUrlLoadding(false)
             setBackNavigation(true)
         }
     }
@@ -83,6 +91,14 @@ Page {
         if (!(appSettings.webview_swipe_back_enabled_value && !flag))
             backNavigation = flag
     }
+    function setUrlLoadding(flag) {
+        if (showUrlLoadingProgressCircle) {
+            urlLoading = flag
+        }
+        if (!flag)
+            urlLoading = false
+    }
+
 }
 
 

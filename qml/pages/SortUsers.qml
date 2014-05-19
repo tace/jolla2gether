@@ -1,36 +1,25 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Page {
+Dialog {
     id: sortPage
     allowedOrientations: Orientation.All
     property string newSortingCriteria: usersModel.sortingCriteriaUsers
 
-
-    onStatusChanged: {
-        // When leaving page change selections only if those are changed
-        if (status === PageStatus.Deactivating) {
-            if (newSortingCriteria !== usersModel.sortingCriteriaUsers) {
-                usersModel.sortingCriteriaUsers = newSortingCriteria
-                usersModel.refresh()
-            }
-        }
-    }
-
-    Flickable
+    SilicaFlickable
     {
-        width: parent.width
-        height: parent.height - Theme.paddingLarge * 3
-        anchors.top: parent.top
-        anchors.topMargin: Theme.paddingLarge * 3
+        anchors.fill: parent
         contentHeight: sortTypeColumn.height
 
         Column {
             id: sortTypeColumn
-            spacing: 10
+            spacing: 2
             width: parent.width
-            PageHeader {
-                title: qsTr("Users sorting criteria")
+
+            DialogHeader {
+                id: header;
+                title: qsTr("Users sorting criteria");
+                acceptText: qsTr("Apply sorting");
             }
 
             Rectangle{
@@ -124,6 +113,13 @@ Page {
                 wrapMode: Text.Wrap
                 text: qsTr("Note: Sorting is global among all users and persists untill changed from this page")
             }
+        }
+    }
+
+    onAccepted: {
+        if (newSortingCriteria !== usersModel.sortingCriteriaUsers) {
+            usersModel.sortingCriteriaUsers = newSortingCriteria
+            usersModel.refresh()
         }
     }
 

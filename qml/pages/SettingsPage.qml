@@ -1,9 +1,12 @@
 import QtQuick 2.1
 import Sailfish.Silica 1.0
 
-Page {
+Dialog {
     id: settingsPage
     allowedOrientations: Orientation.All
+    property string newQuestionListTitleSpaceValue: appSettings.qUESTION_LIST_TITLE_SPACE_VALUE
+    property bool newQuestionResetSearchOnListingUserQuestionsValue: appSettings.question_reset_search_on_listing_user_questions_value
+    property bool newWebviewSwipeBackEnabledValue: appSettings.webview_swipe_back_enabled_value
 
     SilicaFlickable {
         id: mainFlic
@@ -15,8 +18,10 @@ Page {
             spacing: 2
             width: parent.width
 
-            PageHeader {
-                title: qsTr("Settings")
+            DialogHeader {
+                id: header;
+                title: qsTr("Settings");
+                acceptText: qsTr("Save");
             }
 
             SectionHeader {
@@ -38,13 +43,13 @@ Page {
                     MenuItem {
                         text: qsTr("One line (Default)")
                         onClicked: {
-                            appSettings.qUESTION_LIST_TITLE_SPACE_VALUE = appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_ONE_LINE
+                            newQuestionListTitleSpaceValue = appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_ONE_LINE
                         }
                     }
                     MenuItem {
                        text: qsTr("2 lines")
                        onClicked: {
-                           appSettings.qUESTION_LIST_TITLE_SPACE_VALUE = appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_2_LINES
+                           newQuestionListTitleSpaceValue = appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_2_LINES
                        }
                     }
                 }
@@ -81,13 +86,13 @@ Page {
                     MenuItem {
                         text: qsTr("Keep search criteria (Default)")
                         onClicked: {
-                            appSettings.question_reset_search_on_listing_user_questions_value = false
+                            newQuestionResetSearchOnListingUserQuestionsValue = false
                         }
                     }
                     MenuItem {
                        text: qsTr("Reset search criteria")
                        onClicked: {
-                           appSettings.question_reset_search_on_listing_user_questions_value = true
+                           newQuestionResetSearchOnListingUserQuestionsValue = true
                        }
                     }
                 }
@@ -112,20 +117,24 @@ Page {
                     MenuItem {
                         text: qsTr("Disabled (Default)")
                         onClicked: {
-                            appSettings.webview_swipe_back_enabled_value = false
+                            newWebviewSwipeBackEnabledValue = false
                         }
                     }
                     MenuItem {
                        text: qsTr("Enabled")
                        onClicked: {
-                           appSettings.webview_swipe_back_enabled_value = true
+                           newWebviewSwipeBackEnabledValue = true
                        }
                     }
                 }
             }
         } // column
     }
-
+    onAccepted: {
+        appSettings.qUESTION_LIST_TITLE_SPACE_VALUE = newQuestionListTitleSpaceValue
+        appSettings.question_reset_search_on_listing_user_questions_value = newQuestionResetSearchOnListingUserQuestionsValue
+        appSettings.webview_swipe_back_enabled_value = newWebviewSwipeBackEnabledValue
+    }
     Component.onCompleted: {
         titleSpace.set_value(appSettings.qUESTION_LIST_TITLE_SPACE_VALUE)
         swipeBackFromWebview.set_value(appSettings.webview_swipe_back_enabled_value)
