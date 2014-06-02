@@ -292,7 +292,7 @@ Page {
                             id: unansweredFilter
                             visible: questionsModel.unansweredQuestionsFilter !== questionsModel.unansweredQuestionsFilter_DEFAULT
                             font.pixelSize: Theme.fontSizeTiny
-                            color: "blue"
+                            color: "lightblue"
                             text: "[UNANSWERED]"
                         }
                         Separator {
