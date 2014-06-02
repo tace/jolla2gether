@@ -126,6 +126,21 @@ ListModel {
         }
         return false
     }
+    function isSearchCriteriaActive() {
+        if (questionsModel.searchCriteria !== "" ||
+            isFilterCriteriasActive() ||
+            modelSearchTagsGlobal.count > 0 ||
+            ignoredSearchTagsGlobal.count > 0)
+            return true
+        return false
+    }
+    function isFilterCriteriasActive() {
+        if (questionsModel.closedQuestionsFilter !== questionsModel.closedQuestionsFilter_DEFAULT ||
+            questionsModel.answeredQuestionsFilter !== questionsModel.answeredQuestionsFilter_DEFAULT ||
+            questionsModel.unansweredQuestionsFilter !== questionsModel.unansweredQuestionsFilter_DEFAULT)
+            return true
+        return false
+    }
     function resetUserIdSearchCriteria() {
         questionsModel.userIdSearchCriteria = ""
         questionsModel.pageHeader = questionsModel.pageHeader_ALL_QUESTIONS

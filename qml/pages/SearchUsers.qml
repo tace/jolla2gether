@@ -22,6 +22,9 @@ Dialog {
             placeholderText: qsTr("Search")
             width: parent.width
             text: ""
+            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+            EnterKey.enabled: text.length > 0
+            EnterKey.iconSource: "image://theme/icon-m-search"
             onTextChanged: {
                 newSearchString = searchBox.text
             }

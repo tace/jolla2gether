@@ -64,10 +64,12 @@ Page {
         onNextItem: {
             questionListView.currentIndex = questionListView.currentIndex + 1
             changeListItemFromCover(questionListView.currentIndex)
+            viewPageUpdater.changeViewPage(questionListView.currentIndex)
         }
         onPreviousItem: {
             questionListView.currentIndex = questionListView.currentIndex - 1
             changeListItemFromCover(questionListView.currentIndex)
+            viewPageUpdater.changeViewPage(questionListView.currentIndex)
         }
     }
 
@@ -88,7 +90,6 @@ Page {
         coverProxy.currentPage = questionsModel.currentPageNum
         coverProxy.pageCount = questionsModel.pagesCount
         coverProxy.title = questionsModel.get(index).title;
-        viewPageUpdater.changeViewPage(index)
     }
 
 
@@ -152,6 +153,7 @@ Page {
             pressDelay: 0
             anchors.fill: parent
             Label {
+                id: pagesCountLabel
                 font.pixelSize: Theme.fontSizeExtraSmall
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
@@ -192,18 +194,122 @@ Page {
                     }
                 }
                 MenuItem {
+                    visible: questionsModel.isSearchCriteriaActive()
+                    text: qsTr("Reset Search/Filter")
+                    onClicked: {
+                        questionsModel.resetSearchCriteria()
+                        questionsModel.refresh()
+                    }
+                }
+                MenuItem {
                     text: qsTr("Search/Filter...")
                     onClicked: pageStack.push(Qt.resolvedUrl("SearchQuestions.qml"))
                 }
                 MenuItem {
                     text: qsTr("Refresh")
-                    onClicked: questionsModel.refresh();
+                    onClicked: questionsModel.refresh()
                 }
             }
+
+            Row {
+                id: searchActiveBanner
+                width: parent.width
+                height: childrenRect.height
+                anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.top: header.bottom
+                Column {
+                    id: imageColumn
+                    Image {
+                        visible: questionsModel.isSearchCriteriaActive()
+                        anchors.leftMargin: Theme.paddingLarge
+                        source: "image://theme/icon-s-task"
+                    }
+                }
+                Column {
+                    anchors.top: imageColumn.top
+                    anchors.left: imageColumn.right
+                    anchors.right: parent.right
+                    Flow {
+                        id: searchCriteriaRow
+                        width: parent.width
+                        spacing: 5
+                        Label {
+                            visible: questionsModel.searchCriteria !== ""
+                            font.pixelSize: Theme.fontSizeTiny
+                            color: Theme.highlightColor
+                            text: qsTr("Search: ")
+                        }
+                        Label {
+                            visible: questionsModel.searchCriteria !== ""
+                            font.pixelSize: Theme.fontSizeTiny
+                            text: questionsModel.searchCriteria
+                        }
+                        Label {
+                            visible: modelSearchTagsGlobal.count > 0
+                            font.pixelSize: Theme.fontSizeTiny
+                            color: Theme.highlightColor
+                            text: qsTr("Tags: ")
+                        }
+                        Repeater {
+                            visible: modelSearchTagsGlobal.count > 0
+                            model: modelSearchTagsGlobal
+                            Label {
+                                font.pixelSize: Theme.fontSizeTiny
+                                text: modelData
+                            }
+                        }
+                        Repeater {
+                            visible: ignoredSearchTagsGlobal.count > 0
+                            model: ignoredSearchTagsGlobal
+                            Label {
+                                font.pixelSize: Theme.fontSizeTiny
+                                font.strikeout: true
+                                text: modelData
+                            }
+                        }
+                        Label {
+                            visible: questionsModel.isFilterCriteriasActive()
+                            font.pixelSize: Theme.fontSizeTiny
+                            color: Theme.highlightColor
+                            text: qsTr("Filters: ")
+                        }
+                        Label {
+                            visible: questionsModel.closedQuestionsFilter !== questionsModel.closedQuestionsFilter_DEFAULT
+                            font.pixelSize: Theme.fontSizeTiny
+                            font.strikeout: true
+                            color: "lightgreen"
+                            text: "[closed]"
+                        }
+                        Label {
+                            visible: (questionsModel.answeredQuestionsFilter !== questionsModel.answeredQuestionsFilter_DEFAULT) && !unansweredFilter.visible
+                            font.pixelSize: Theme.fontSizeTiny
+                            font.strikeout: true
+                            color: "orange"
+                            text: "[answered]"
+                        }
+                        Label {
+                            id: unansweredFilter
+                            visible: questionsModel.unansweredQuestionsFilter !== questionsModel.unansweredQuestionsFilter_DEFAULT
+                            font.pixelSize: Theme.fontSizeTiny
+                            color: "blue"
+                            text: "[UNANSWERED]"
+                        }
+                        Separator {
+                            visible: questionsModel.isSearchCriteriaActive()
+                            width: parent.width
+                            horizontalAlignment: Qt.AlignCenter
+                            color: Theme.secondaryColor
+                            height: 2
+                        }
+                    }
+                }
+            }
+
             SilicaListView {
                 id: questionListView
                 pressDelay: 0
-                anchors.top: header.bottom
+                anchors.top: searchActiveBanner.bottom
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -215,12 +321,6 @@ Page {
                 onCurrentIndexChanged: questionsModel.listViewCurrentIndex = currentIndex
                 delegate: QuestionDelegate { id: questionDelegate }
                 VerticalScrollDecorator { flickable: questionListView }
-
-                //            onMovementEnded: {
-                //                if(atYEnd) {
-                //                    questionsModel.get_nextPageQuestions()
-                //                }
-                //            }
                 onAtYEndChanged: {
                     if (atYEnd && contentY >= parent.height)
                         questionsModel.get_nextPageQuestions()

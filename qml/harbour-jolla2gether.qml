@@ -126,13 +126,16 @@ ApplicationWindow
         target: pageStack
         onCurrentPageChanged: {
             coverProxy.mode = pageStack.currentPage.objectName === "Questions" ||
-                              pageStack.currentPage.objectName === "QuestionViewPage"
-                              ? coverProxy.mode_QUESTIONS
-                              : coverProxy.mode_INFO
+                    pageStack.currentPage.objectName === "QuestionViewPage"
+                    ? coverProxy.mode_QUESTIONS
+                    : coverProxy.mode_INFO
 
             // Initialize webview back text on first page
             if (pageStack.currentPage.objectName === "FirstPage")
                 webviewBrowseBackText = "Back"
+            // Initialize attachment of vebview on qustions list page
+            if (pageStack.currentPage.objectName === "Questions")
+                webviewAttached = false
         }
     }
 
@@ -147,7 +150,7 @@ ApplicationWindow
     }
 
     function attachWebview(who) {
-        if (!isWebviewAttached() && Qt.application.active) {
+        if (!webviewAttached && Qt.application.active) {
             if (onPageAllowedtoAttachWebview()) {
                 if (siteURL === loginURL)
                     siteURL = siteBaseUrl
@@ -156,12 +159,12 @@ ApplicationWindow
                     backtext = who
                 }
                 questionsModel.pushWebviewWithCustomScript(true, {browseBackText: backtext})
-                webviewAttached = true
                 // Navigate back to return where user left
                 if (webviewWasActiveWhenUnattached) {
                     pageStack.navigateForward(PageStackAction.Immediate)
                     webviewWasActiveWhenUnattached = false
                 }
+                webviewAttached = true
                 console.log("WebView attached")
             }
         }
@@ -169,20 +172,28 @@ ApplicationWindow
     function unattachWebview() {
         if (webviewAttached) {
             if (pageStack.currentPage.objectName === "WebView") {
-                if (siteURL === loginURL)
+                if (siteURL === loginURL) {
                     pageStack.pop()
+                }
                 else {
                     // Save back browsing text and move away from webview
                     webviewBrowseBackText = pageStack.currentPage.browseBackText
                     webviewWasActiveWhenUnattached = true
                     pageStack.currentPage.backNavigation = true
                     pageStack.navigateBack(PageStackAction.Immediate)
+                    console.log("Webview was active while unattaching")
                 }
             }
-            var page = pageStack.find(onPageAllowedtoAttachWebview)
-            if (page !== null) {
-                webviewBrowseBackText = pageStack.nextPage().browseBackText
-                pageStack.popAttached(page)
+            else {
+                var page = pageStack.find(onPageAllowedtoAttachWebview)
+                if (page !== null) {
+                    var nextPage = pageStack.nextPage()
+                    if (nextPage !== null && nextPage.objectName === "WebView") {
+                        webviewBrowseBackText = nextPage.browseBackText
+                        pageStack.popAttached()
+                        console.log("Webview was attached to page " + page.objectName)
+                    }
+                }
             }
             webviewAttached = false
             console.log("WebView unattached")
@@ -192,18 +203,6 @@ ApplicationWindow
         if (pageStack.currentPage.objectName === "Users" ||
             pageStack.currentPage.objectName === "QuestionViewPage") {
             return true
-        }
-        return false
-    }
-    function isWebviewAttached() {
-        if (pageStack.currentPage.objectName === "WebView")
-            return true
-        if (onPageAllowedtoAttachWebview()) {
-            var nextPage = pageStack.nextPage()
-            if (nextPage !== null) {
-                if (nextPage.objectName === "WebView")
-                    return true
-            }
         }
         return false
     }

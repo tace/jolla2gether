@@ -112,7 +112,7 @@ Dialog {
                         val = 1
                     swipeBackFromWebview.currentIndex = val
                 }
-                label: qsTr("Swipe back to question list")
+                label: qsTr("Swipe back from webview")
                 menu: ContextMenu {
                     MenuItem {
                         text: qsTr("Disabled (Default)")

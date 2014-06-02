@@ -237,7 +237,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                                    "answer_count" : ginfo.answer_count,
                                    "view_count" : ginfo.view_count,
                                    "votes" : ginfo.score,
-                                   "tags" : ginfo.tags,
+                                   "tags" : stringifyJsonArray(ginfo.tags),
                                    "text": wiki2Html(ginfo.text),
                                    "has_accepted_answer": ginfo.has_accepted_answer,
                                    "closed": ginfo.closed,
@@ -262,6 +262,17 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
     xhr.send();
 }
 
+// Make json array to comma separated stringto save it to listmodel easier
+function stringifyJsonArray(array) {
+    var res = ""
+    for (var i = 0; i < array.length; i++) {
+        if ((i + 1) < array.length)
+            res = res + array[i] + ","
+        else
+            res = res + array[i]
+    }
+    return res
+}
 
 function get_users(model, page) {
     var query_params = "?"
