@@ -16,9 +16,9 @@ var converter = new Converter.Markdown.Converter();
 //  changed to ![image description](https://together.jolla.com/upfiles/13951886327876853.jpg)
 //
 function addFullUrltoImageLinks(text, baseUrl) {
-    var imagePattern = /\!\[image description\]\(\/upfiles\/(\S+\.\S{3})\)/gim;
+    var imagePattern = /\!\[(.+)\]\(\/upfiles\/(\S+\.\S{3})\)/gim;
     return text
-        .replace(imagePattern, '![image description](' + baseUrl + '/upfiles/$1)')
+        .replace(imagePattern, '![$1](' + baseUrl + '/upfiles/$2)')
 }
 
 function wiki2Html(text) {
