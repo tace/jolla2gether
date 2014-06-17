@@ -13,6 +13,13 @@ CoverBackground {
         }
     }
 
+    Image {
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        source: appicon
+        opacity: 0.1
+    }
+
     Column {
         visible: coverProxy.mode === coverProxy.mode_INFO
 

@@ -71,11 +71,6 @@ Page {
             }
         }
     }
-    FancyScrollerForWebView {
-        flickable: webview
-        anchors.fill: parent
-    }
-
     onStatusChanged: {
         if (status === PageStatus.Active) {
             setBackNavigation(false)

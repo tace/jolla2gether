@@ -5,23 +5,23 @@ ListItem  {
     id: background
     anchors.left: ListView.left
     anchors.right: ListView.right
-    contentHeight: Theme.itemSizeSmall
+    contentHeight: Theme.itemSizeLarge
     menu: contextMenu
 
     onClicked: { siteURL = url; pageStack.navigateForward(); }
 
     Column{
-        anchors.fill: parent
-        Row {
+        Row{
+            id: imageRow
             Image {
                 id: userPic
-                width: 80
-                height: 80
-                source: "http:" + avatar
+                width: 120
+                height: 120
+                source: "http:" + usersModel.changeImageLinkSize(avatar, 120)
             }
             Label {
                 id: userLabel
-                font.pixelSize: Theme.fontSizeTiny
+                font.pixelSize: Theme.fontSizeSmall
                 color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
                 font.bold: model.url === siteURL
                 text: " " + username
@@ -31,53 +31,67 @@ ListItem  {
             Rectangle {
                 id: fillRectangel
                 color: "transparent"
-                width: background.width - userPic.width - userLabel.width - karmaRectangle.width - timesRectangle.width
+                width: background.width - userPic.width - karmaRectangle.width - timesRectangle.width - userLabel.width
                 height: 40
             }
+        }
+        Column {
+            anchors.top: imageRow.top
+            anchors.left: imageRow.right
 
-            // Joined and last seen time strings
-            Rectangle {
-                id: timesRectangle
-                color: "transparent"
-                smooth: true
-                //border.width: 1
-                width: 235
-                height: 40
-                radius: 10
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    anchors.top: parent.top
-                    anchors.right: parent.right
-                    text: "joined: " + joined_at + "  "
-                }
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    text: "  seen: " + last_seen_at + "  "
+            Row {
+                Rectangle {
+                    id: fillRectangel2
+                    color: "transparent"
+                    width: 1
+                    height: 40
                 }
             }
-            // Karma
-            Rectangle {
-                id: karmaRectangle
-                color: "transparent"
-                smooth: true
-                border.width: 1
-                width: 70
-                height: 40
-                radius: 10
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    color: "lightgreen"
-                    text: reputation
+            Row {
+                // Joined and last seen time strings
+                Rectangle {
+                    id: timesRectangle
+                    color: "transparent"
+                    smooth: true
+                    //border.width: 1
+                    width: 235
+                    height: 40
+                    radius: 10
+                    Label {
+                        font.pixelSize: Theme.fontSizeTiny
+                        anchors.top: parent.top
+                        anchors.right: parent.right
+                        text: "joined: " + joined_at + "  "
+                    }
+                    Label {
+                        font.pixelSize: Theme.fontSizeTiny
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        text: "  seen: " + last_seen_at + "  "
+                    }
                 }
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    text: "karma"
+                // Karma
+                Rectangle {
+                    id: karmaRectangle
+                    color: "transparent"
+                    smooth: true
+                    border.width: 1
+                    width: 70
+                    height: 40
+                    radius: 10
+                    Label {
+                        font.pixelSize: Theme.fontSizeTiny
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        color: "lightgreen"
+                        text: reputation
+                    }
+                    Label {
+                        font.pixelSize: Theme.fontSizeTiny
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        text: "karma"
+                    }
                 }
             }
         }

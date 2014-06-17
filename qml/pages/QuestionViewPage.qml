@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import QtQuick.XmlListModel 2.0
 
 Page {
     id: page
@@ -7,6 +8,7 @@ Page {
     allowedOrientations: Orientation.All
 
     property int index: 0
+    property string qid: questionsModel.get(index).id
     property string title: questionsModel.get(index).title
     property string text: questionsModel.get(index).text
     property string url: questionsModel.get(index).url
@@ -25,6 +27,71 @@ Page {
 
     property bool openExternalLinkOnWebview: false
     property string externalUrl: ""
+    property string commentFilter: "comment"
+    property string answerFilter: "answer"
+
+    ListModel {
+        id: rssModel
+        property bool ready: false
+    }
+    ListModel {
+        id: tmpListModel
+    }
+    XmlListModel {
+        id: rssModelOriginal
+        source: siteBaseUrl + "/feeds/question/" + qid + "/"
+        query: "/rss/channel/item[contains(lower-case(child::category),lower-case(\""+commentFilter+"\")) or contains(lower-case(child::category),lower-case(\""+answerFilter+"\"))]"
+        //namespaceDeclarations: "declare default element namespace 'http://www.w3.org/2005/Atom';"
+
+        XmlRole { name: "title"; query: "title/string()" }
+        XmlRole { name: "link"; query: "link/string()" }
+        XmlRole { name: "description"; query: "description/string()" }
+        XmlRole { name: "category"; query: "category/string()" }
+        XmlRole { name: "pubDate"; query: "pubDate/string()"; isKey: true }
+        onStatusChanged:{
+            console.debug("feedSource: "+source)
+            console.debug("feed itemcount: "+rssModel.count)
+            console.debug("feedProgress: "+rssModel.progress)
+            if (status === XmlListModel.Ready) {
+                fillListModel(rssModelOriginal, rssModel)
+                rssModel.ready = true
+                //sortModel(rssModel)
+            }
+        }
+    }
+    function fillListModel(xmlModel, listModel)
+    {
+        var n;
+        listModel.clear();
+        for (n=0; n < xmlModel.count; n++)
+        {
+            if (xmlModel.get(n).category === commentFilter) {
+                add2ListModel(xmlModel, tmpListModel, n)
+            }
+            else {  // Answer
+                // Add here comments in reverse order
+                fillModelInReverseOrder(tmpListModel, listModel)
+                tmpListModel.clear()
+                add2ListModel(xmlModel, listModel, n)
+            }
+        }
+        fillModelInReverseOrder(tmpListModel, listModel)
+        tmpListModel.clear()
+    }
+    function fillModelInReverseOrder(sourceModel, toModel) {
+        var n;
+        for (n=sourceModel.count - 1; n >= 0; n--)
+        {
+            add2ListModel(sourceModel, toModel, n)
+        }
+    }
+    function add2ListModel(sourceModel, toModel, index) {
+        toModel.append({"title":          sourceModel.get(index).title,
+                      "link":           sourceModel.get(index).link,
+                      "description":    sourceModel.get(index).description,
+                      "category":       sourceModel.get(index).category,
+                      "pubDate":        sourceModel.get(index).pubDate})
+    }
 
     function goToItem(idx) {
         var props = {
@@ -45,7 +112,8 @@ Page {
     // after answer got from asyncronous (get_user) http request.
     function setUserData(user_data) {
         userKarma = user_data.reputation
-        userAvatarUrl = "http:" + user_data.avatar
+        userAvatarUrl = "http:" + usersModel.changeImageLinkSize(user_data.avatar, 100) //match this size to userPic size
+        console.log("avatar: "+userAvatarUrl)
     }
     function selectLabelRight() {
         return askedLabel.paintedWidth > updatedLabel.paintedWidth ? askedLabel.right : updatedLabel.right
@@ -298,10 +366,8 @@ Page {
                         color: "transparent"
                         smooth: true
                         border.width: 1
-                        //border.color: "gray"
                         border.color: Theme.secondaryHighlightColor
                         height: 30
-                        //radius: 10
                         Label {
                             id: tagText
                             anchors.centerIn: parent
@@ -355,8 +421,28 @@ Page {
                 width: 1
                 height: Theme.paddingLarge
             }
-        }
+            Item {
+                width: 1
+                height: Theme.paddingLarge
+            }
 
+            Repeater {
+                id: answersAndCommentsList
+                visible: (rssModel.ready)
+                width: parent.width
+                height: childrenRect.height
+                anchors.left: parent.left
+                anchors.right: parent.right
+                model: rssModel
+                clip: true
+                //VerticalScrollDecorator { flickable: answersAndCommentsList }
+                delegate: AnswersAndCommentsDelegate { }
+            }
+            Item {
+                width: 1
+                height: Theme.paddingLarge
+            }
+        }
         ScrollDecorator { }
     }
 

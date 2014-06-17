@@ -36,6 +36,7 @@ Page {
     objectName: "Questions"
     allowedOrientations: Orientation.All
     property bool userIdSearch: false
+    property var pageCounter: null // To keep track in whihc level of questionsPage we are
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
@@ -46,31 +47,52 @@ Page {
             }
         }
     }
+    Component.onCompleted: {
+        pageCounter = pageStack.depth
+    }
 
     Connections {
         id: connections
         target: coverProxy
         onStart: {
-            changeListItemFromCover(questionListView.currentIndex)
+            if (activateCoverSignals()) {
+                changeListItemFromCover(questionListView.currentIndex)
+            }
         }
         onRefresh: {
-            var closure = function(x) {
-                return function() {
-                    changeListItemFromCover(x);
-                }
-            };
-            questionsModel.refresh(questionsModel.currentPageNum, closure(questionListView.currentIndex))
+            if (activateCoverSignals()) {
+                var closure = function(x) {
+                    return function() {
+                        changeListItemFromCover(x);
+                    }
+                };
+                questionsModel.refresh(questionsModel.currentPageNum, closure(questionListView.currentIndex))
+            }
         }
         onNextItem: {
-            questionListView.currentIndex = questionListView.currentIndex + 1
-            changeListItemFromCover(questionListView.currentIndex)
-            viewPageUpdater.changeViewPage(questionListView.currentIndex)
+            if (activateCoverSignals()) {
+                questionListView.currentIndex = questionListView.currentIndex + 1
+                changeListItemFromCover(questionListView.currentIndex)
+                viewPageUpdater.changeViewPage(questionListView.currentIndex)
+            }
         }
         onPreviousItem: {
-            questionListView.currentIndex = questionListView.currentIndex - 1
-            changeListItemFromCover(questionListView.currentIndex)
-            viewPageUpdater.changeViewPage(questionListView.currentIndex)
+            if (activateCoverSignals()) {
+                questionListView.currentIndex = questionListView.currentIndex - 1
+                changeListItemFromCover(questionListView.currentIndex)
+                viewPageUpdater.changeViewPage(questionListView.currentIndex)
+            }
         }
+    }
+
+    // Pagestack can have many times this page and we want signals only one time
+    // and also we want signals to be executed if QuestionViewPage is active
+    function activateCoverSignals() {
+        if (status === PageStatus.Active ||
+            (pageStack.currentPage.objectName === "QuestionViewPage") && (pageStack.depth - pageCounter) === 2) {
+            return true
+        }
+        return false
     }
 
     function changeListItemFromCover(index) {
@@ -78,6 +100,7 @@ Page {
         // Load more already when on previous last item if fast cover actions
         if (index === (questionsModel.count - 2)) {
             if (questionsModel.questionsCount > (index + 1)) {
+                console.log("Load next page questions from cover")
                 questionsModel.get_nextPageQuestions()
             }
         }
@@ -322,13 +345,14 @@ Page {
                 delegate: QuestionDelegate { id: questionDelegate }
                 VerticalScrollDecorator { flickable: questionListView }
                 onAtYEndChanged: {
-                    if (atYEnd && contentY >= parent.height)
-                        questionsModel.get_nextPageQuestions()
+                    if (atYEnd && contentY >= parent.height) {
+                        // BugFix: Ensure Y and height are something, if not page is just loaded and we do not want to load douple items to view
+                        if (contentY > 0 && parent.height > 0) {
+                            console.log("At end of view, load next page questions")
+                            questionsModel.get_nextPageQuestions()
+                        }
+                    }
                 }
-            }
-            FancyScroller {
-                anchors.fill: questionListView
-                flickable: questionListView
             }
         }
     } // Drawer

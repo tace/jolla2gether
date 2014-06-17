@@ -27,7 +27,6 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/WebView.qml \
     qml/pages/CreditsModel.qml \
     qml/pages/LicensePage.qml \
-    qml/pages/FancyScroller.qml \
     qml/pages/UsersPage.qml \
     qml/pages/UserDelegate.qml \
     qml/pages/QuestionsPage.qml \
@@ -36,7 +35,6 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/QuestionsModel.qml \
     qml/pages/UsersModel.qml \
     qml/pages/InfoModel.qml \
-    qml/pages/FancyScrollerForWebView.qml \
     qml/pages/TagSearch.qml \
     qml/pages/SearchQuestions.qml \
     qml/pages/SettingsPage.qml \
@@ -44,7 +42,8 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/RescalingRichText.qml \
     qml/pages/QuestionViewPage.qml \
     qml/pages/ExternalLinkDialog.qml \
-    js/Markdown.Converter.js
+    js/Markdown.Converter.js \
+    qml/pages/AnswersAndCommentsDelegate.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}

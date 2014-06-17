@@ -169,7 +169,7 @@ function get_questions(model, page, onLoadedCallback) {
 function get_questions_httpReq(model, query_params, onLoadedCallback)
 {
     var xhr = new XMLHttpRequest();
-    var url = "https://together.jolla.com//api/v1/questions/" + query_params
+    var url = "https://together.jolla.com/api/v1/questions/" + query_params
     urlLoading = true
     console.log(url)
     xhr.open("GET", url, true);
@@ -229,7 +229,9 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                         }
                     }
 
-                    model.append({"title" : ginfo.title,
+                    model.append({
+                                   "id" : ginfo.id,
+                                   "title" : ginfo.title,
                                    "url" : ginfo.url,
                                    "author" : ginfo.author.username,
                                    "author_id" : ginfo.author.id,

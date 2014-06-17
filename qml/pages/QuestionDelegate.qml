@@ -190,7 +190,6 @@ ListItem  {
 
                     questionsModel.setUserIdSearchCriteria(author_id)
                     questionsModel.pageHeader = author + "'s questions"
-                    unattachWebview()
                     questionsModel.refresh()
                     pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"), {userIdSearch: true})
                 }

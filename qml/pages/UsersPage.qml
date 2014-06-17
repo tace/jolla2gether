@@ -100,10 +100,6 @@ Page {
                 }
             }
         }
-        FancyScroller {
-            anchors.fill: usersListView
-            flickable: usersListView
-        }
     }
 }
 

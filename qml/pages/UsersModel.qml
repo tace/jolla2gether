@@ -59,4 +59,9 @@ ListModel {
     {
         return Askbot.get_user(user, userFunc)
     }
+    function changeImageLinkSize(link, size) {
+        var pattern = /(.+)\?s=48\&(.+)/gim;
+        return link
+        .replace(pattern, '$1' + '?s=' + size + '&' + '$2')
+    }
 }

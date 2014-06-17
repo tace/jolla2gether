@@ -204,4 +204,12 @@ ListModel {
 
         c.myQuestionsToggle = p.myQuestionsToggle
     }
+    function wiki2Html(text) {
+        return Askbot.wiki2Html(text)
+    }
+    function rssPubdate2ElapsedTimeString(rssPubDate) {
+        var date = new Date(rssPubDate);
+        var seconds = date.getTime() / 1000; // seconds since midnight, 1 Jan 1970
+        return Askbot.getTimeDurationAsString(seconds).trim()
+    }
 }
