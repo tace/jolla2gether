@@ -41,7 +41,7 @@ Item {
         text: "<style>* { font-size: 1px }</style>" + parent.text
 
         onContentWidthChanged: {
-            console.log("contentWidth: " + contentWidth);
+            //console.log("contentWidth: " + contentWidth);
             rescaleTimer.restart();
         }
     }
@@ -72,7 +72,7 @@ Item {
         onTriggered: {
             var contentWidth = Math.floor(layoutLabel.contentWidth);
             scaling = Math.min(1, parent.width / (layoutLabel.contentWidth + 0.0));
-            console.log("scaling: " + scaling);
+            //console.log("scaling: " + scaling);
 
             // force reflow
             contentLabel.text = contentLabel.text + " ";

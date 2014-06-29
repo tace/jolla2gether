@@ -29,17 +29,26 @@ Page {
     property string externalUrl: ""
     property string commentFilter: "comment"
     property string answerFilter: "answer"
+    property bool answersAndCommentsOpen: false
+    property bool answersAndCommentsLoaded: false
+    property string rssFeedUrl: siteBaseUrl + "/feeds/question/" + qid + "/"
 
     ListModel {
         id: rssModel
         property bool ready: false
     }
     ListModel {
-        id: tmpListModel
+        id: sortModel
+    }
+    ListModel {
+        id: pagingListModel
+        property int pageSize: 20 // 20 answers or comments at a time
+        property int currentIndex: 0 // Keep track of point in total rss feed index
+        property int pageStopIndex: 0
     }
     XmlListModel {
         id: rssModelOriginal
-        source: siteBaseUrl + "/feeds/question/" + qid + "/"
+        source: ""
         query: "/rss/channel/item[contains(lower-case(child::category),lower-case(\""+commentFilter+"\")) or contains(lower-case(child::category),lower-case(\""+answerFilter+"\"))]"
         //namespaceDeclarations: "declare default element namespace 'http://www.w3.org/2005/Atom';"
 
@@ -50,47 +59,92 @@ Page {
         XmlRole { name: "pubDate"; query: "pubDate/string()"; isKey: true }
         onStatusChanged:{
             console.debug("feedSource: "+source)
-            console.debug("feed itemcount: "+rssModel.count)
-            console.debug("feedProgress: "+rssModel.progress)
             if (status === XmlListModel.Ready) {
-                fillListModel(rssModelOriginal, rssModel)
+                console.debug("feed itemcount ready: "+rssModelOriginal.count)
+                sortCommentsByTime(rssModelOriginal, pagingListModel)
+                fillRssModel(rssModel)
                 rssModel.ready = true
-                //sortModel(rssModel)
+                urlLoading = false
+            }
+            if (status === XmlListModel.Error) {
+                urlLoading = false
             }
         }
     }
-    function fillListModel(xmlModel, listModel)
-    {
+    function sortCommentsByTime(sourceModel, targetModel) {
         var n;
-        listModel.clear();
-        for (n=0; n < xmlModel.count; n++)
+        for (n=0; n < sourceModel.count; n++)
         {
-            if (xmlModel.get(n).category === commentFilter) {
-                add2ListModel(xmlModel, tmpListModel, n)
+            if (sourceModel.get(n).category === commentFilter) {
+                add2ListModel(sourceModel, sortModel, n)
             }
             else {  // Answer
-                // Add here comments in reverse order
-                fillModelInReverseOrder(tmpListModel, listModel)
-                tmpListModel.clear()
-                add2ListModel(xmlModel, listModel, n)
+                // Add here comments sorted by time
+                addSortedComments(targetModel)
+                add2ListModel(sourceModel, targetModel, n)
             }
         }
-        fillModelInReverseOrder(tmpListModel, listModel)
-        tmpListModel.clear()
+        // copy possible rest of comments
+        addSortedComments(targetModel)
     }
-    function fillModelInReverseOrder(sourceModel, toModel) {
+    function addSortedComments(targetModel) {
+        sortListModel(sortModel)
+        copyModel(sortModel, targetModel)
+        sortModel.clear()
+    }
+    function fillRssModel(listModel)
+    {
         var n;
-        for (n=sourceModel.count - 1; n >= 0; n--)
+        pagingListModel.pageStopIndex = pagingListModel.currentIndex + pagingListModel.pageSize
+        if (pagingListModel.pageStopIndex > pagingListModel.count)
+            pagingListModel.pageStopIndex = pagingListModel.count
+        for (n=pagingListModel.currentIndex; n < pagingListModel.pageStopIndex; n++)
         {
-            add2ListModel(sourceModel, toModel, n)
+            urlLoading = true
+            add2ListModel(pagingListModel, listModel, n)
+            pagingListModel.currentIndex++
+        }
+    }
+    function initRssModel() {
+        rssModel.clear()
+        pagingListModel.currentIndex = 0
+        pagingListModel.pageStopIndex = 0
+    }
+
+    //    function fillModelInReverseOrder(sourceModel, toModel) {
+    //        var n;
+    //        for (n=sourceModel.count - 1; n >= 0; n--)
+    //        {
+    //            add2ListModel(sourceModel, toModel, n)
+    //        }
+    //    }
+    function sortListModel(listModel) {
+        var n;
+        var i;
+        for (n=0; n < listModel.count; n++)
+            for (i=n+1; i < listModel.count; i++)
+            {
+                var itemTime = questionsModel.rssPubDate2Seconds(listModel.get(n).pubDate)
+                var nextItemTime = questionsModel.rssPubDate2Seconds(listModel.get(i).pubDate)
+                if (itemTime > nextItemTime)
+                {
+                    listModel.move(i, n, 1);
+                    n=0;
+                }
+            }
+    }
+    function copyModel(source, target) {
+        var i;
+        for (i=0; i < source.count; i++) {
+            add2ListModel(source, target, i)
         }
     }
     function add2ListModel(sourceModel, toModel, index) {
         toModel.append({"title":          sourceModel.get(index).title,
-                      "link":           sourceModel.get(index).link,
-                      "description":    sourceModel.get(index).description,
-                      "category":       sourceModel.get(index).category,
-                      "pubDate":        sourceModel.get(index).pubDate})
+                           "link":           sourceModel.get(index).link,
+                           "description":    sourceModel.get(index).description,
+                           "category":       sourceModel.get(index).category,
+                           "pubDate":        sourceModel.get(index).pubDate})
     }
 
     function goToItem(idx) {
@@ -98,6 +152,22 @@ Page {
             "index": idx
         };
         pageStack.replace("QuestionViewPage.qml", props);
+    }
+
+    function loadAnswersAndComments() {
+        if (!answersAndCommentsLoaded) {
+            urlLoading = true
+            rssModelOriginal.source = rssFeedUrl
+            answersAndCommentsLoaded = true
+        }
+        if (answersAndCommentsOpen) {
+            answersAndCommentsOpen = false
+            initRssModel()
+        }
+        else {
+            answersAndCommentsOpen = true
+            fillRssModel(rssModel)
+        }
     }
 
     Connections {
@@ -117,6 +187,9 @@ Page {
     }
     function selectLabelRight() {
         return askedLabel.paintedWidth > updatedLabel.paintedWidth ? askedLabel.right : updatedLabel.right
+    }
+    function getTagsArray() {
+        return tags.split(",")
     }
 
     Component.onCompleted: {
@@ -138,7 +211,6 @@ Page {
             }
         }
     }
-
 
     SilicaFlickable {
         id: contentFlickable
@@ -426,28 +498,77 @@ Page {
                 height: Theme.paddingLarge
             }
 
+            MouseArea {
+                id: clicker;
+                width: parent.width
+                height: 40
+                onClicked: { loadAnswersAndComments() }
+                Image {
+                    source: "qrc:/qml/images/arrow-right.png"
+                    anchors.leftMargin: Theme.paddingMedium
+                    rotation: answersAndCommentsOpen ? +90 : 0
+                    anchors.left: parent.left
+                    Behavior on rotation { NumberAnimation { duration: 180; } }
+                }
+                Label {
+                    anchors.centerIn: parent
+                    font.pixelSize: Theme.fontSizeMedium
+                    text: qsTr("Answers and Comments") + (answersAndCommentsOpen ? " (" + rssModelOriginal.count + ")" : "")
+                }
+            }
+            Item {
+                width: 1
+                height: Theme.paddingLarge
+            }
+
             Repeater {
                 id: answersAndCommentsList
-                visible: (rssModel.ready)
+                visible: rssModel.ready && answersAndCommentsOpen
                 width: parent.width
-                height: childrenRect.height
+                height: answersAndCommentsOpen ? childrenRect.height : 0
                 anchors.left: parent.left
                 anchors.right: parent.right
-                model: rssModel
+                model: answersAndCommentsOpen ? rssModel : undefined
                 clip: true
-                //VerticalScrollDecorator { flickable: answersAndCommentsList }
                 delegate: AnswersAndCommentsDelegate { }
+                onItemAdded: {
+                    if (index === (pagingListModel.pageStopIndex - 1)) {
+                        urlLoading = false
+                    }
+                }
             }
+
+            //            CollapsiblePanel
+            //            {
+            //                id: panel1
+            //                visible: (rssModel.ready)
+            //                width: parent.width
+            //                //height: parent.height
+            //                height: childrenRect.height
+            //                anchors.left: parent.left
+            //                anchors.right: parent.right
+            //                titleText: "Date & Time Settings"
+            //                customModel: rssModel
+            //                customDelegate: AnswersAndCommentsDelegate {}
+            //                onItemselected:{
+            //                    console.log(index)
+            //                }
+            //            }
+
             Item {
                 width: 1
                 height: Theme.paddingLarge
             }
         }
         ScrollDecorator { }
+        onAtYEndChanged: {
+            //console.log("at END. " + contentY + "," + parent.height + "," + height + "," + atYEnd)
+            if (atYEnd && contentY >= parent.height && answersAndCommentsOpen) {
+                if (contentY > 0 && parent.height > 0) {
+                    console.log("At end of page, load next answers/comments")
+                    fillRssModel(rssModel)
+                }
+            }
+        }
     }
-
-    function getTagsArray() {
-        return tags.split(",")
-    }
-
 }

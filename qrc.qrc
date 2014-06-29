@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>harbour-jolla2gether_250px.png</file>
+        <file>qml/images/arrow-right.png</file>
     </qresource>
 </RCC>

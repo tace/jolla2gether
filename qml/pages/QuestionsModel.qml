@@ -207,9 +207,12 @@ ListModel {
     function wiki2Html(text) {
         return Askbot.wiki2Html(text)
     }
-    function rssPubdate2ElapsedTimeString(rssPubDate) {
+    function rssPubDate2Seconds(rssPubDate) {
         var date = new Date(rssPubDate);
-        var seconds = date.getTime() / 1000; // seconds since midnight, 1 Jan 1970
+        return date.getTime() / 1000; // seconds since midnight, 1 Jan 1970
+    }
+    function rssPubdate2ElapsedTimeString(rssPubDate) {
+        var seconds = rssPubDate2Seconds(rssPubDate)
         return Askbot.getTimeDurationAsString(seconds).trim()
     }
 }

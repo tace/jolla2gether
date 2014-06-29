@@ -105,21 +105,11 @@ ApplicationWindow
 
     initialPage: Component { FirstPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
-    ProgressCircle {
-        id: progressCircle
-        z: 2
-        anchors.top: parent.top
-        anchors.topMargin: 16
-        anchors.horizontalCenter: parent.horizontalCenter
+    BusyIndicator {
+        running: urlLoading
         visible: urlLoading
-        width: 32
-        height: 32
-        Timer {
-            interval: 32
-            repeat: true
-            onTriggered: progressCircle.value = (progressCircle.value + 0.005) % 1.0
-            running: urlLoading
-        }
+        size: BusyIndicatorSize.Large
+        anchors.centerIn: parent
     }
 
     Connections {
@@ -201,7 +191,7 @@ ApplicationWindow
     }
     function onPageAllowedtoAttachWebview() {
         if (pageStack.currentPage.objectName === "Users" ||
-            pageStack.currentPage.objectName === "QuestionViewPage") {
+                pageStack.currentPage.objectName === "QuestionViewPage") {
             return true
         }
         return false

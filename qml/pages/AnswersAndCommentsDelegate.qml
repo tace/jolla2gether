@@ -27,15 +27,8 @@ ListItem  {
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.secondaryColor
             width: parent.width
-            text: getTitle() + " by <b>" + getUser() + "</b>   <b><font size=\"1\">(" + questionsModel.rssPubdate2ElapsedTimeString(pubDate) + ")</font></b>"
+            text: getTitle() + " <b>" + getUser() + "</b>   <font size=\"1\">(" + questionsModel.rssPubdate2ElapsedTimeString(pubDate) + ")</font>"
         }
-        //        Label {
-        //            id: descriptionLabel
-        //            font.pixelSize: Theme.fontSizeTiny
-        //            width: parent.width
-        //            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        //            text: questionsModel.wiki2Html(description)
-        //        }
         RescalingRichText {
             anchors.left: parent.left
             anchors.right: parent.right
@@ -60,14 +53,6 @@ ListItem  {
             }
         }
 
-        //        Label {
-        //            id: pubDateLabel
-        //            font.pixelSize: Theme.fontSizeTiny
-        //            font.bold: true
-        //            color: Theme.secondaryColor
-        //            width: parent.width
-        //            text: questionsModel.rssPubdate2ElapsedTimeString(pubDate)
-        //        }
         Item {
             id: filler
             width: 1
@@ -82,8 +67,8 @@ ListItem  {
     }
     function getTitle() {
         if (isAnswer())
-            return "Answer"
-        return "Comment"
+            return "<font color=\"orange\">Answer</font> by"
+        return "<font size=\"1\">Comment by</font>"
     }
 
     // E.g. "Comment by tace ..."
