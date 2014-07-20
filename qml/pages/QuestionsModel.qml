@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import "../../js/askbot.js" as Askbot
-import "../../js/custom.js" as Custom
 
 ListModel {
     id: listModel
