@@ -17,7 +17,7 @@ Page {
     property string userId: questionsModel.get(index).author_id
     property string userName: questionsModel.get(index).author
     property string userPageUrl: questionsModel.get(index).author_page_url
-    property string votes: questionsModel.get(index).votes
+    property int votes: questionsModel.get(index).votes
     property string answer_count: questionsModel.get(index).answer_count
     property string view_count: questionsModel.get(index).view_count
     property string tags: questionsModel.get(index).tags
@@ -32,6 +32,15 @@ Page {
     property bool answersAndCommentsOpen: false
     property bool answersAndCommentsLoaded: false
     property string rssFeedUrl: siteBaseUrl + "/feeds/question/" + qid + "/"
+    property bool upVoteOn: false
+    property bool downVoteOn: false
+    property bool voteStatusLoaded: false
+    property bool userLoggedIn: false
+
+
+    InfoBanner {
+        id: infoBanner
+    }
 
     ListModel {
         id: rssModel
@@ -110,14 +119,6 @@ Page {
         pagingListModel.currentIndex = 0
         pagingListModel.pageStopIndex = 0
     }
-
-    //    function fillModelInReverseOrder(sourceModel, toModel) {
-    //        var n;
-    //        for (n=sourceModel.count - 1; n >= 0; n--)
-    //        {
-    //            add2ListModel(sourceModel, toModel, n)
-    //        }
-    //    }
     function sortListModel(listModel) {
         var n;
         var i;
@@ -170,13 +171,6 @@ Page {
         }
     }
 
-    Connections {
-        id: connections
-        target: viewPageUpdater
-        onChangeViewPage: {
-            goToItem(pageIndex)
-        }
-    }
 
     // Set some properties
     // after answer got from asyncronous (get_user) http request.
@@ -188,8 +182,60 @@ Page {
     function selectLabelRight() {
         return askedLabel.paintedWidth > updatedLabel.paintedWidth ? askedLabel.right : updatedLabel.right
     }
+    function getLabelMaxWidth() {
+        return askedLabel.paintedWidth > updatedLabel.paintedWidth ? askedLabel.width : updatedLabel.width
+    }
     function getTagsArray() {
         return tags.split(",")
+    }
+
+    function votingResultsCallback(up, down) {
+        upVoteOn = up
+        downVoteOn = down
+        voteDownButton.refreshSource()
+        voteUpButton.refreshSource()
+        voteStatusLoaded = true
+    }
+
+    function setVotesToQuestionModel(votes) {
+        questionsModel.set(index, {"votes": votes})
+    }
+
+    function question_vote_up(question_id) {
+        var script = "document.getElementById('question-img-upvote-" + question_id + "').click();"
+        pageStack.nextPage().evaluateJavaScriptOnWebPage(script, function(result) {
+            if (downVoteOn)
+                upVoteOn = false
+            else
+                upVoteOn = true
+            downVoteOn = false
+            voteUpButton.refreshSource()
+            voteDownButton.refreshSource()
+            setVotesToQuestionModel(votes + 1)
+            console.log("Voted UP question " + question_id + ", result: " + result)
+        })
+    }
+    function question_vote_down(question_id) {
+        var script = "document.getElementById('question-img-downvote-" + question_id + "').click();"
+        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
+            if (upVoteOn)
+                downVoteOn = false
+            else
+                downVoteOn = true
+            upVoteOn = false
+            voteDownButton.refreshSource()
+            voteUpButton.refreshSource()
+            setVotesToQuestionModel(votes - 1)
+            console.log("Voted DOWN question " + question_id + ", result: " + result)
+        })
+    }
+
+    Connections {
+        id: connections
+        target: viewPageUpdater
+        onChangeViewPage: {
+            goToItem(pageIndex)
+        }
     }
 
     Component.onCompleted: {
@@ -201,7 +247,9 @@ Page {
         if (status === PageStatus.Active && (url !== "" || externalUrl !== ""))
         {
             siteURL = page.url
+            userLoggedIn = questionsModel.isUserLoggedIn()
             attachWebview()
+
             if (openExternalLinkOnWebview) {
                 openExternalLinkOnWebview = false
                 siteURL = externalUrl
@@ -296,11 +344,15 @@ Page {
             id: timesAndStatsRec
             anchors.top: questionTitleItem.bottom
             anchors.left: parent.left
-            anchors.right: parent.right
+            //anchors.right: parent.right
             anchors.leftMargin: Theme.paddingMedium
-            anchors.rightMargin: Theme.paddingMedium
+            //anchors.rightMargin: Theme.paddingMedium
             color: "transparent"
-            width: parent.width
+            width: getLabelMaxWidth() +
+                   fillRectangel.width +
+                   votesRectangle.width +
+                   answersRectangle.width +
+                   viewsRectangle.width
             height: askedLabel.height + updatedLabel.height
 
             Label {
@@ -406,6 +458,84 @@ Page {
             }
         }
 
+        // Voting buttons
+        Image {
+            id: voteUpButton
+            enabled: voteStatusLoaded
+            visible: voteStatusLoaded
+            function refreshSource() {
+                voteUpButton.source = upVoteOn ? "qrc:/qml/images/arrow-right-vote-up.png" : "qrc:/qml/images/arrow-right.png"
+            }
+            anchors.top: timesAndStatsRec.top
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.paddingLarge
+            anchors.leftMargin: Theme.paddingLarge
+            anchors.bottomMargin: Theme.paddingLarge
+            source: upVoteOn ? "qrc:/qml/images/arrow-right-vote-up.png" : "qrc:/qml/images/arrow-right.png"
+            rotation: -90
+            MouseArea {
+                anchors.fill: parent
+                onPressed: {
+                    if (userLoggedIn) {
+                        if (!upVoteOn)
+                            voteUpButton.source = "qrc:/qml/images/arrow-right-pressed.png"
+                        else {
+                            //notif to user
+                            infoBanner.showText(qsTr("Already voted up!"))
+                        }
+                    }
+                    else {
+                        infoBanner.showText(qsTr("Please login to vote!"))
+                    }
+                }
+                onReleased: {
+                    if (!upVoteOn && userLoggedIn) {
+                        voteUpButton.refreshSource()
+                        console.log("voting up")
+                        question_vote_up(qid)
+                    }
+                }
+            }
+        }
+        Image {
+            id: voteDownButton
+            enabled: voteStatusLoaded
+            visible: voteStatusLoaded
+            function refreshSource() {
+                voteDownButton.source = downVoteOn ? "qrc:/qml/images/arrow-right-vote-down.png" : "qrc:/qml/images/arrow-right.png"
+            }
+            anchors.top: voteUpButton.bottom
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.paddingLarge
+            anchors.leftMargin: Theme.paddingLarge
+            anchors.topMargin: Theme.paddingLarge
+            source: downVoteOn ? "qrc:/qml/images/arrow-right-vote-down.png" : "qrc:/qml/images/arrow-right.png"
+            rotation: +90
+            MouseArea {
+                anchors.fill: parent
+                onPressed: {
+                    if (userLoggedIn) {
+                        if (!downVoteOn)
+                            voteDownButton.source = "qrc:/qml/images/arrow-right-pressed.png"
+                        else {
+                            //notif to user
+                            infoBanner.showText(qsTr("Already voted down!"))
+                        }
+                    }
+                    else {
+                        infoBanner.showText(qsTr("Please login to vote!"))
+                    }
+                }
+                onReleased: {
+                    if (!downVoteOn && userLoggedIn) {
+                        voteDownButton.refreshSource()
+                        console.log("voting down")
+                        question_vote_down(qid)
+                    }
+                }
+            }
+        }
+
         Item {
             id: filler
             width: 1
@@ -420,7 +550,7 @@ Page {
             height: childrenRect.height
             anchors.top: filler.bottom
             anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.right: voteDownButton.left
             anchors.leftMargin: Theme.paddingMedium
             anchors.rightMargin: Theme.paddingMedium
 

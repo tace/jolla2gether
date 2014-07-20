@@ -7,11 +7,9 @@ Page {
     objectName: "WebView"
     allowedOrientations: Orientation.All
     property string browseBackText: "Back"
-    property string customJavaScriptToExecute: ""
-    property var customJavaScriptResultHandler: null
     property bool showUrlLoadingProgressCircle: false
     forwardNavigation: false
-
+    property var callbacks: null
 
     SilicaWebView {
         id: webview
@@ -26,11 +24,18 @@ Page {
             else
                 setUrlLoadding(false)
             if (loadRequest.status === WebView.LoadSucceededStatus) {
+                console.log("webview load succeeded")
                 setUrlLoadding(false)
                 webviewPage.forceActiveFocus()
-            }
-            if (!loading && customJavaScriptToExecute !== "" && loadRequest.status === WebView.LoadSucceededStatus) {
-                webview.experimental.evaluateJavaScript(customJavaScriptToExecute, customJavaScriptResultHandler);
+                if (callbacks !== null){
+                    for (var i=0; i < callbacks.length; i++) {
+                        console.log("run callback in webview")
+                        // Callback function can expect webview page as a parameter
+                        // so function can use e.g. evaluateJavaScriptOnWebPage for running
+                        // javascript in webpage
+                        callbacks[i](webviewPage)
+                    }
+                }
             }
         }
         onNavigationRequested: {
@@ -92,6 +97,11 @@ Page {
         }
         if (!flag)
             urlLoading = false
+    }
+
+    function evaluateJavaScriptOnWebPage(script, onReadyCallback) {
+        //console.log("Running script in webview:  " + script)
+        webview.experimental.evaluateJavaScript(script, onReadyCallback);
     }
 
 }

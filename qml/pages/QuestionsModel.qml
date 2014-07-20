@@ -78,36 +78,90 @@ ListModel {
     }
 
     function pushWebviewWithCustomScript(attached, props) {
-        var closure = function(result) {
-            questionsModel.ownUserIdValue = result
-        };
+        var callbacksList = []
         var properties = {}
         if (((questionsModel.ownUserIdValue === "" ||
-            questionsModel.ownUserIdValue === "signin") &&
-            loginRetryCount < loginRetryCountMaximum) ||
-            !attached) {
-            var custom_scrip_props = {customJavaScriptToExecute : Custom.get_userId_script(),
-                                      customJavaScriptResultHandler: Custom.get_userId_script_result_handler(closure)}
-            properties = merge(custom_scrip_props, props)
+              questionsModel.ownUserIdValue === "signin") &&
+             loginRetryCount < loginRetryCountMaximum) ||
+                !attached) {
+            callbacksList.push(getUserIdFromWebViewCallback())
             loginRetryCount = loginRetryCount + 1
         }
-        else {
+        if (pageStack.currentPage.objectName === "QuestionViewPage") {
+            callbacksList.push(getVotingDataFromWebViewCallback(getQuestionId(),
+                                                                pageStack.currentPage.votingResultsCallback))
+        }
+        if (callbacksList.length > 0) {
+            properties = merge(props, {callbacks: callbacksList})
+        }
+        else
             properties = props
-        }
 
+        //printProps(properties)
         if (attached) {
-            pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"), properties)
+            return pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"), properties)
         }
         else {
-            pageStack.push(Qt.resolvedUrl("WebView.qml"), properties)
+            return pageStack.push(Qt.resolvedUrl("WebView.qml"), properties)
+        }
+    }
+
+    function getQuestionId() {
+        return questionsModel.get(questionsModel.listViewCurrentIndex).id
+    }
+
+    // Custom javascript to executein webview. Picks userId field from together.jolla.com
+    // site.
+    // First href in the userToolsNav element should return either
+    //     "/account/signin/?next=/"    (not logged in)
+    // or
+    //     "/users/497/tace/"           (logged in)
+    //
+    // So this function returns userId number (e.g. 497) or "signin" string.
+    function getUserIdFromWebViewCallback() {
+        return function(webview) {
+            var scriptToRun = "(function() { \
+            var userElem = document.getElementById('userToolsNav'); \
+            var firstHref = userElem.getElementsByTagName('a')[0].getAttribute('href'); \
+            return firstHref.split('/')[2]; \
+            })()"
+            var handleResult = function(result) {
+                questionsModel.ownUserIdValue = result
+                console.log( "Got userId from webview: " + result );
+            }
+            webview.evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
+        }
+    }
+
+    function getVotingDataFromWebViewCallback(questionId, votingResultsCallback) {
+        return function(webview) {
+            var scriptToRun = "(function() { \
+                        var upvoteElem = document.getElementById('question-img-upvote-" + questionId + "'); \
+                        var upvoteOn = upvoteElem.getAttribute('class').split('question-img-upvote post-vote upvote')[1]; \
+                        var downvoteElem = document.getElementById('question-img-downvote-" + questionId + "'); \
+                        var downvoteOn = downvoteElem.getAttribute('class').split('question-img-downvote post-vote downvote')[1]; \
+                        return upvoteOn + ',' + downvoteOn \
+                        })()"
+            var handleVoteResult = function(result) {
+                var upDownVotes = result.split(',')
+                var upVoteOn = false
+                var downVoteOn = false
+                if (upDownVotes[0].trim() !== '')
+                    upVoteOn = true
+                if (upDownVotes[1].trim() !== '')
+                    downVoteOn = true
+                console.log("Got votes status from webview. upVote: " + upVoteOn + ", downVote: " + downVoteOn)
+                votingResultsCallback(upVoteOn, downVoteOn)
+            }
+            webview.evaluateJavaScriptOnWebPage(scriptToRun, handleVoteResult)
         }
     }
 
     function merge() {
         var obj = {},
-            i = 0,
-            il = arguments.length,
-            key;
+        i = 0,
+                il = arguments.length,
+                key;
         for (; i < il; i++) {
             for (key in arguments[i]) {
                 if (arguments[i].hasOwnProperty(key)) {
@@ -117,7 +171,41 @@ ListModel {
         }
         return obj;
     }
+    function printProps() {
+        var i = 0,
+                il = arguments.length,
+                key;
+        console.log("properties:")
+        for (; i < il; i++) {
+            for (key in arguments[i]) {
+                console.log(key + ": " + arguments[i][key])
+            }
+        }
+    }
+    function getProp() {
+        var name = arguments[0]
+        var j=1, l=arguments.length, args=[];
+        while(j<l)
+        {
+            args.push(arguments[j++]);
+        }
+        var i = 0,
+                il = args.length,
+                key;
+        for (; i < il; i++) {
+            for (key in args[i]) {
+                if (key === name)
+                    return args[i][key]
+            }
+        }
+    }
 
+    function isUserLoggedIn() {
+        if (questionsModel.ownUserIdValue !== "" && questionsModel.ownUserIdValue !== "signin") {
+            return true
+        }
+        return false
+    }
     function setUserIdSearchCriteria(userId) {
         console.log("Userid: "+userId)
         if (userId !== "" && userId !== "signin") {
@@ -128,16 +216,16 @@ ListModel {
     }
     function isSearchCriteriaActive() {
         if (questionsModel.searchCriteria !== "" ||
-            isFilterCriteriasActive() ||
-            modelSearchTagsGlobal.count > 0 ||
-            ignoredSearchTagsGlobal.count > 0)
+                isFilterCriteriasActive() ||
+                modelSearchTagsGlobal.count > 0 ||
+                ignoredSearchTagsGlobal.count > 0)
             return true
         return false
     }
     function isFilterCriteriasActive() {
         if (questionsModel.closedQuestionsFilter !== questionsModel.closedQuestionsFilter_DEFAULT ||
-            questionsModel.answeredQuestionsFilter !== questionsModel.answeredQuestionsFilter_DEFAULT ||
-            questionsModel.unansweredQuestionsFilter !== questionsModel.unansweredQuestionsFilter_DEFAULT)
+                questionsModel.answeredQuestionsFilter !== questionsModel.answeredQuestionsFilter_DEFAULT ||
+                questionsModel.unansweredQuestionsFilter !== questionsModel.unansweredQuestionsFilter_DEFAULT)
             return true
         return false
     }

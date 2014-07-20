@@ -44,7 +44,8 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/ExternalLinkDialog.qml \
     js/Markdown.Converter.js \
     qml/pages/AnswersAndCommentsDelegate.qml \
-    images/arrowdown.png
+    images/arrowdown.png \
+    qml/pages/InfoBanner.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}

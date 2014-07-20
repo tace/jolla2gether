@@ -139,16 +139,22 @@ ApplicationWindow
         }
     }
 
-    function attachWebview(who) {
+    function attachWebview(props) {
         if (!webviewAttached && Qt.application.active) {
             if (onPageAllowedtoAttachWebview()) {
                 if (siteURL === loginURL)
                     siteURL = siteBaseUrl
+                var properties = props
                 var backtext = webviewBrowseBackText
-                if (who !== undefined) {
-                    backtext = who
+                var browseBackFromProps = questionsModel.getProp("browseBackText", props)
+                if (browseBackFromProps !== undefined) {
+                    properties = questionsModel.merge({browseBackText: browseBackFromProps}, props)
+                    console.log("from props: " +browseBackFromProps)
                 }
-                questionsModel.pushWebviewWithCustomScript(true, {browseBackText: backtext})
+                else
+                    properties = questionsModel.merge({browseBackText: backtext}, props)
+
+                var webPage = questionsModel.pushWebviewWithCustomScript(true, properties)
                 // Navigate back to return where user left
                 if (webviewWasActiveWhenUnattached) {
                     pageStack.navigateForward(PageStackAction.Immediate)
@@ -156,8 +162,10 @@ ApplicationWindow
                 }
                 webviewAttached = true
                 console.log("WebView attached")
+                return webPage
             }
         }
+        return null
     }
     function unattachWebview() {
         if (webviewAttached) {

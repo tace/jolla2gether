@@ -41,7 +41,7 @@ Page {
             if (questionsModel.userQuestionsAsked) {
                 questionsModel.restoreModel()
             }
-            attachWebview("Users")
+            attachWebview({browseBackText: "Users"})
         }
     }
 
