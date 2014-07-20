@@ -32,11 +32,11 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/QuestionsPage.qml \
     qml/pages/SortUsers.qml \
     qml/pages/SearchUsers.qml \
+    qml/pages/SearchQuestions.qml \
     qml/pages/QuestionsModel.qml \
     qml/pages/UsersModel.qml \
     qml/pages/InfoModel.qml \
     qml/pages/TagSearch.qml \
-    qml/pages/SearchQuestions.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/Settings.qml \
     qml/pages/RescalingRichText.qml \
@@ -44,7 +44,6 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/ExternalLinkDialog.qml \
     js/Markdown.Converter.js \
     qml/pages/AnswersAndCommentsDelegate.qml \
-    images/arrowdown.png \
     qml/pages/InfoBanner.qml
 
 js.files = js

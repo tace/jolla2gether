@@ -269,7 +269,7 @@ Page {
                             text: questionsModel.searchCriteria
                         }
                         Label {
-                            visible: modelSearchTagsGlobal.count > 0
+                            visible: modelSearchTagsGlobal.count > 0 || ignoredSearchTagsGlobal.count > 0
                             font.pixelSize: Theme.fontSizeTiny
                             color: Theme.highlightColor
                             text: qsTr("Tags: ")
