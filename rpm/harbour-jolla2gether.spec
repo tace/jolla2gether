@@ -13,7 +13,7 @@ Name:       harbour-jolla2gether
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Jolla Together client app
-Version:    0.12
+Version:    0.13
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
