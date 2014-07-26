@@ -6,9 +6,8 @@ ListItem  {
     anchors.left: ListView.left
     anchors.right: ListView.right
     width: parent.width
-    contentHeight: titleText.lineCount > 1 ? Theme.itemSizeLarge : Theme.itemSizeSmall
+    contentHeight: getListItemContentHeight()
     menu: contextMenu
-    property var viewPage;
 
     onClicked: {
         questionListView.currentIndex = index
@@ -16,9 +15,47 @@ ListItem  {
         var props = {
             "index": questionListView.currentIndex
         };
-        viewPage = pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+        pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
     }
 
+    function getListItemContentHeight() {
+        var appsettingForTextSize = getTitleTextFontSize()
+        var extraSpace = 20
+        if (appsettingForTextSize >= Theme.fontSizeLarge) {
+            if (appsettingForTextSize >= Theme.fontSizeExtraLarge)
+                extraSpace += 20
+            if (titleText.lineCount > 1)
+                return Theme.itemSizeExtraLarge + extraSpace
+            else
+                return Theme.itemSizeLarge
+        }
+        if (appsettingForTextSize >= Theme.fontSizeMedium) {
+            if (titleText.lineCount > 1)
+                return Theme.itemSizeLarge + extraSpace
+            else
+                return Theme.itemSizeSmall + 10
+        }
+        if (appsettingForTextSize >= Theme.fontSizeSmall) {
+            if (titleText.lineCount > 1)
+                return Theme.itemSizeLarge + 7
+            else
+                return Theme.itemSizeSmall + 1
+        }
+        if (titleText.lineCount > 1) {
+            return Theme.itemSizeSmall + 13
+        }
+        else {
+            return Theme.itemSizeSmall - 11
+        }
+    }
+    function getTitleTextFontSize() {
+        //return Theme.fontSizeExtraLarge
+        //return Theme.fontSizeLarge
+        //return Theme.fontSizeMedium
+        //return Theme.fontSizeSmall // Default
+        //return Theme.fontSizeTiny
+        return appSettings.question_list_title_font_size_value
+    }
     function getTitleColor() {
         var color = Theme.primaryColor
         // If item selected either from list or Cover, make color highlighted
@@ -47,7 +84,7 @@ ListItem  {
 
     Label {
         id: titleText
-        font.pixelSize: Theme.fontSizeSmall
+        font.pixelSize: getTitleTextFontSize()
         width: parent.width
         color: getTitleColor()
         font.bold: model.url === siteURL
@@ -170,6 +207,7 @@ ListItem  {
             }
         }
     }
+
     // context menu is activated with long press
     Component {
         id: contextMenu

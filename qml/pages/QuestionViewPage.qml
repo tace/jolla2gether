@@ -229,6 +229,14 @@ Page {
             console.log("Voted DOWN question " + question_id + ", result: " + result)
         })
     }
+    function getPageTextFontSize() {
+        //return Theme.fontSizeTiny
+        //return Theme.fontSizeSmall // Default
+        //return Theme.fontSizeMedium
+        //return Theme.fontSizeLarge
+        //return Theme.fontSizeExtraLarge
+        return appSettings.question_view_page_font_size_value
+    }
 
     Connections {
         id: connections
@@ -602,7 +610,7 @@ Page {
                 anchors.rightMargin: Theme.paddingMedium
 
                 color: Theme.primaryColor
-                fontSize: Theme.fontSizeSmall
+                fontSize: getPageTextFontSize()
                 text: page.text
 
                 onLinkActivated: {
@@ -667,23 +675,6 @@ Page {
                     }
                 }
             }
-
-            //            CollapsiblePanel
-            //            {
-            //                id: panel1
-            //                visible: (rssModel.ready)
-            //                width: parent.width
-            //                //height: parent.height
-            //                height: childrenRect.height
-            //                anchors.left: parent.left
-            //                anchors.right: parent.right
-            //                titleText: "Date & Time Settings"
-            //                customModel: rssModel
-            //                customDelegate: AnswersAndCommentsDelegate {}
-            //                onItemselected:{
-            //                    console.log(index)
-            //                }
-            //            }
 
             Item {
                 width: 1

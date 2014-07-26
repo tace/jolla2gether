@@ -7,6 +7,9 @@ Dialog {
     property string newQuestionListTitleSpaceValue: appSettings.qUESTION_LIST_TITLE_SPACE_VALUE
     property bool newQuestionResetSearchOnListingUserQuestionsValue: appSettings.question_reset_search_on_listing_user_questions_value
     property bool newWebviewSwipeBackEnabledValue: appSettings.webview_swipe_back_enabled_value
+    property int newQuestionListTitleFontSizeValue: appSettings.question_list_title_font_size_value
+    property int newQuestionViewPageFontSizeValue: appSettings.question_view_page_font_size_value
+    property int newQuestionViewPageAnswersAndCommentsFontSizeValue: appSettings.question_view_page_answers_and_comments_font_size_value
 
     SilicaFlickable {
         id: mainFlic
@@ -54,6 +57,162 @@ Dialog {
                     }
                 }
             }
+            ComboBox {
+                id: titleFontSize
+                function set_value(value) {
+                    var val = 0
+                    if (value === Theme.fontSizeExtraLarge)
+                        val = 0
+                    if (value === Theme.fontSizeLarge)
+                        val = 1
+                    if (value === Theme.fontSizeMedium)
+                        val = 2
+                    if (value === Theme.fontSizeSmall)
+                        val = 3
+                    if (value === Theme.fontSizeTiny)
+                        val = 4
+                    titleFontSize.currentIndex = val
+                }
+                label: qsTr("Title font size")
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Extra Large")
+                        onClicked: {
+                            newQuestionListTitleFontSizeValue = Theme.fontSizeExtraLarge
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Large")
+                        onClicked: {
+                            newQuestionListTitleFontSizeValue = Theme.fontSizeLarge
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Medium")
+                        onClicked: {
+                            newQuestionListTitleFontSizeValue = Theme.fontSizeMedium
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Small (Default)")
+                        onClicked: {
+                            newQuestionListTitleFontSizeValue = Theme.fontSizeSmall
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Tiny")
+                        onClicked: {
+                            newQuestionListTitleFontSizeValue = Theme.fontSizeTiny
+                        }
+                    }
+                }
+            }
+
+            SectionHeader {
+                text: qsTr("Question view page")
+            }
+
+            ComboBox {
+                id: questionViewPageTextFontSize
+                function set_value(value) {
+                    var val = 0
+                    if (value === Theme.fontSizeExtraLarge)
+                        val = 0
+                    if (value === Theme.fontSizeLarge)
+                        val = 1
+                    if (value === Theme.fontSizeMedium)
+                        val = 2
+                    if (value === Theme.fontSizeSmall)
+                        val = 3
+                    if (value === Theme.fontSizeTiny)
+                        val = 4
+                    questionViewPageTextFontSize.currentIndex = val
+                }
+                label: qsTr("Question text font size")
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Extra Large")
+                        onClicked: {
+                            newQuestionViewPageFontSizeValue = Theme.fontSizeExtraLarge
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Large")
+                        onClicked: {
+                            newQuestionViewPageFontSizeValue = Theme.fontSizeLarge
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Medium")
+                        onClicked: {
+                            newQuestionViewPageFontSizeValue = Theme.fontSizeMedium
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Small (Default)")
+                        onClicked: {
+                            newQuestionViewPageFontSizeValue = Theme.fontSizeSmall
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Tiny")
+                        onClicked: {
+                            newQuestionViewPageFontSizeValue = Theme.fontSizeTiny
+                        }
+                    }
+                }
+            }
+            ComboBox {
+                id: questionViewPageAnswersAndCommentsFontSize
+                function set_value(value) {
+                    var val = 0
+                    if (value === Theme.fontSizeExtraLarge)
+                        val = 0
+                    if (value === Theme.fontSizeLarge)
+                        val = 1
+                    if (value === Theme.fontSizeMedium)
+                        val = 2
+                    if (value === Theme.fontSizeSmall)
+                        val = 3
+                    if (value === Theme.fontSizeTiny)
+                        val = 4
+                    questionViewPageAnswersAndCommentsFontSize.currentIndex = val
+                }
+                label: qsTr("Answers and comments font size")
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Extra Large")
+                        onClicked: {
+                            newQuestionViewPageAnswersAndCommentsFontSizeValue = Theme.fontSizeExtraLarge
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Large")
+                        onClicked: {
+                            newQuestionViewPageAnswersAndCommentsFontSizeValue = Theme.fontSizeLarge
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Medium")
+                        onClicked: {
+                            newQuestionViewPageAnswersAndCommentsFontSizeValue = Theme.fontSizeMedium
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Small")
+                        onClicked: {
+                            newQuestionViewPageAnswersAndCommentsFontSizeValue = Theme.fontSizeSmall
+                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Tiny (Default)")
+                        onClicked: {
+                            newQuestionViewPageAnswersAndCommentsFontSizeValue = Theme.fontSizeTiny
+                        }
+                    }
+                }
+            }
+
 
             SectionHeader {
                 text: qsTr("Question search for user's questions")
@@ -132,11 +291,17 @@ Dialog {
     }
     onAccepted: {
         appSettings.qUESTION_LIST_TITLE_SPACE_VALUE = newQuestionListTitleSpaceValue
+        appSettings.question_list_title_font_size_value = newQuestionListTitleFontSizeValue
+        appSettings.question_view_page_font_size_value = newQuestionViewPageFontSizeValue
+        appSettings.question_view_page_answers_and_comments_font_size_value = newQuestionViewPageAnswersAndCommentsFontSizeValue
         appSettings.question_reset_search_on_listing_user_questions_value = newQuestionResetSearchOnListingUserQuestionsValue
         appSettings.webview_swipe_back_enabled_value = newWebviewSwipeBackEnabledValue
     }
     Component.onCompleted: {
         titleSpace.set_value(appSettings.qUESTION_LIST_TITLE_SPACE_VALUE)
+        titleFontSize.set_value(appSettings.question_list_title_font_size_value)
+        questionViewPageTextFontSize.set_value(appSettings.question_view_page_font_size_value)
+        questionViewPageAnswersAndCommentsFontSize.set_value(appSettings.question_view_page_answers_and_comments_font_size_value)
         swipeBackFromWebview.set_value(appSettings.webview_swipe_back_enabled_value)
         subSearchReset.set_value(appSettings.question_reset_search_on_listing_user_questions_value)
     }

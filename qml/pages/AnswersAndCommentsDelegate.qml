@@ -11,6 +11,15 @@ ListItem  {
     contentHeight: answersAndCommentsColumn.height
     _showPress: false // Disable normal list item highlighting
 
+    function getTextSize() {
+        //return Theme.fontSizeTiny // Default
+        //return Theme.fontSizeSmall
+        //return Theme.fontSizeMedium
+        //return Theme.fontSizeLarge
+        //return Theme.fontSizeExtraLarge
+        return appSettings.question_view_page_answers_and_comments_font_size_value
+    }
+
     Column {
         id: answersAndCommentsColumn
         width: parent.width
@@ -36,7 +45,7 @@ ListItem  {
             anchors.rightMargin: Theme.paddingMedium
 
             color: Theme.primaryColor
-            fontSize: Theme.fontSizeTiny
+            fontSize: getTextSize()
             text: questionsModel.wiki2Html(description)
 
             onLinkActivated: {
