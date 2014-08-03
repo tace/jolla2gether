@@ -38,7 +38,6 @@ ApplicationWindow
     property string siteBaseUrl: "https://together.jolla.com"
     property string loginURL: siteBaseUrl + "/account/signin/?next=/"
     property string siteURL: loginURL
-    property string version: "0.0.13"
     property string license: "GPL v2.0"
     property string appicon: "qrc:/harbour-jolla2gether_250px.png"
     property string appname: "Jolla Together"

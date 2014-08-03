@@ -108,6 +108,18 @@ Dialog {
                 }
             }
 
+            TextSwitch {
+                id: showTags
+                checked: appSettings.question_list_show_tags_value
+                text: qsTr("Show tags")
+            }
+            TextSwitch {
+                id: showSeparatorLine
+                checked: appSettings.question_list_show_separator_line_value
+                text: qsTr("Show separator line between questions")
+            }
+
+
             SectionHeader {
                 text: qsTr("Question view page")
             }
@@ -294,6 +306,8 @@ Dialog {
         appSettings.question_list_title_font_size_value = newQuestionListTitleFontSizeValue
         appSettings.question_view_page_font_size_value = newQuestionViewPageFontSizeValue
         appSettings.question_view_page_answers_and_comments_font_size_value = newQuestionViewPageAnswersAndCommentsFontSizeValue
+        appSettings.question_list_show_tags_value = showTags.checked
+        appSettings.question_list_show_separator_line_value = showSeparatorLine.checked
         appSettings.question_reset_search_on_listing_user_questions_value = newQuestionResetSearchOnListingUserQuestionsValue
         appSettings.webview_swipe_back_enabled_value = newWebviewSwipeBackEnabledValue
     }
@@ -302,6 +316,8 @@ Dialog {
         titleFontSize.set_value(appSettings.question_list_title_font_size_value)
         questionViewPageTextFontSize.set_value(appSettings.question_view_page_font_size_value)
         questionViewPageAnswersAndCommentsFontSize.set_value(appSettings.question_view_page_answers_and_comments_font_size_value)
+        showTags.checked = appSettings.question_list_show_tags_value
+        showSeparatorLine.checked = appSettings.question_list_show_separator_line_value
         swipeBackFromWebview.set_value(appSettings.webview_swipe_back_enabled_value)
         subSearchReset.set_value(appSettings.question_reset_search_on_listing_user_questions_value)
     }

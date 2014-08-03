@@ -28,7 +28,7 @@ Page {
             }
             Label {
                 font.pixelSize: Theme.fontSizeMedium
-                text: appname+" v"+version
+                text: appname+" v"+APP_VERSION
                 anchors.horizontalCenter: parent.horizontalCenter
 
             }
@@ -81,9 +81,9 @@ Page {
             }
             Button {
                 id: releaseNotesButton
-                text: "Release notes for version "+version
+                text: "Release notes"
                 anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: Qt.openUrlExternally("https://github.com/tace/jolla2gether/wiki/ReleaseNotes#wiki-"+version2WikiIndex(version))
+                onClicked: Qt.openUrlExternally("https://github.com/tace/jolla2gether/wiki/ReleaseNotes")
             }
             Button {
                 id: licenseButton
@@ -104,8 +104,5 @@ Page {
  \nNOTE: jolla2gether is using webview component where you can login with your own Jolla credentials. When logged in, be carefull concerning actions on page to avoid accidental cliks.")
             }
         }
-    }
-    function version2WikiIndex(version) {
-        return version.replace(/\./g, "")
     }
 }

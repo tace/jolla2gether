@@ -30,3 +30,5 @@ Files:
 - /usr/share/icons/hicolor/86x86/apps
 - /usr/share/harbour-jolla2gether
 PkgBR: []
+QMakeOptions:
+- VERSION='%{version}-%{release}'

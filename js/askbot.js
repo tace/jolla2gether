@@ -18,7 +18,7 @@ var converter = new Converter.Markdown.Converter();
 function addFullUrltoImageLinks(text, baseUrl) {
     var imagePattern = /\!\[(.+)\]\(\/upfiles\/(\S+\.\S{3})\)/gim;
     return text
-        .replace(imagePattern, '![$1](' + baseUrl + '/upfiles/$2)')
+    .replace(imagePattern, '![$1](' + baseUrl + '/upfiles/$2)')
 }
 
 function wiki2Html(text) {
@@ -47,11 +47,11 @@ function get_info(model)
                 model.questions = ginfo.questions
                 model.answers = ginfo.answers
                 model.comments = ginfo.comments
-//                model.append({"item" : "Groups: "+ginfo.groups})
-//                model.append({"item" : "Users: "+ginfo.users})
-//                model.append({"item" : "Questions: "+ginfo.questions})
-//                model.append({"item" : "Answers: "+ginfo.answers})
-//                model.append({"item" : "Comments: "+ginfo.comments})
+                //                model.append({"item" : "Groups: "+ginfo.groups})
+                //                model.append({"item" : "Users: "+ginfo.users})
+                //                model.append({"item" : "Questions: "+ginfo.questions})
+                //                model.append({"item" : "Answers: "+ginfo.answers})
+                //                model.append({"item" : "Comments: "+ginfo.comments})
 
                 console.log("Info, comments: " + ginfo.comments)
             }
@@ -230,21 +230,23 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                     }
 
                     model.append({
-                                   "id" : ginfo.id,
-                                   "title" : ginfo.title,
-                                   "url" : ginfo.url,
-                                   "author" : ginfo.author.username,
-                                   "author_id" : ginfo.author.id,
-                                   "author_page_url" : siteBaseUrl + "/users/" + ginfo.author.id + "/" + ginfo.author.username,
-                                   "answer_count" : ginfo.answer_count,
-                                   "view_count" : ginfo.view_count,
-                                   "votes" : ginfo.score,
-                                   "tags" : stringifyJsonArray(ginfo.tags),
-                                   "text": wiki2Html(ginfo.text),
-                                   "has_accepted_answer": ginfo.has_accepted_answer,
-                                   "closed": ginfo.closed,
-                                   "created" : getTimeDurationAsString(ginfo.added_at),
-                                   "updated" : getTimeDurationAsString(ginfo.last_activity_at),
+                                     "id" : ginfo.id,
+                                     "title" : ginfo.title,
+                                     "url" : ginfo.url,
+                                     "author" : ginfo.author.username,
+                                     "author_id" : ginfo.author.id,
+                                     "author_page_url" : siteBaseUrl + "/users/" + ginfo.author.id + "/" + ginfo.author.username,
+                                     "answer_count" : ginfo.answer_count,
+                                     "view_count" : ginfo.view_count,
+                                     "votes" : ginfo.score,
+                                     "tags" : stringifyJsonArray(ginfo.tags),
+                                     "text": wiki2Html(ginfo.text),
+                                     "has_accepted_answer": ginfo.has_accepted_answer,
+                                     "closed": ginfo.closed,
+                                     "created" : getTimeDurationAsString(ginfo.added_at),
+                                     "updated" : getTimeDurationAsString(ginfo.last_activity_at),
+                                     "created_date" : getDateAndTimeStamp(ginfo.added_at),
+                                     "updated_date" : getDateAndTimeStamp(ginfo.last_activity_at),
                                  })
                 }
 
@@ -257,7 +259,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                 console.log("Error: " + xhr.status)
             }
             urlLoading = false
-        }    
+        }
     }
     xhr.timeout = 4000;
     xhr.ontimeout = function () { console.log("Timed out!!!"); }
@@ -348,12 +350,12 @@ function get_users_httpReq(model, query_params)
                     var uinfo = us[index]
 
                     model.append({"username" : uinfo.username,
-                                   "reputation" : uinfo.reputation,
-                                   "avatar" : uinfo.avatar,
-                                   "last_seen_at" : getTimeDurationAsString(uinfo.last_seen_at),
-                                   "joined_at" : getTimeDurationAsString(uinfo.joined_at),
-                                   "id" : uinfo.id,
-                                   "url" : siteBaseUrl + "/users/" + uinfo.id + "/" + uinfo.username,
+                                     "reputation" : uinfo.reputation,
+                                     "avatar" : uinfo.avatar,
+                                     "last_seen_at" : getTimeDurationAsString(uinfo.last_seen_at),
+                                     "joined_at" : getTimeDurationAsString(uinfo.joined_at),
+                                     "id" : uinfo.id,
+                                     "url" : siteBaseUrl + "/users/" + uinfo.id + "/" + uinfo.username,
                                  })
                 }
             }
@@ -408,10 +410,10 @@ function get_user(user, userFunc)
 }
 
 function getTimeDurationAsString(seconds) {
-    return secondsToString(getCurrentTimeAsSeconds() - seconds)
+    return secondsToDurationStringMoreRounded(getCurrentTimeAsSeconds() - seconds)
 }
 
-function secondsToString(seconds)
+function secondsToDurationString(seconds)
 {
     var numdays = Math.floor(seconds / 86400);
     var numhours = Math.floor((seconds % 86400) / 3600);
@@ -433,6 +435,87 @@ function secondsToString(seconds)
     return value;
 }
 
+function secondsToDurationStringMoreRounded(seconds)
+{
+    var numyears = Math.floor(seconds / 86400 / 30 / 12);
+    var nummonths = Math.floor(seconds / 86400 / 30);
+    //    var numyears = Math.floor(seconds / 31556926 ); // 365.24 days
+    //    var nummonths = Math.floor(seconds / 2629743 ); // 30.44 days
+    var numweeks = Math.floor(seconds / 604800 );
+    var numdays = Math.floor(seconds / 86400);
+    var numhours = Math.floor((seconds % 86400) / 3600);
+    var numminutes = Math.floor(((seconds % 86400) % 3600) / 60);
+    var numseconds = Math.floor(((seconds % 86400) % 3600) % 60);
+
+    var value = "";
+    var amountOfUnitsAdded = 0
+    var onlySeconds = false
+    if (seconds < 60)
+        onlySeconds = true
+
+    if (numyears > 0) {
+        value = value + numyears + "y ";
+        nummonths = nummonths - (numyears * 12)
+        amountOfUnitsAdded = amountOfUnitsAdded + 1
+    }
+    if (nummonths > 0) {
+        value = value + nummonths + "m ";
+        numweeks = numweeks - (nummonths * 4)
+        numdays = numdays - (nummonths * 30)
+        amountOfUnitsAdded = amountOfUnitsAdded + 1
+    }
+    //    if (numweeks > 0) {
+    //        if (amountOfUnitsAdded < 2) {
+    //            value = value + numweeks + "wk ";
+    //            numdays = numdays - (numweeks * 7)
+    //            amountOfUnitsAdded = amountOfUnitsAdded + 1
+    //        }
+    //    }
+    if (numdays > 0) {
+        if (amountOfUnitsAdded < 2) {
+            value = value + numdays + "d ";
+            amountOfUnitsAdded = amountOfUnitsAdded + 1
+        }
+    }
+    if (numhours > 0) {
+        if (amountOfUnitsAdded < 2) {
+            value = value + numhours + "h ";
+            amountOfUnitsAdded = amountOfUnitsAdded + 1
+        }
+    }
+    if (numminutes > 0) {
+        if (amountOfUnitsAdded < 2) {
+            value = value + numminutes + "min ";
+            amountOfUnitsAdded = amountOfUnitsAdded + 1
+        }
+    }
+    // Leave seconds away to save space, except if only seconds
+    if (onlySeconds) {
+        if (numseconds > 0) { value = "now" }
+    }
+    else {
+        value = value + "ago "
+    }
+    return value;
+}
+
+
 function getCurrentTimeAsSeconds() {
     return Date.now() / 1000;
+}
+
+function getDateAndTimeStamp(seconds) {
+    var dateIn = new Date(seconds*1000)
+    var year = dateIn.getFullYear()
+    var day = addZeroPreDigit(dateIn.getDate())
+    var month = addZeroPreDigit(dateIn.getMonth() + 1)
+    var hours = addZeroPreDigit(dateIn.getHours())
+    var minutes = addZeroPreDigit(dateIn.getMinutes())
+    return day + "." + month + "." + year + " " + hours + ":" + minutes
+}
+
+function addZeroPreDigit(value) {
+    if (value < 10)
+        return "0" + value
+    return value
 }

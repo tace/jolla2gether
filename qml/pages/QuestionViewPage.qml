@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtQuick.XmlListModel 2.0
+import "../components"
 
 Page {
     id: page
@@ -12,8 +13,8 @@ Page {
     property string title: questionsModel.get(index).title
     property string text: questionsModel.get(index).text
     property string url: questionsModel.get(index).url
-    property string asked: questionsModel.get(index).created
-    property string updated: questionsModel.get(index).updated
+    property string asked: questionsModel.get(index).created_date
+    property string updated: questionsModel.get(index).updated_date
     property string userId: questionsModel.get(index).author_id
     property string userName: questionsModel.get(index).author
     property string userPageUrl: questionsModel.get(index).author_page_url
@@ -180,10 +181,14 @@ Page {
         console.log("avatar: "+userAvatarUrl)
     }
     function selectLabelRight() {
-        return askedLabel.paintedWidth > updatedLabel.paintedWidth ? askedLabel.right : updatedLabel.right
+        return (askedLabel.paintedWidth + askedValue.paintedWidth) >
+                (updatedLabel.paintedWidth + updatedValue.paintedWidth) ?
+                    askedValue.right : updatedValue.right
     }
     function getLabelMaxWidth() {
-        return askedLabel.paintedWidth > updatedLabel.paintedWidth ? askedLabel.width : updatedLabel.width
+        return (askedLabel.paintedWidth + askedValue.paintedWidth) >
+                (updatedLabel.paintedWidth + updatedValue.paintedWidth) ?
+                    (askedLabel.width + askedValue.width) : (updatedLabel.width + updatedValue.width)
     }
     function getTagsArray() {
         return tags.split(",")
@@ -352,9 +357,7 @@ Page {
             id: timesAndStatsRec
             anchors.top: questionTitleItem.bottom
             anchors.left: parent.left
-            //anchors.right: parent.right
             anchors.leftMargin: Theme.paddingMedium
-            //anchors.rightMargin: Theme.paddingMedium
             color: "transparent"
             width: getLabelMaxWidth() +
                    fillRectangel.width +
@@ -369,7 +372,16 @@ Page {
                 horizontalAlignment: Text.AlignLeft
                 color: Theme.secondaryColor
                 font.pixelSize: Theme.fontSizeTiny
-                text: qsTr("Asked: ") + asked
+                text: qsTr("Asked") + ":"
+            }
+            Label {
+                id: askedValue
+                anchors.top: askedLabel.top
+                anchors.left: updatedLabel.right
+                horizontalAlignment: Text.AlignRight
+                color: Theme.secondaryColor
+                font.pixelSize: Theme.fontSizeTiny
+                text: asked
             }
             Label {
                 id: updatedLabel
@@ -378,7 +390,16 @@ Page {
                 horizontalAlignment: Text.AlignLeft
                 color: Theme.secondaryColor
                 font.pixelSize: Theme.fontSizeTiny
-                text: qsTr("Updated: ") + updated
+                text: qsTr("Updated") + ": "
+            }
+            Label {
+                id: updatedValue
+                anchors.top: updatedLabel.top
+                anchors.left: updatedLabel.right
+                horizontalAlignment: Text.AlignRight
+                color: Theme.secondaryColor
+                font.pixelSize: Theme.fontSizeTiny
+                text: updated
             }
 
             // Fill some space before statics rectangles
@@ -389,40 +410,15 @@ Page {
                 width: 15
                 height: 40
             }
-            // Votes
+            // Answers
             Rectangle {
-                id: votesRectangle
+                id: answersRectangle
                 anchors.left: fillRectangel.right
                 anchors.bottom: updatedLabel.bottom
                 color: "transparent"
                 smooth: true
-                border.width: 1
-                width: 60
-                height: 40
-                radius: 10
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    color: "lightgreen"
-                    text: votes
-                }
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    text: qsTr("votes")
-                }
-            }
-            // Answers
-            Rectangle {
-                id: answersRectangle
-                anchors.left: votesRectangle.right
-                anchors.bottom: updatedLabel.bottom
-                color: "transparent"
-                smooth: true
-                border.width: 1
-                width: 70
+                //border.width: 1
+                width: 80
                 height: 40
                 radius: 10
                 Label {
@@ -434,6 +430,7 @@ Page {
                 }
                 Label {
                     font.pixelSize: Theme.fontSizeTiny
+                    color: Theme.secondaryColor
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     text: qsTr("answers")
@@ -446,8 +443,8 @@ Page {
                 anchors.bottom: updatedLabel.bottom
                 color: "transparent"
                 smooth: true
-                border.width: 1
-                width: 60
+                //border.width: 1
+                width: 80
                 height: 40
                 radius: 10
                 Label {
@@ -459,6 +456,7 @@ Page {
                 }
                 Label {
                     font.pixelSize: Theme.fontSizeTiny
+                    color: Theme.secondaryColor
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     text: qsTr("views")
@@ -478,7 +476,7 @@ Page {
             anchors.right: parent.right
             anchors.rightMargin: Theme.paddingLarge
             anchors.leftMargin: Theme.paddingLarge
-            anchors.bottomMargin: Theme.paddingLarge
+            //anchors.bottomMargin: Theme.paddingLarge
             source: upVoteOn ? "qrc:/qml/images/arrow-right-vote-up.png" : "qrc:/qml/images/arrow-right.png"
             rotation: -90
             MouseArea {
@@ -505,6 +503,33 @@ Page {
                 }
             }
         }
+        // Votes
+        Rectangle {
+            id: votesRectangle
+            anchors.top: voteUpButton.bottom
+            anchors.horizontalCenter: voteUpButton.horizontalCenter
+            color: "transparent"
+            smooth: true
+            width: 80
+            height: 40
+            radius: 10
+            Label {
+                font.pixelSize: Theme.fontSizeTiny
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                visible: voteStatusLoaded
+                color: "lightgreen"
+                text: votes
+            }
+            Label {
+                font.pixelSize: Theme.fontSizeTiny
+                color: Theme.secondaryColor
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                visible: voteStatusLoaded
+                text: qsTr("votes")
+            }
+        }
         Image {
             id: voteDownButton
             enabled: voteStatusLoaded
@@ -512,11 +537,11 @@ Page {
             function refreshSource() {
                 voteDownButton.source = downVoteOn ? "qrc:/qml/images/arrow-right-vote-down.png" : "qrc:/qml/images/arrow-right.png"
             }
-            anchors.top: voteUpButton.bottom
+            anchors.top: votesRectangle.bottom
             anchors.right: parent.right
             anchors.rightMargin: Theme.paddingLarge
             anchors.leftMargin: Theme.paddingLarge
-            anchors.topMargin: Theme.paddingLarge
+            //anchors.topMargin: Theme.paddingLarge
             source: downVoteOn ? "qrc:/qml/images/arrow-right-vote-down.png" : "qrc:/qml/images/arrow-right.png"
             rotation: +90
             MouseArea {
@@ -552,44 +577,13 @@ Page {
             height: Theme.paddingMedium
         }
 
-        Column {
+        ItemFlowColumn {
             id: tagsColumn
-            width: parent.width
-            height: childrenRect.height
+            itemsArrayModel: tagsArray
             anchors.top: filler.bottom
             anchors.left: parent.left
             anchors.right: voteDownButton.left
-            anchors.leftMargin: Theme.paddingMedium
-            anchors.rightMargin: Theme.paddingMedium
 
-            Flow {
-                spacing: 5
-                width: parent.width
-                height: childrenRect.height
-                Repeater {
-                    width: parent.width
-                    anchors.left: parent.left
-                    model: tagsArray
-                    delegate:
-                        Rectangle {
-                        visible: tagsArray.length > 0 && tagsArray[0] !== ""
-                        color: "transparent"
-                        smooth: true
-                        border.width: 1
-                        border.color: Theme.secondaryHighlightColor
-                        height: 30
-                        Label {
-                            id: tagText
-                            anchors.centerIn: parent
-                            font.pixelSize: Theme.fontSizeTiny
-                            text: modelData
-                        }
-                        Component.onCompleted: {
-                            width = tagText.paintedWidth + 20
-                        }
-                    }
-                }
-            }
         }
 
         Column {

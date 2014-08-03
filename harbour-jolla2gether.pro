@@ -44,7 +44,8 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/ExternalLinkDialog.qml \
     js/Markdown.Converter.js \
     qml/pages/AnswersAndCommentsDelegate.qml \
-    qml/pages/InfoBanner.qml
+    qml/pages/InfoBanner.qml \
+    qml/components/ItemFlowColumn.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}
@@ -54,3 +55,5 @@ RESOURCES += \
 
 HEADERS += \
     src/settings.h
+
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"

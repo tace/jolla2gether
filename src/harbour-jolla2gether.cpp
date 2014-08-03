@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
+    view->rootContext()->setContextProperty("APP_VERSION", APP_VERSION);
     Settings* settings = new Settings(app.data());
     view->rootContext()->setContextProperty("Settings", settings);
     view->setSource(SailfishApp::pathTo("qml/harbour-jolla2gether.qml"));

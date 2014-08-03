@@ -1,13 +1,17 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 ListItem  {
     id: background
     anchors.left: ListView.left
     anchors.right: ListView.right
     width: parent.width
-    contentHeight: getListItemContentHeight()
+    contentHeight: getListItemContentHeight() + getTagsColumnHeight() + getSeparatorHeight()
     menu: contextMenu
+    property string tagsString: tags
+    property var tagsArray: null
+
 
     onClicked: {
         questionListView.currentIndex = index
@@ -48,6 +52,23 @@ ListItem  {
             return Theme.itemSizeSmall - 11
         }
     }
+    function isTagsShown() {
+        if ((tagsString !== "") && appSettings.question_list_show_tags_value)
+            return true
+        return false
+    }
+    function getTagsColumnHeight() {
+        if (isTagsShown()) {
+            if (tagsFlowColumn.itemsArrayModel.length > 0)
+                return tagsFlowColumn.height
+        }
+        return 0
+    }
+    function getSeparatorHeight() {
+        if (appSettings.question_list_show_separator_line_value)
+            return 1
+        return 0
+    }
     function getTitleTextFontSize() {
         //return Theme.fontSizeExtraLarge
         //return Theme.fontSizeLarge
@@ -81,6 +102,9 @@ ListItem  {
         if (appSettings.qUESTION_LIST_TITLE_SPACE_VALUE === appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_2_LINES)
             return true
     }
+    function getTagsArray(tags) {
+        return tags.split(",")
+    }
 
     Label {
         id: titleText
@@ -93,11 +117,25 @@ ListItem  {
         wrapMode: is2LinesForTitle() ? Text.WrapAtWordBoundaryOrAnywhere : Text.NoWrap
         text: getStatusPrefixText() + title
     }
+    ItemFlowColumn {
+        id: tagsFlowColumn
+        itemsArrayModel: tagsArray
+        visible: isTagsShown()
+        width: parent.width
+        anchors.top: titleText.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: 0
+        anchors.rightMargin: 0
+    }
+
     Label {
         id: authorLabel
-        anchors.top: titleText.bottom
-        anchors.left: titleText.left
+        anchors.top: isTagsShown() ? tagsFlowColumn.bottom : titleText.bottom
+        anchors.left: parent.left
         font.pixelSize: Theme.fontSizeTiny
+        color: Theme.secondaryColor
+        font.bold: true
         text: author + "  "
     }
 
@@ -121,12 +159,14 @@ ListItem  {
         height: 40
         Label {
             font.pixelSize: Theme.fontSizeTiny
+            color: Theme.secondaryColor
             anchors.top: parent.top
             anchors.right: parent.right
             text: "c: " + created
         }
         Label {
             font.pixelSize: Theme.fontSizeTiny
+            color: Theme.secondaryColor
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             text: "u: " + updated
@@ -138,8 +178,9 @@ ListItem  {
             anchors.left: timesRectangle.right
             color: "transparent"
             smooth: true
-            border.width: 1
-            width: 60
+            //            border.width: 1
+            //            border.color: "gray"
+            width: 80
             height: 40
             radius: 10
             Label {
@@ -151,6 +192,7 @@ ListItem  {
             }
             Label {
                 font.pixelSize: Theme.fontSizeTiny
+                color: Theme.secondaryColor
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 text: qsTr("votes")
@@ -163,8 +205,9 @@ ListItem  {
             anchors.left: votesRectangle.right
             color: "transparent"
             smooth: true
-            border.width: 1
-            width: 70
+            //            border.width: 1
+            //            border.color: "gray"
+            width: 80
             height: 40
             radius: 10
             Label {
@@ -176,6 +219,7 @@ ListItem  {
             }
             Label {
                 font.pixelSize: Theme.fontSizeTiny
+                color: Theme.secondaryColor
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 text: qsTr("answers")
@@ -188,8 +232,9 @@ ListItem  {
             anchors.left: answersRectangle.right
             color: "transparent"
             smooth: true
-            border.width: 1
-            width: 60
+            //            border.width: 1
+            //            border.color: "gray"
+            width: 80
             height: 40
             radius: 10
             Label {
@@ -201,12 +246,22 @@ ListItem  {
             }
             Label {
                 font.pixelSize: Theme.fontSizeTiny
+                color: Theme.secondaryColor
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 text: qsTr("views")
             }
         }
     }
+    Separator {
+        width: parent.width
+        visible: appSettings.question_list_show_separator_line_value
+        anchors.top: timesRectangle.bottom
+        horizontalAlignment: Qt.AlignCenter
+        color: Theme.secondaryHighlightColor
+        height: 1
+    }
+
 
     // context menu is activated with long press
     Component {
@@ -233,5 +288,8 @@ ListItem  {
                 }
             }
         }
+    }
+    Component.onCompleted: {
+        tagsArray = getTagsArray(tagsString)
     }
 }
