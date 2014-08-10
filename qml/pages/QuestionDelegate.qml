@@ -259,7 +259,7 @@ ListItem  {
         anchors.top: timesRectangle.bottom
         horizontalAlignment: Qt.AlignCenter
         color: Theme.secondaryHighlightColor
-        height: 1
+        //height: 1
     }
 
 
@@ -268,7 +268,7 @@ ListItem  {
         id: contextMenu
         ContextMenu {
             MenuItem {
-                text: qsTr("Copy url")
+                text: qsTr("Copy url to clipboard")
                 onClicked: Clipboard.text = url
             }
             MenuItem {

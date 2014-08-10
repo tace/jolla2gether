@@ -19,9 +19,11 @@ Item {
     property string _style: "<style>" +
                             "a:link { color:" + Theme.highlightColor + "}" +
                             "</style>"
+    property bool textSelectMode: false
 
     signal linkActivated(string link)
 
+    //    height: (contentLabel.height * scaling) + textSelectButton.height
     height: contentLabel.height * scaling
     clip: true
 
@@ -46,8 +48,16 @@ Item {
         }
     }
 
-    Label {
+    TextEdit {
         id: contentLabel
+        readOnly: true
+
+        onSelectedTextChanged: {
+            if (selectedText !== "") {
+                //copy()
+                Clipboard.text = selectedText
+            }
+        }
 
         width: parent.width / scaling
         scale: scaling
@@ -56,12 +66,25 @@ Item {
         font.pixelSize: parent.fontSize / scaling
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         textFormat: Text.RichText
+
         smooth: true
 
         text: _style + parent.text
 
         onLinkActivated: {
             root.linkActivated(link);
+        }
+    }
+    function toggleTextSelectMode() {
+        if (textSelectMode) {
+            contentLabel.selectByMouse = false
+            textSelectMode = false
+            return false
+        }
+        else {
+            contentLabel.selectByMouse = true
+            textSelectMode = true
+            return true
         }
     }
 

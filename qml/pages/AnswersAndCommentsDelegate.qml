@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-
+import "../components"
 
 ListItem  {
     anchors.left: parent.left
@@ -30,36 +30,34 @@ ListItem  {
             color: Theme.secondaryHighlightColor
             height: 1
         }
-
-        Label {
-            id: titleLabel
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.secondaryColor
+        Row {
             width: parent.width
-            text: getTitle() + " <b>" + getUser() + "</b>   <font size=\"1\">(" + questionsModel.rssPubdate2ElapsedTimeString(pubDate) + ")</font>"
+            height: textSelectionEnabled ? textSelect.height : titleLabel.height
+            Label {
+                id: titleLabel
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryColor
+                text: getTitle() + " <b>" + getUser() + "</b>   <font size=\"1\">(" + questionsModel.rssPubdate2ElapsedTimeString(pubDate) + ")</font>"
+            }
+            Image {
+                id: textSelect
+                visible: textSelectionEnabled
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingMedium
+                source: "image://theme/icon-m-clipboard"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        answerCommentText.toggleTextSelectMode()
+                    }
+                }
+            }
         }
-        RescalingRichText {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.leftMargin: Theme.paddingMedium
-            anchors.rightMargin: Theme.paddingMedium
-
-            color: Theme.primaryColor
+        ShowRichTextWithLinkActions {
+            id: answerCommentText
             fontSize: getTextSize()
             text: questionsModel.wiki2Html(description)
-
-            onLinkActivated: {
-                var props = {
-                    "url": link
-                }
-                var dialog = pageStack.push(Qt.resolvedUrl("ExternalLinkDialog.qml"), props);
-                dialog.accepted.connect(function() {
-                    if (dialog.__browser_type === "webview") {
-                        openExternalLinkOnWebview = true
-                        externalUrl = link
-                    }
-                })
-            }
+            textBanner: infoBanner
         }
 
         Item {
@@ -69,6 +67,7 @@ ListItem  {
             height: Theme.paddingLarge
         }
     }
+
     function isAnswer() {
         if (category == answerFilter)
             return true

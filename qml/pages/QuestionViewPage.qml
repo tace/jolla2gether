@@ -37,6 +37,7 @@ Page {
     property bool downVoteOn: false
     property bool voteStatusLoaded: false
     property bool userLoggedIn: false
+    property bool textSelectionEnabled: false
 
 
     InfoBanner {
@@ -322,6 +323,27 @@ Page {
                 }
             }
         }
+        PullDownMenu {
+            //
+            // Disabled text selection feature as copy to system clipboard seems not to work constantly
+            //
+            enabled: false
+            visible: false
+            MenuItem {
+                text: qsTr("Show text selection buttons")
+                visible: !textSelectionEnabled
+                onClicked: {
+                    textSelectionEnabled = true
+                }
+            }
+            MenuItem {
+                text: qsTr("Hide text selection buttons")
+                visible: textSelectionEnabled
+                onClicked: {
+                    textSelectionEnabled = false
+                }
+            }
+        }
         Item {
             id: questionTitleItem
             anchors.top: pageHeader.bottom
@@ -597,30 +619,26 @@ Page {
                 height: Theme.paddingLarge
             }
 
-            RescalingRichText {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: Theme.paddingMedium
-                anchors.rightMargin: Theme.paddingMedium
-
-                color: Theme.primaryColor
+            ShowRichTextWithLinkActions {
+                id: questionText
                 fontSize: getPageTextFontSize()
                 text: page.text
-
-                onLinkActivated: {
-                    var props = {
-                        "url": link
-                    }
-                    var dialog = pageStack.push(Qt.resolvedUrl("ExternalLinkDialog.qml"), props);
-                    dialog.accepted.connect(function() {
-                        if (dialog.__browser_type === "webview") {
-                            openExternalLinkOnWebview = true
-                            externalUrl = link
-                        }
-                    })
-                }
+                textBanner: infoBanner
             }
 
+            Image {
+                id: textSelectButton
+                visible: textSelectionEnabled
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingLarge
+                source: "image://theme/icon-m-clipboard"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        questionText.toggleTextSelectMode()
+                    }
+                }
+            }
             Item {
                 width: 1
                 height: Theme.paddingLarge

@@ -809,7 +809,12 @@ else
 
             alt_text = escapeCharacters(attributeEncode(alt_text), "*_[]()");
             url = escapeCharacters(url, "*_");
-            var result = "<img src=\"" + url + "\" alt=\"" + alt_text + "\"";
+            //
+            // 08.08.2014 samuli.silvius@gmail.com
+            // Added href to images to make images clickable too
+            //
+            //            var result = "<img src=\"" + url + "\" alt=\"" + alt_text + "\"";
+            var result = "<a href=\"" + url + "\"><img src=\"" + url + "\" alt=\"" + alt_text + "\"";
 
             // attacklab: Markdown.pl adds empty title attributes to images.
             // Replicate this bug.
@@ -820,8 +825,9 @@ else
             result += " title=\"" + title + "\"";
             //}
 
-            result += " />";
-
+            // 08.08.2014 samuli.silvius@gmail.com
+            //            result += " />";
+            result += " /></a>";
             return result;
         }
 

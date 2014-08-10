@@ -39,13 +39,15 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/TagSearch.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/Settings.qml \
-    qml/pages/RescalingRichText.qml \
     qml/pages/QuestionViewPage.qml \
-    qml/pages/ExternalLinkDialog.qml \
     js/Markdown.Converter.js \
     qml/pages/AnswersAndCommentsDelegate.qml \
-    qml/pages/InfoBanner.qml \
-    qml/components/ItemFlowColumn.qml
+    qml/components/ItemFlowColumn.qml \
+    qml/pages/SelectTags.qml \
+    qml/components/ExternalLinkDialog.qml \
+    qml/components/ShowRichText.qml \
+    qml/components/ShowRichTextWithLinkActions.qml \
+    qml/components/InfoBanner.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}
