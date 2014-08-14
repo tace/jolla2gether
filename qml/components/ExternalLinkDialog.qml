@@ -93,7 +93,9 @@ Dialog {
             visible: isImageUrl
             width: imgLoader.sourceSize.width
             height: imgLoader.sourceSize.height
-            renderStrategy: Canvas.Cooperative
+            renderStrategy: Canvas.Immediate
+            //renderStrategy: Canvas.Threaded
+            //renderTarget: Canvas.FramebufferObject
             onPaint: {
                 var ctx = getContext("2d")
                 ctx.drawImage(imgLoader, 0, 0)

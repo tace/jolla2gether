@@ -19,11 +19,11 @@ Item {
     property string _style: "<style>" +
                             "a:link { color:" + Theme.highlightColor + "}" +
                             "</style>"
-    property bool textSelectMode: false
+
+//    property bool textSelectMode: false
 
     signal linkActivated(string link)
 
-    //    height: (contentLabel.height * scaling) + textSelectButton.height
     height: contentLabel.height * scaling
     clip: true
 
@@ -48,16 +48,17 @@ Item {
         }
     }
 
-    TextEdit {
+//    TextEdit
+    Label {
         id: contentLabel
-        readOnly: true
+        //readOnly: true
 
-        onSelectedTextChanged: {
-            if (selectedText !== "") {
-                //copy()
-                Clipboard.text = selectedText
-            }
-        }
+//        onSelectedTextChanged: {
+//            if (selectedText !== "") {
+//                //copy()
+//                Clipboard.text = selectedText
+//            }
+//        }
 
         width: parent.width / scaling
         scale: scaling
@@ -75,25 +76,13 @@ Item {
             root.linkActivated(link);
         }
     }
-    function toggleTextSelectMode() {
-        if (textSelectMode) {
-            contentLabel.selectByMouse = false
-            textSelectMode = false
-            return false
-        }
-        else {
-            contentLabel.selectByMouse = true
-            textSelectMode = true
-            return true
-        }
-    }
 
     Timer {
         id: rescaleTimer
         interval: 100
 
         onTriggered: {
-            var contentWidth = Math.floor(layoutLabel.contentWidth);
+            //var contentWidth = Math.floor(layoutLabel.contentWidth);
             scaling = Math.min(1, parent.width / (layoutLabel.contentWidth + 0.0));
             //console.log("scaling: " + scaling);
 
@@ -101,4 +90,17 @@ Item {
             contentLabel.text = contentLabel.text + " ";
         }
     }
+
+//    function toggleTextSelectMode() {
+//        if (textSelectMode) {
+//            contentLabel.selectByMouse = false
+//            textSelectMode = false
+//            return false
+//        }
+//        else {
+//            contentLabel.selectByMouse = true
+//            textSelectMode = true
+//            return true
+//        }
+//    }
 }
