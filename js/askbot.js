@@ -12,11 +12,13 @@
 var converter = new Converter.Markdown.Converter();
 
 //
-// ![image description](/upfiles/13951886327876853.jpg)
+// ![image description](/upfiles/13951886327876853.jpg) or
+// ![image description](/upfiles/13951886327876853.jpg hinttext)
+//
 //  changed to ![image description](https://together.jolla.com/upfiles/13951886327876853.jpg)
 //
 function addFullUrltoImageLinks(text, baseUrl) {
-    var imagePattern = /\!\[(.+)\]\(\/upfiles\/(\S+\.\S{3})\)/gim;
+    var imagePattern = /\!\[(.+)\]\(\/upfiles\/(\S+\.\S{3}(\s+\S+)?)\)/gim;
     return text
     .replace(imagePattern, '![$1](' + baseUrl + '/upfiles/$2)')
 }
