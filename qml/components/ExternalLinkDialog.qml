@@ -94,22 +94,9 @@ Dialog {
             width: imgLoader.sourceSize.width
             height: imgLoader.sourceSize.height
             renderStrategy: Canvas.Immediate
-            //renderStrategy: Canvas.Threaded
-            //renderTarget: Canvas.FramebufferObject
             onPaint: {
                 var ctx = getContext("2d")
                 ctx.drawImage(imgLoader, 0, 0)
-                console.log("Canvas onPainted triggered")
-            }
-            onPainted: {
-                console.log("Canvas painted ready")
-            }
-            onImageLoaded: {
-                console.log("Canvas image loaded")
-            }
-
-            Component.onCompleted: {
-                console.log("Canvas loaded")
             }
         }
         Image {
@@ -154,6 +141,8 @@ Dialog {
         if (strEndsWith(link, ".jpg"))
             return true
         if (strEndsWith(link, ".png"))
+            return true
+        if (strEndsWith(link, ".svg"))
             return true
         return false
     }
