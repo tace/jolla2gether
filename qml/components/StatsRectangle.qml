@@ -5,9 +5,10 @@ Rectangle {
     id: statsRec
     property alias topLabelText: topLabel.text
     property alias topLabelFontColor: topLabel.color
+    property int topLabelFontSize: Theme.fontSizeTiny
     property alias bottomLabelText: bottomLabel.text
     property alias bottomLabelFontColor: bottomLabel.color
-    property int statsFontSize: Theme.fontSizeTiny
+    property int bottomLabelFontSize: Theme.fontSizeTiny
     // How much to increase or decrease (negative number) the height of regtangle to make topLabel and bottomLabel vertical distance from each other
     property int recHeightAdjustment: -5
 
@@ -25,7 +26,7 @@ Rectangle {
     Label {
         id: topLabel
         anchors.top: parent.top
-        font.pixelSize: statsFontSize
+        font.pixelSize: topLabelFontSize
         anchors.horizontalCenter: anchorCenter ? parent.horizontalCenter : undefined
         anchors.right: anchorRight ? parent.right : undefined
         anchors.left: anchorLeft ? parent.left : undefined
@@ -33,7 +34,7 @@ Rectangle {
     Label {
         id: bottomLabel
         anchors.bottom: parent.bottom
-        font.pixelSize: statsFontSize
+        font.pixelSize: bottomLabelFontSize
         anchors.horizontalCenter: anchorCenter ? parent.horizontalCenter : undefined
         anchors.right: anchorRight ? parent.right : undefined
         anchors.left: anchorLeft ? parent.left : undefined

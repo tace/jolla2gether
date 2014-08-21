@@ -7,6 +7,7 @@ Row {
     property bool votesVisible: true
     property bool answersVisible: true
     property bool viewsVisible: true
+    property int statsLabelsFontSize: Theme.fontSizeTiny
     property int rectangleHeightAdjustment: -5
 
     // Fill some space before statics rectangles
@@ -31,6 +32,7 @@ Row {
         visible: viewsVisible
         topLabelText: view_count
         topLabelFontColor: "red"
+        topLabelFontSize: statsLabelsFontSize
         bottomLabelText: qsTr("views")
         bottomLabelFontColor: Theme.secondaryColor
         recHeightAdjustment: rectangleHeightAdjustment
@@ -40,6 +42,7 @@ Row {
         visible: answersVisible
         topLabelText: answer_count
         topLabelFontColor: "orange"
+        topLabelFontSize: statsLabelsFontSize
         bottomLabelText: qsTr("answers")
         bottomLabelFontColor: Theme.secondaryColor
         recHeightAdjustment: rectangleHeightAdjustment
@@ -49,6 +52,7 @@ Row {
         visible: votesVisible
         topLabelText: votes
         topLabelFontColor: "lightgreen"
+        topLabelFontSize: statsLabelsFontSize
         bottomLabelText: qsTr("votes")
         bottomLabelFontColor: Theme.secondaryColor
         recHeightAdjustment: rectangleHeightAdjustment

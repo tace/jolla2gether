@@ -491,7 +491,6 @@ Page {
             anchors.bottom: askedAdUpdatedTimesRec.bottom
             anchors.right: parent.right
             anchors.rightMargin: Theme.paddingMedium
-            rectangleHeightAdjustment: 0
         }
 
         // Voting buttons
