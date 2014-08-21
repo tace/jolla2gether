@@ -23,6 +23,7 @@ Page {
     property string view_count: questionsModel.get(index).view_count
     property string tags: questionsModel.get(index).tags
     property var tagsArray: null
+    property int numberOfTags: 0
     property string userKarma: ""
     property string userAvatarUrl: ""
 
@@ -36,9 +37,9 @@ Page {
     property bool upVoteOn: false
     property bool downVoteOn: false
     property bool voteStatusLoaded: false
-    property bool userLoggedIn: false
     property bool textSelectionEnabled: false
-
+    property bool followedStatusLoaded: false
+    property bool followed: false
 
     InfoBanner {
         id: infoBanner
@@ -235,6 +236,30 @@ Page {
             console.log("Voted DOWN question " + question_id + ", result: " + result)
         })
     }
+
+    function followedStatusCallback(flag) {
+        followed = flag
+        followedStatusLoaded = true
+    }
+
+    function followQuestion() {
+        var script = "var contentRight = document.getElementById('ContentRight'); \
+                      var followButton = contentRight.getElementsByTagName('a')[0]; \
+                      if (followButton.getAttribute('class') === 'button followed'); \
+                          followButton.click();"
+        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
+            if (followed)
+                followed = false
+            else
+                followed = true
+            console.log("Followed question: " + followed)
+            var infoText = qsTr("Followed question")
+            if (!followed)
+                infoText = qsTr("Un-followed question")
+            infoBanner.showText(infoText)
+        })
+    }
+
     function getPageTextFontSize() {
         //return Theme.fontSizeTiny
         //return Theme.fontSizeSmall // Default
@@ -242,6 +267,9 @@ Page {
         //return Theme.fontSizeLarge
         //return Theme.fontSizeExtraLarge
         return appSettings.question_view_page_font_size_value
+    }
+    function hasTags() {
+        return numberOfTags > 0 && tagsArray[0] !== ""
     }
 
     Connections {
@@ -255,13 +283,13 @@ Page {
     Component.onCompleted: {
         usersModel.get_user(userId, setUserData)
         tagsArray = getTagsArray()
+        numberOfTags = tagsArray.length
     }
 
     onStatusChanged: {
         if (status === PageStatus.Active && (url !== "" || externalUrl !== ""))
         {
             siteURL = page.url
-            userLoggedIn = questionsModel.isUserLoggedIn()
             attachWebview()
 
             if (openExternalLinkOnWebview) {
@@ -279,7 +307,11 @@ Page {
         anchors.fill: parent
         contentHeight: pageHeader.height +
                        questionTitleItem.height +
-                       timesAndStatsRec.height +
+                       titlePadding.height +
+                       askedAdUpdatedTimesRec.height +
+                       voteUpButton.height +
+                       voteDownButton.height +
+                       filler.height +
                        tagsColumn.height +
                        questionTextContentColumn.height
 
@@ -348,16 +380,19 @@ Page {
             id: questionTitleItem
             anchors.top: pageHeader.bottom
             anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.right: voteUpButton.left
             anchors.leftMargin: Theme.paddingMedium
             anchors.rightMargin: Theme.paddingMedium
             height: childrenRect.height
+            width: parent.width
 
             Label {
+                id: pageTitle
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingMedium
                 horizontalAlignment: Text.AlignLeft
+                width: parent.width
                 color: Theme.highlightColor
                 font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -374,18 +409,21 @@ Page {
                 }
             }
         }
+        Item {
+            id: titlePadding
+            width: 1
+            anchors.left: parent.left
+            anchors.top: questionTitleItem.bottom
+            height: Theme.paddingMedium
+        }
 
         Rectangle {
-            id: timesAndStatsRec
-            anchors.top: questionTitleItem.bottom
+            id: askedAdUpdatedTimesRec
+            anchors.top: titlePadding.bottom
             anchors.left: parent.left
             anchors.leftMargin: Theme.paddingMedium
             color: "transparent"
-            width: getLabelMaxWidth() +
-                   fillRectangel.width +
-                   votesRectangle.width +
-                   answersRectangle.width +
-                   viewsRectangle.width
+            width: getLabelMaxWidth()
             height: askedLabel.height + updatedLabel.height
 
             Label {
@@ -423,67 +461,37 @@ Page {
                 font.pixelSize: Theme.fontSizeTiny
                 text: updated
             }
+        }
 
-            // Fill some space before statics rectangles
-            Rectangle {
-                id: fillRectangel
-                anchors.left: selectLabelRight()
-                color: "transparent"
-                width: 15
-                height: 40
-            }
-            // Answers
-            Rectangle {
-                id: answersRectangle
-                anchors.left: fillRectangel.right
-                anchors.bottom: updatedLabel.bottom
-                color: "transparent"
-                smooth: true
-                //border.width: 1
-                width: 80
-                height: 40
-                radius: 10
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    color: "orange"
-                    text: answer_count
-                }
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    color: Theme.secondaryColor
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    text: qsTr("answers")
+        Image {
+            id: followedIcon
+            visible: followedStatusLoaded
+            anchors.left: askedAdUpdatedTimesRec.right
+            anchors.top: askedAdUpdatedTimesRec.top
+            anchors.leftMargin: Theme.paddingLarge - 5
+            source: followed ? "image://theme/icon-l-favorite"
+                             : "image://theme/icon-l-star"
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: ! infoBanner.visible()
+                onClicked: {                    
+                    followQuestion()
                 }
             }
-            // Views
-            Rectangle {
-                id: viewsRectangle
-                anchors.left: answersRectangle.right
-                anchors.bottom: updatedLabel.bottom
-                color: "transparent"
-                smooth: true
-                //border.width: 1
-                width: 80
-                height: 40
-                radius: 10
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    color: "red"
-                    text: view_count
-                }
-                Label {
-                    font.pixelSize: Theme.fontSizeTiny
-                    color: Theme.secondaryColor
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    text: qsTr("views")
-                }
-            }
+        }
+
+        StatsRow {
+            id: statsRow
+            timesVisible: false
+            parentWidth: parent.width -
+                         askedAdUpdatedTimesRec.width -
+                         followedIcon.width -
+                         Theme.paddingMedium    // left of askedAdUpdatedTimesRec
+            anchors.bottom: askedAdUpdatedTimesRec.bottom
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.paddingMedium
+            rectangleHeightAdjustment: 0
         }
 
         // Voting buttons
@@ -494,17 +502,16 @@ Page {
             function refreshSource() {
                 voteUpButton.source = upVoteOn ? "qrc:/qml/images/arrow-right-vote-up.png" : "qrc:/qml/images/arrow-right.png"
             }
-            anchors.top: timesAndStatsRec.top
+            anchors.bottom: statsRow.top
             anchors.right: parent.right
             anchors.rightMargin: Theme.paddingLarge
-            anchors.leftMargin: Theme.paddingLarge
-            //anchors.bottomMargin: Theme.paddingLarge
             source: upVoteOn ? "qrc:/qml/images/arrow-right-vote-up.png" : "qrc:/qml/images/arrow-right.png"
             rotation: -90
+            scale: 1.2
             MouseArea {
                 anchors.fill: parent
                 onPressed: {
-                    if (userLoggedIn) {
+                    if (questionsModel.isUserLoggedIn()) {
                         if (!upVoteOn)
                             voteUpButton.source = "qrc:/qml/images/arrow-right-pressed.png"
                         else {
@@ -517,39 +524,12 @@ Page {
                     }
                 }
                 onReleased: {
-                    if (!upVoteOn && userLoggedIn) {
+                    if (!upVoteOn && questionsModel.isUserLoggedIn()) {
                         voteUpButton.refreshSource()
                         console.log("voting up")
                         question_vote_up(qid)
                     }
                 }
-            }
-        }
-        // Votes
-        Rectangle {
-            id: votesRectangle
-            anchors.top: voteUpButton.bottom
-            anchors.horizontalCenter: voteUpButton.horizontalCenter
-            color: "transparent"
-            smooth: true
-            width: 80
-            height: 40
-            radius: 10
-            Label {
-                font.pixelSize: Theme.fontSizeTiny
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                visible: voteStatusLoaded
-                color: "lightgreen"
-                text: votes
-            }
-            Label {
-                font.pixelSize: Theme.fontSizeTiny
-                color: Theme.secondaryColor
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                visible: voteStatusLoaded
-                text: qsTr("votes")
             }
         }
         Image {
@@ -559,17 +539,16 @@ Page {
             function refreshSource() {
                 voteDownButton.source = downVoteOn ? "qrc:/qml/images/arrow-right-vote-down.png" : "qrc:/qml/images/arrow-right.png"
             }
-            anchors.top: votesRectangle.bottom
+            anchors.top: statsRow.bottom
             anchors.right: parent.right
             anchors.rightMargin: Theme.paddingLarge
-            anchors.leftMargin: Theme.paddingLarge
-            //anchors.topMargin: Theme.paddingLarge
             source: downVoteOn ? "qrc:/qml/images/arrow-right-vote-down.png" : "qrc:/qml/images/arrow-right.png"
             rotation: +90
+            scale: 1.2
             MouseArea {
                 anchors.fill: parent
                 onPressed: {
-                    if (userLoggedIn) {
+                    if (questionsModel.isUserLoggedIn()) {
                         if (!downVoteOn)
                             voteDownButton.source = "qrc:/qml/images/arrow-right-pressed.png"
                         else {
@@ -582,7 +561,7 @@ Page {
                     }
                 }
                 onReleased: {
-                    if (!downVoteOn && userLoggedIn) {
+                    if (!downVoteOn && questionsModel.isUserLoggedIn()) {
                         voteDownButton.refreshSource()
                         console.log("voting down")
                         question_vote_down(qid)
@@ -595,8 +574,8 @@ Page {
             id: filler
             width: 1
             anchors.left: parent.left
-            anchors.top: timesAndStatsRec.bottom
-            height: Theme.paddingMedium
+            anchors.top: askedAdUpdatedTimesRec.bottom
+            height: hasTags() ? Theme.paddingLarge : 0
         }
 
         ItemFlowColumn {
@@ -612,11 +591,11 @@ Page {
             id: questionTextContentColumn
             width: parent.width
             height: childrenRect.height
-            anchors.top: tagsColumn.bottom
+            anchors.top: (voteDownButton.y > tagsColumn.y) ? voteDownButton.bottom : tagsColumn.bottom
 
             Item {
                 width: 1
-                height: Theme.paddingLarge
+                height: hasTags() ? Theme.paddingLarge : 0
             }
 
             ShowRichTextWithLinkActions {
@@ -668,7 +647,7 @@ Page {
             }
             Item {
                 width: 1
-                height: Theme.paddingLarge
+                height: Theme.paddingExtraLarge
             }
 
             Repeater {
@@ -687,10 +666,9 @@ Page {
                     }
                 }
             }
-
             Item {
                 width: 1
-                height: Theme.paddingLarge
+                height: Theme.paddingExtraLarge
             }
         }
         ScrollDecorator { }

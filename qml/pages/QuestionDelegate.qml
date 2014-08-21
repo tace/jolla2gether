@@ -24,20 +24,23 @@ ListItem  {
 
     function getListItemContentHeight() {
         var appsettingForTextSize = getTitleTextFontSize()
-        var extraSpace = 20
-        if (appsettingForTextSize >= Theme.fontSizeLarge) {
-            if (appsettingForTextSize >= Theme.fontSizeExtraLarge)
-                extraSpace += 20
+        if (appsettingForTextSize >= Theme.fontSizeExtraLarge) {
             if (titleText.lineCount > 1)
-                return Theme.itemSizeExtraLarge + extraSpace
+                return Theme.itemSizeExtraLarge + 35
             else
-                return Theme.itemSizeLarge
+                return Theme.itemSizeLarge - 2
+        }
+        if (appsettingForTextSize >= Theme.fontSizeLarge) {
+            if (titleText.lineCount > 1)
+                return Theme.itemSizeExtraLarge + 10
+            else
+                return Theme.itemSizeMedium - 5
         }
         if (appsettingForTextSize >= Theme.fontSizeMedium) {
             if (titleText.lineCount > 1)
-                return Theme.itemSizeLarge + extraSpace
+                return Theme.itemSizeLarge + 15
             else
-                return Theme.itemSizeSmall + 10
+                return Theme.itemSizeSmall + 5
         }
         if (appsettingForTextSize >= Theme.fontSizeSmall) {
             if (titleText.lineCount > 1)
@@ -66,7 +69,7 @@ ListItem  {
     }
     function getSeparatorHeight() {
         if (appSettings.question_list_show_separator_line_value)
-            return 1
+            return 2
         return 0
     }
     function getTitleTextFontSize() {
@@ -139,124 +142,17 @@ ListItem  {
         text: author + "  "
     }
 
-    // Fill some space before statics rectangles
-    Rectangle {
-        id: fillRectangel
-        anchors.left: authorLabel.right
+    StatsRow {
+        id: staticticsRow
+        parentWidth: background.width - authorLabel.width
         anchors.top: authorLabel.top
-        color: "transparent"
-        width: background.width - authorLabel.width - timesRectangle.width - votesRectangle.width - answersRectangle.width - viewsRectangle.width
-        height: 40
+        anchors.left: authorLabel.right
     }
 
-    // Created and updated time strings
-    Rectangle {
-        id: timesRectangle
-        anchors.left: fillRectangel.right
-        anchors.top: fillRectangel.top
-        color: "transparent"
-        width: 200
-        height: 40
-        Label {
-            font.pixelSize: Theme.fontSizeTiny
-            color: Theme.secondaryColor
-            anchors.top: parent.top
-            anchors.right: parent.right
-            text: "c: " + created
-        }
-        Label {
-            font.pixelSize: Theme.fontSizeTiny
-            color: Theme.secondaryColor
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            text: "u: " + updated
-        }
-
-        // Votes
-        Rectangle {
-            id: votesRectangle
-            anchors.left: timesRectangle.right
-            color: "transparent"
-            smooth: true
-            //            border.width: 1
-            //            border.color: "gray"
-            width: 80
-            height: 40
-            radius: 10
-            Label {
-                font.pixelSize: Theme.fontSizeTiny
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                color: "lightgreen"
-                text: votes
-            }
-            Label {
-                font.pixelSize: Theme.fontSizeTiny
-                color: Theme.secondaryColor
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                text: qsTr("votes")
-            }
-        }
-
-        // Answers
-        Rectangle {
-            id: answersRectangle
-            anchors.left: votesRectangle.right
-            color: "transparent"
-            smooth: true
-            //            border.width: 1
-            //            border.color: "gray"
-            width: 80
-            height: 40
-            radius: 10
-            Label {
-                font.pixelSize: Theme.fontSizeTiny
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                color: "orange"
-                text: answer_count
-            }
-            Label {
-                font.pixelSize: Theme.fontSizeTiny
-                color: Theme.secondaryColor
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                text: qsTr("answers")
-            }
-        }
-
-        // Views
-        Rectangle {
-            id: viewsRectangle
-            anchors.left: answersRectangle.right
-            color: "transparent"
-            smooth: true
-            //            border.width: 1
-            //            border.color: "gray"
-            width: 80
-            height: 40
-            radius: 10
-            Label {
-                font.pixelSize: Theme.fontSizeTiny
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                color: "red"
-                text: view_count
-            }
-            Label {
-                font.pixelSize: Theme.fontSizeTiny
-                color: Theme.secondaryColor
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                text: qsTr("views")
-            }
-        }
-    }
     Separator {
         width: parent.width
         visible: appSettings.question_list_show_separator_line_value
-        anchors.top: timesRectangle.bottom
+        anchors.top: staticticsRow.bottom
         horizontalAlignment: Qt.AlignCenter
         color: Theme.secondaryHighlightColor
         //height: 1

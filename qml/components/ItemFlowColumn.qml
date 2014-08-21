@@ -21,24 +21,10 @@ Column {
             anchors.left: parent.left
             model: itemsArrayModel
             delegate:
-                Rectangle {
+                DynamicTextRectangle {
+                id: dynamicRec
                 visible: itemsArrayModel.length > 0 && itemsArrayModel[0] !== ""
-                color: "transparent"
-                smooth: true
-                border.width: 1
-                border.color: Theme.secondaryHighlightColor
-                height: 30
-                radius: 5
-                Label {
-                    id: tagText
-                    anchors.centerIn: parent
-                    font.pixelSize: Theme.fontSizeTiny
-                    color: Theme.secondaryColor
-                    text: modelData
-                }
-                Component.onCompleted: {
-                    width = tagText.paintedWidth + 20
-                }
+                labelText: modelData
             }
         }
     }

@@ -47,7 +47,10 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/components/ExternalLinkDialog.qml \
     qml/components/ShowRichText.qml \
     qml/components/ShowRichTextWithLinkActions.qml \
-    qml/components/InfoBanner.qml
+    qml/components/InfoBanner.qml \
+    qml/components/DynamicTextRectangle.qml \
+    qml/components/StatsRectangle.qml \
+    qml/components/StatsRow.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}

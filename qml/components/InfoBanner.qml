@@ -30,6 +30,10 @@ Rectangle {
         }
     }
 
+    function visible() {
+        return opacity > 0
+    }
+
     function showText(text) {
         infoLabel.text = text;
         opacity = 0.9;

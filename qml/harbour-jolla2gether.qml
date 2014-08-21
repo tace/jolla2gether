@@ -148,7 +148,6 @@ ApplicationWindow
                 var browseBackFromProps = questionsModel.getProp("browseBackText", props)
                 if (browseBackFromProps !== undefined) {
                     properties = questionsModel.merge({browseBackText: browseBackFromProps}, props)
-                    console.log("from props: " +browseBackFromProps)
                 }
                 else
                     properties = questionsModel.merge({browseBackText: backtext}, props)

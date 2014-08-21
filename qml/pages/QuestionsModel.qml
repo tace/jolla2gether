@@ -89,6 +89,7 @@ ListModel {
         if (pageStack.currentPage.objectName === "QuestionViewPage") {
             callbacksList.push(getVotingDataFromWebViewCallback(getQuestionId(),
                                                                 pageStack.currentPage.votingResultsCallback))
+            callbacksList.push(getFollowedStatusFromWebViewCallback(pageStack.currentPage.followedStatusCallback))
         }
         if (callbacksList.length > 0) {
             properties = merge(props, {callbacks: callbacksList})
@@ -153,6 +154,35 @@ ListModel {
                 votingResultsCallback(upVoteOn, downVoteOn)
             }
             webview.evaluateJavaScriptOnWebPage(scriptToRun, handleVoteResult)
+        }
+    }
+
+    //
+    // Webpage contains following part and "button followed" has 2 div elements
+    // under it if question is been followed by the user.
+    //
+    // <a class="button followed" alt="click to unfollow this question">
+    //     <div>Following</div>
+    //     <div class="unfollow">Unfollow</div>
+    // </a>
+    //
+    function getFollowedStatusFromWebViewCallback(followedStatusCallback) {
+        return function(webview) {
+            var scriptToRun = "(function() { \
+                        var contentRight = document.getElementById('ContentRight'); \
+                        var followButton = contentRight.getElementsByTagName('a')[0]; \
+                        if (followButton.getAttribute('class') === 'button followed'); \
+                            return followButton.getElementsByTagName('div').length; \
+                        return 0; \
+                        })()"
+            var handleResult = function(result) {
+                console.log("Got followed status from webview. Followed: " + result)
+                if (result > 0)
+                    followedStatusCallback(true)
+                else
+                    followedStatusCallback(false)
+            }
+            webview.evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
         }
     }
 

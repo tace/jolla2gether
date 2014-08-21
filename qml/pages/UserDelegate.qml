@@ -51,17 +51,17 @@ ListItem  {
                         color: "transparent"
                         smooth: true
                         //border.width: 1
-                        width: 235
-                        height: 40
+                        width: 250
+                        height: 60
                         radius: 10
                         Label {
-                            font.pixelSize: Theme.fontSizeTiny
+                            font.pixelSize: Theme.fontSizeSmall
                             anchors.top: parent.top
                             anchors.right: parent.right
                             text: "joined: " + joined_at + "  "
                         }
                         Label {
-                            font.pixelSize: Theme.fontSizeTiny
+                            font.pixelSize: Theme.fontSizeSmall
                             anchors.bottom: parent.bottom
                             anchors.right: parent.right
                             text: "  seen: " + last_seen_at + "  "
@@ -73,18 +73,18 @@ ListItem  {
                         color: "transparent"
                         smooth: true
                         border.width: 1
-                        width: 70
-                        height: 40
+                        width: 85
+                        height: 60
                         radius: 10
                         Label {
-                            font.pixelSize: Theme.fontSizeTiny
+                            font.pixelSize: Theme.fontSizeSmall
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.top: parent.top
                             color: "lightgreen"
                             text: reputation
                         }
                         Label {
-                            font.pixelSize: Theme.fontSizeTiny
+                            font.pixelSize: Theme.fontSizeSmall
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.bottom: parent.bottom
                             text: "karma"
