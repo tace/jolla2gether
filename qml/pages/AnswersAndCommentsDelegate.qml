@@ -69,7 +69,7 @@ ListItem  {
     }
 
     function isAnswer() {
-        if (category == answerFilter)
+        if (category == rssFeedModel.answerFilter)
             return true
         return false
     }

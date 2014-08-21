@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import QtQuick.XmlListModel 2.0
 import "../components"
+import "../models"
 
 Page {
     id: page
@@ -23,14 +23,10 @@ Page {
     property string view_count: questionsModel.get(index).view_count
     property string tags: questionsModel.get(index).tags
     property var tagsArray: null
-    property int numberOfTags: 0
     property string userKarma: ""
     property string userAvatarUrl: ""
-
     property bool openExternalLinkOnWebview: false
     property string externalUrl: ""
-    property string commentFilter: "comment"
-    property string answerFilter: "answer"
     property bool answersAndCommentsOpen: false
     property bool answersAndCommentsLoaded: false
     property string rssFeedUrl: siteBaseUrl + "/feeds/question/" + qid + "/"
@@ -40,13 +36,15 @@ Page {
     property bool textSelectionEnabled: false
     property bool followedStatusLoaded: false
     property bool followed: false
+    property var startTime
+    property var endTime
 
     InfoBanner {
         id: infoBanner
     }
 
     ListModel {
-        id: rssModel
+        id: finalRssModel
         property bool ready: false
     }
     ListModel {
@@ -58,97 +56,10 @@ Page {
         property int currentIndex: 0 // Keep track of point in total rss feed index
         property int pageStopIndex: 0
     }
-    XmlListModel {
-        id: rssModelOriginal
-        source: ""
-        query: "/rss/channel/item[contains(lower-case(child::category),lower-case(\""+commentFilter+"\")) or contains(lower-case(child::category),lower-case(\""+answerFilter+"\"))]"
-        //namespaceDeclarations: "declare default element namespace 'http://www.w3.org/2005/Atom';"
-
-        XmlRole { name: "title"; query: "title/string()" }
-        XmlRole { name: "link"; query: "link/string()" }
-        XmlRole { name: "description"; query: "description/string()" }
-        XmlRole { name: "category"; query: "category/string()" }
-        XmlRole { name: "pubDate"; query: "pubDate/string()"; isKey: true }
-        onStatusChanged:{
-            console.debug("feedSource: "+source)
-            if (status === XmlListModel.Ready) {
-                console.debug("feed itemcount ready: "+rssModelOriginal.count)
-                sortCommentsByTime(rssModelOriginal, pagingListModel)
-                fillRssModel(rssModel)
-                rssModel.ready = true
-                urlLoading = false
-            }
-            if (status === XmlListModel.Error) {
-                urlLoading = false
-            }
-        }
-    }
-    function sortCommentsByTime(sourceModel, targetModel) {
-        var n;
-        for (n=0; n < sourceModel.count; n++)
-        {
-            if (sourceModel.get(n).category === commentFilter) {
-                add2ListModel(sourceModel, sortModel, n)
-            }
-            else {  // Answer
-                // Add here comments sorted by time
-                addSortedComments(targetModel)
-                add2ListModel(sourceModel, targetModel, n)
-            }
-        }
-        // copy possible rest of comments
-        addSortedComments(targetModel)
-    }
-    function addSortedComments(targetModel) {
-        sortListModel(sortModel)
-        copyModel(sortModel, targetModel)
-        sortModel.clear()
-    }
-    function fillRssModel(listModel)
-    {
-        var n;
-        pagingListModel.pageStopIndex = pagingListModel.currentIndex + pagingListModel.pageSize
-        if (pagingListModel.pageStopIndex > pagingListModel.count)
-            pagingListModel.pageStopIndex = pagingListModel.count
-        for (n=pagingListModel.currentIndex; n < pagingListModel.pageStopIndex; n++)
-        {
-            urlLoading = true
-            add2ListModel(pagingListModel, listModel, n)
-            pagingListModel.currentIndex++
-        }
-    }
-    function initRssModel() {
-        rssModel.clear()
-        pagingListModel.currentIndex = 0
-        pagingListModel.pageStopIndex = 0
-    }
-    function sortListModel(listModel) {
-        var n;
-        var i;
-        for (n=0; n < listModel.count; n++)
-            for (i=n+1; i < listModel.count; i++)
-            {
-                var itemTime = questionsModel.rssPubDate2Seconds(listModel.get(n).pubDate)
-                var nextItemTime = questionsModel.rssPubDate2Seconds(listModel.get(i).pubDate)
-                if (itemTime > nextItemTime)
-                {
-                    listModel.move(i, n, 1);
-                    n=0;
-                }
-            }
-    }
-    function copyModel(source, target) {
-        var i;
-        for (i=0; i < source.count; i++) {
-            add2ListModel(source, target, i)
-        }
-    }
-    function add2ListModel(sourceModel, toModel, index) {
-        toModel.append({"title":          sourceModel.get(index).title,
-                           "link":           sourceModel.get(index).link,
-                           "description":    sourceModel.get(index).description,
-                           "category":       sourceModel.get(index).category,
-                           "pubDate":        sourceModel.get(index).pubDate})
+    RssFeedModel {
+        id: rssFeedModel
+        pagingModel: pagingListModel
+        sortingModel: sortModel
     }
 
     function goToItem(idx) {
@@ -159,18 +70,19 @@ Page {
     }
 
     function loadAnswersAndComments() {
+        startTime = Date.now()
         if (!answersAndCommentsLoaded) {
             urlLoading = true
-            rssModelOriginal.source = rssFeedUrl
+            rssFeedModel.source = rssFeedUrl
             answersAndCommentsLoaded = true
         }
         if (answersAndCommentsOpen) {
             answersAndCommentsOpen = false
-            initRssModel()
+            rssFeedModel.initRssModel()
         }
         else {
             answersAndCommentsOpen = true
-            fillRssModel(rssModel)
+            rssFeedModel.fillRssModel(finalRssModel)
         }
     }
 
@@ -181,11 +93,6 @@ Page {
         userKarma = user_data.reputation
         userAvatarUrl = "http:" + usersModel.changeImageLinkSize(user_data.avatar, 100) //match this size to userPic size
         console.log("avatar: "+userAvatarUrl)
-    }
-    function selectLabelRight() {
-        return (askedLabel.paintedWidth + askedValue.paintedWidth) >
-                (updatedLabel.paintedWidth + updatedValue.paintedWidth) ?
-                    askedValue.right : updatedValue.right
     }
     function getLabelMaxWidth() {
         return (askedLabel.paintedWidth + askedValue.paintedWidth) >
@@ -269,7 +176,7 @@ Page {
         return appSettings.question_view_page_font_size_value
     }
     function hasTags() {
-        return numberOfTags > 0 && tagsArray[0] !== ""
+        return tagsArray.length > 0 && tagsArray[0] !== ""
     }
 
     Connections {
@@ -283,7 +190,6 @@ Page {
     Component.onCompleted: {
         usersModel.get_user(userId, setUserData)
         tagsArray = getTagsArray()
-        numberOfTags = tagsArray.length
     }
 
     onStatusChanged: {
@@ -641,7 +547,7 @@ Page {
                 Label {
                     anchors.centerIn: parent
                     font.pixelSize: Theme.fontSizeMedium
-                    text: qsTr("Answers and Comments") + (answersAndCommentsOpen ? " (" + rssModelOriginal.count + ")" : "")
+                    text: qsTr("Answers and Comments") + (answersAndCommentsOpen ? " (" + rssFeedModel.count + ")" : "")
                 }
             }
             Item {
@@ -651,17 +557,19 @@ Page {
 
             Repeater {
                 id: answersAndCommentsList
-                visible: rssModel.ready && answersAndCommentsOpen
+                visible: finalRssModel.ready && answersAndCommentsOpen
                 width: parent.width
                 height: answersAndCommentsOpen ? childrenRect.height : 0
                 anchors.left: parent.left
                 anchors.right: parent.right
-                model: answersAndCommentsOpen ? rssModel : undefined
+                model: answersAndCommentsOpen ? finalRssModel : undefined
                 clip: true
                 delegate: AnswersAndCommentsDelegate { }
                 onItemAdded: {
                     if (index === (pagingListModel.pageStopIndex - 1)) {
                         urlLoading = false
+                        endTime = Date.now()
+                        console.log("AnswersAndComments load time: " + (endTime - startTime))
                     }
                 }
             }
@@ -676,7 +584,7 @@ Page {
             if (atYEnd && contentY >= parent.height && answersAndCommentsOpen) {
                 if (contentY > 0 && parent.height > 0) {
                     console.log("At end of page, load next answers/comments")
-                    fillRssModel(rssModel)
+                    rssFeedModel.fillRssModel(finalRssModel)
                 }
             }
         }
