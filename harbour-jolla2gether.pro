@@ -51,7 +51,8 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/components/DynamicTextRectangle.qml \
     qml/components/StatsRectangle.qml \
     qml/components/StatsRow.qml \
-    qml/models/RssFeedModel.qml
+    qml/models/RssFeedModel.qml \
+    qml/components/SearchBanner.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}

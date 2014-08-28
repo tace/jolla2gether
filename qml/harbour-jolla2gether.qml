@@ -44,6 +44,7 @@ ApplicationWindow
     property bool webviewAttached: false
     property string webviewBrowseBackText: "Back"
     property bool webviewWasActiveWhenUnattached: false
+    property int phoneOrientation: deviceOrientation
 
     Settings {
         id: appSettings

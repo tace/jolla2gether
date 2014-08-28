@@ -10,6 +10,7 @@ import Sailfish.Silica 1.0
 Item {
     id: root
 
+    property var parentFlickable: null
     property string text
     property alias color: contentLabel.color
     property real fontSize: Theme.fontSizeSmall
@@ -48,17 +49,18 @@ Item {
         }
     }
 
-//    TextEdit
-    Label {
+//    Label
+    TextEdit {
         id: contentLabel
-        //readOnly: true
+        readOnly: true
 
-//        onSelectedTextChanged: {
-//            if (selectedText !== "") {
-//                //copy()
-//                Clipboard.text = selectedText
-//            }
-//        }
+        onSelectedTextChanged: {
+            if (selectedText !== "") {
+                //copy()
+                //Clipboard.text = selectedText
+                //console.log("selectedText: " + selectedText)
+            }
+        }
 
         width: parent.width / scaling
         scale: scaling
@@ -67,13 +69,18 @@ Item {
         font.pixelSize: parent.fontSize / scaling
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         textFormat: Text.RichText
-
+        selectedTextColor: Theme.secondaryColor
+        selectionColor: Theme.secondaryHighlightColor
         smooth: true
 
         text: _style + parent.text
 
         onLinkActivated: {
             root.linkActivated(link);
+        }
+        onCursorRectangleChanged: {
+            if (parentFlickable !== null)
+                parentFlickable.ensureVisible(cursorRectangle)
         }
     }
 
@@ -84,11 +91,27 @@ Item {
         onTriggered: {
             //var contentWidth = Math.floor(layoutLabel.contentWidth);
             scaling = Math.min(1, parent.width / (layoutLabel.contentWidth + 0.0));
+
             //console.log("scaling: " + scaling);
+            if (scaling < 0.7) {
+                scaling = 0.7
+                console.log("limit scaling to 0.7")
+            }
 
             // force reflow
             contentLabel.text = contentLabel.text + " ";
         }
+    }
+
+    function selectAndMovetoText(start, end) {
+        contentLabel.select(start, end)
+        return contentLabel.positionAt(start, end)
+    }
+    function getPlainText() {
+        return contentLabel.getText(0, contentLabel.text.length)
+    }
+    function resetTextSelection() {
+        contentLabel.deselect()
     }
 
 //    function toggleTextSelectMode() {

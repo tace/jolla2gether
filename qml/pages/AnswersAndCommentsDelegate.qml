@@ -9,6 +9,7 @@ ListItem  {
     anchors.leftMargin: Theme.paddingLarge
     anchors.rightMargin: Theme.paddingMedium
     contentHeight: answersAndCommentsColumn.height
+    height: contentHeight
     _showPress: false // Disable normal list item highlighting
 
     function getTextSize() {
@@ -66,6 +67,15 @@ ListItem  {
             anchors.left: parent.left
             height: Theme.paddingLarge
         }
+    }
+    function getPlainText() {
+        return answerCommentText.getPlainText()
+    }
+    function selectAndMovetoText(start, end) {
+        return answerCommentText.selectAndMovetoText(start, end)
+    }
+    function resetSearchTextSelection() {
+        answerCommentText.resetTextSelection()
     }
 
     function isAnswer() {

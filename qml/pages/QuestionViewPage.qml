@@ -179,6 +179,7 @@ Page {
         return tagsArray.length > 0 && tagsArray[0] !== ""
     }
 
+
     Connections {
         id: connections
         target: viewPageUpdater
@@ -211,14 +212,7 @@ Page {
     SilicaFlickable {
         id: contentFlickable
         anchors.fill: parent
-        contentHeight: pageHeader.height +
-                       questionTitleItem.height +
-                       titlePadding.height +
-                       askedAdUpdatedTimesRec.height +
-                       voteUpButton.height +
-                       voteDownButton.height +
-                       filler.height +
-                       tagsColumn.height +
+        contentHeight: heighBeforeTextContent() +
                        questionTextContentColumn.height
 
         PageHeader {
@@ -262,23 +256,31 @@ Page {
             }
         }
         PullDownMenu {
+            id: pullDownMenu
             //
             // Disabled text selection feature as copy to system clipboard seems not to work constantly
             //
-            enabled: false
-            visible: false
+            //enabled: false
+            //visible: false
+            //            MenuItem {
+            //                text: qsTr("Show text selection buttons")
+            //                visible: !textSelectionEnabled
+            //                onClicked: {
+            //                    textSelectionEnabled = true
+            //                }
+            //            }
+            //            MenuItem {
+            //                text: qsTr("Hide text selection buttons")
+            //                visible: textSelectionEnabled
+            //                onClicked: {
+            //                    textSelectionEnabled = false
+            //                }
+            //            }
+
             MenuItem {
-                text: qsTr("Show text selection buttons")
-                visible: !textSelectionEnabled
+                text: qsTr("Search...")
                 onClicked: {
-                    textSelectionEnabled = true
-                }
-            }
-            MenuItem {
-                text: qsTr("Hide text selection buttons")
-                visible: textSelectionEnabled
-                onClicked: {
-                    textSelectionEnabled = false
+                    searchBanner.show()
                 }
             }
         }
@@ -381,7 +383,7 @@ Page {
             MouseArea {
                 anchors.fill: parent
                 enabled: ! infoBanner.visible()
-                onClicked: {                    
+                onClicked: {
                     followQuestion()
                 }
             }
@@ -508,6 +510,7 @@ Page {
                 fontSize: getPageTextFontSize()
                 text: page.text
                 textBanner: infoBanner
+                parentFlickable: contentFlickable
             }
 
             Image {
@@ -588,5 +591,37 @@ Page {
                 }
             }
         }
+        function ensureVisible(r)
+        {
+            if (searchBanner.opened) {
+                contentY += searchBanner.height
+            }
+
+            if (contentX >= r.x)
+                contentX = r.x;
+            else if (contentX+width <= r.x+r.width)
+                contentX = r.x+r.width-width;
+            if (contentY >= r.y)
+                contentY = r.y;
+            else if (contentY+height <= r.y+r.height)
+                contentY = r.y+r.height-height;
+        }
+        function heighBeforeTextContent() {
+            return pageHeader.height +
+                    questionTitleItem.height +
+                    titlePadding.height +
+                    askedAdUpdatedTimesRec.height +
+                    voteUpButton.height +
+                    voteDownButton.height +
+                    filler.height +
+                    tagsColumn.height
+        }
+    }
+    SearchBanner {
+        id: searchBanner
+        foreground: contentFlickable
+        mainFlickable: contentFlickable
+        pageMainTextElement: questionText
+        pageDynamicTextModelElement: answersAndCommentsList
     }
 }
