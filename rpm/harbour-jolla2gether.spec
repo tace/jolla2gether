@@ -23,6 +23,7 @@ Source100:  harbour-jolla2gether.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
 Requires:   qt5-qtdeclarative-import-xmllistmodel
 Requires:   qt5-qtsvg-plugin-imageformat-svg
+Requires:   qt5-plugin-imageformat-gif
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Core)

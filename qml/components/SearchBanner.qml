@@ -50,8 +50,8 @@ Drawer {
                 IconButton {
                     icon.source: "image://theme/icon-l-cancel"
                     onClicked: {
-                        resetMainSearch()
-                        resetModelSearch()
+                        //resetMainSearch()
+                        //resetModelSearch()
                         hide()
                     }
                 }
@@ -136,9 +136,11 @@ Drawer {
         if (searchStringNotFound) {
             if (backward) {
                 previousButtonEnabled = false
+                searchRepeatIndex += 1 // Correct index back to last found item
             }
             else {
                 nextButtonEnabled = false
+                searchRepeatIndex -= 1 // Correct index back to last found item
             }
         }
     }
@@ -154,8 +156,6 @@ Drawer {
     }
     function beforeSearchtInits() {
         // Each time inited items
-        resetMainSearchTextSelection()
-        resetModelSearchTextSelection()
         searchStringNotFound = false
 
         // Always check if model items amount changed and needs reload
@@ -190,36 +190,48 @@ Drawer {
     }
     function traverseSearchHits(searchText) {
         var found = false
+        var loc
         if (searchRepeatIndex >= 0) {
             if ((searchMainTextIndexesArray.length > 0) && (searchRepeatIndex < searchMainTextIndexesArray.length)
                     && !searchInsideDynModelText) {
-                var loc = searchMainTextIndexesArray[searchRepeatIndex]
-                pageMainTextElement.selectAndMovetoText(loc, loc + searchText.length)
                 found = true
             }
             else { // then find from answers and comments
                 if ((searchModelTextIndexesArray.length > 0) && (searchRepeatIndex < searchModelTextIndexesArray.length)) {
                     searchInsideDynModelText = true
-                    loc = searchModelTextIndexesArray[searchRepeatIndex]
-                    var pos = pageDynamicTextModelElement.itemAt(searchModelTextModelIndexArray[searchRepeatIndex]).selectAndMovetoText(loc, loc + searchText.length)
-                    var previousItemsHeight = 0
-                    for (var j = 0; j < searchModelTextModelIndexArray[searchRepeatIndex]; j++) {
-                        previousItemsHeight += pageDynamicTextModelElement.itemAt(j).height
-                    }
-                    var modelY = mainFlickable.heighBeforeTextContent() + pageMainTextElement.y + pageMainTextElement.height
-                    var modelHeight = previousItemsHeight + pos
-                    if (mainFlickable.contentY >= modelY) {
-                        mainFlickable.contentY = modelY
-                    }
-                    else if (mainFlickable.contentY+mainFlickable.height <= modelY+modelHeight) {
-                        mainFlickable.contentY = modelY+modelHeight-mainFlickable.height
-                    }
-                    mainFlickable.contentY += drawerContent.height
                     found = true
                 }
             }
         }
-        if (!found) { // String not found
+        if (found) {
+            // Reset previous text selection only when new one is found
+            resetMainSearchTextSelection()
+            resetModelSearchTextSelection()
+
+            // Move cursor to found location
+            if (!searchInsideDynModelText) {
+                loc = searchMainTextIndexesArray[searchRepeatIndex]
+                pageMainTextElement.selectAndMovetoText(loc, loc + searchText.length)
+            }
+            else {
+                loc = searchModelTextIndexesArray[searchRepeatIndex]
+                var pos = pageDynamicTextModelElement.itemAt(searchModelTextModelIndexArray[searchRepeatIndex]).selectAndMovetoText(loc, loc + searchText.length)
+                var previousItemsHeight = 0
+                for (var j = 0; j < searchModelTextModelIndexArray[searchRepeatIndex]; j++) {
+                    previousItemsHeight += pageDynamicTextModelElement.itemAt(j).height
+                }
+                var modelY = mainFlickable.heighBeforeTextContent() + pageMainTextElement.y + pageMainTextElement.height
+                var modelHeight = previousItemsHeight + pos
+                if (mainFlickable.contentY >= modelY) {
+                    mainFlickable.contentY = modelY
+                }
+                else if (mainFlickable.contentY+mainFlickable.height <= modelY+modelHeight) {
+                    mainFlickable.contentY = modelY+modelHeight-mainFlickable.height
+                }
+                mainFlickable.contentY += drawerContent.height
+            }
+        }
+        else {
             console.log("String \"" + searchText + "\" not found!")
             searchStringNotFound = true
         }

@@ -42,7 +42,6 @@ Page {
     InfoBanner {
         id: infoBanner
     }
-
     ListModel {
         id: finalRssModel
         property bool ready: false
@@ -69,11 +68,18 @@ Page {
         pageStack.replace("QuestionViewPage.qml", props);
     }
 
+    onFollowedStatusLoadedChanged: {
+        if (followedStatusLoaded)
+            rssFeedModel.source = rssFeedUrl
+    }
+
     function loadAnswersAndComments() {
         startTime = Date.now()
         if (!answersAndCommentsLoaded) {
             urlLoading = true
-            rssFeedModel.source = rssFeedUrl
+            // Start loading RssFeed only after webview is surely loaded,
+            // so link it to the followed status which is the last callback run on webview start
+            //rssFeedModel.source = rssFeedUrl
             answersAndCommentsLoaded = true
         }
         if (answersAndCommentsOpen) {
@@ -82,7 +88,8 @@ Page {
         }
         else {
             answersAndCommentsOpen = true
-            rssFeedModel.fillRssModel(finalRssModel)
+            if (finalRssModel.ready)
+                rssFeedModel.fillRssModel(finalRssModel)
         }
     }
 
@@ -92,7 +99,7 @@ Page {
     function setUserData(user_data) {
         userKarma = user_data.reputation
         userAvatarUrl = "http:" + usersModel.changeImageLinkSize(user_data.avatar, 100) //match this size to userPic size
-        console.log("avatar: "+userAvatarUrl)
+        //console.log("avatar: "+userAvatarUrl)
     }
     function getLabelMaxWidth() {
         return (askedLabel.paintedWidth + askedValue.paintedWidth) >
@@ -103,52 +110,17 @@ Page {
         return tags.split(",")
     }
 
-    function votingResultsCallback(up, down) {
-        upVoteOn = up
-        downVoteOn = down
-        voteDownButton.refreshSource()
-        voteUpButton.refreshSource()
-        voteStatusLoaded = true
+    function getVotingResultsCallback() {
+        return function votingResultsCallback(up, down) {
+            voteDownButton.setVoteStatus(down)
+            voteUpButton.setVoteStatus(up)
+            voteStatusLoaded = true
+        }
     }
-
-    function setVotesToQuestionModel(votes) {
-        questionsModel.set(index, {"votes": votes})
-    }
-
-    function question_vote_up(question_id) {
-        var script = "document.getElementById('question-img-upvote-" + question_id + "').click();"
-        pageStack.nextPage().evaluateJavaScriptOnWebPage(script, function(result) {
-            if (downVoteOn)
-                upVoteOn = false
-            else
-                upVoteOn = true
-            downVoteOn = false
-            voteUpButton.refreshSource()
-            voteDownButton.refreshSource()
-            setVotesToQuestionModel(votes + 1)
-            console.log("Voted UP question " + question_id + ", result: " + result)
-        })
-    }
-    function question_vote_down(question_id) {
-        var script = "document.getElementById('question-img-downvote-" + question_id + "').click();"
-        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
-            if (upVoteOn)
-                downVoteOn = false
-            else
-                downVoteOn = true
-            upVoteOn = false
-            voteDownButton.refreshSource()
-            voteUpButton.refreshSource()
-            setVotesToQuestionModel(votes - 1)
-            console.log("Voted DOWN question " + question_id + ", result: " + result)
-        })
-    }
-
     function followedStatusCallback(flag) {
         followed = flag
         followedStatusLoaded = true
     }
-
     function followQuestion() {
         var script = "var contentRight = document.getElementById('ContentRight'); \
                       var followButton = contentRight.getElementsByTagName('a')[0]; \
@@ -166,6 +138,102 @@ Page {
             infoBanner.showText(infoText)
         })
     }
+    function get_answer_data(answer_id, item) {
+        var script = "(function() { \
+                      var upvoteElem = document.getElementById('answer-img-upvote-" + answer_id + "'); \
+                      var upvoteOn = upvoteElem.getAttribute('class').split('answer-img-upvote post-vote upvote')[1]; \
+                      var downvoteElem = document.getElementById('answer-img-downvote-" + answer_id + "'); \
+                      var downvoteOn = downvoteElem.getAttribute('class').split('answer-img-downvote post-vote downvote')[1]; \
+                      var voteNumberElem = document.getElementById('answer-vote-number-" + answer_id + "'); \
+                      var votes = voteNumberElem.childNodes[0].nodeValue; \
+                      var answerPost = document.getElementById('post-id-" + answer_id + "'); \
+                      var images = answerPost.getElementsByTagName('img'); \
+                      var gravatarUrl = ''; \
+                      var flagUrl = ''; \
+                      for (var i = 0; i < images.length; i++) { \
+                          if (images[i].getAttribute('class') === 'gravatar' && gravatarUrl === '') { \
+                              gravatarUrl = images[i].getAttribute('src'); \
+                          } \
+                          if (images[i].getAttribute('class') === 'flag' && flagUrl === '') { \
+                              flagUrl = images[i].getAttribute('src'); \
+                          } \
+                      } \
+                      var karma = 0; \
+                      var karmaElem = answerPost.getElementsByTagName('span')[0]; \
+                      if (karmaElem.getAttribute('class') === 'reputation-score') { \
+                          karma = karmaElem.childNodes[0].nodeValue; \
+                      } \
+                      var answerAccepted = false; \
+                      var answerAcceptedElem = document.getElementById('answer-img-accept-" + answer_id + "'); \
+                      if (answerAcceptedElem.getAttribute('title') === 'this answer has been selected as correct') { \
+                          answerAccepted = true; \
+                      } \
+                      return upvoteOn + ',' + downvoteOn + ',' + votes + ',' + gravatarUrl + ',' + flagUrl + ',' + karma + ',' + answerAccepted \
+                      })()"
+        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
+            console.log("Answer: " + answer_id + ", result: " + result)
+            var answerData = result.split(',')
+            var upVote = false
+            var downVote = false
+            if (answerData[0].trim() !== '')
+                upVote = true
+            if (answerData[1].trim() !== '')
+                downVote = true
+            if (answerData[2].trim() !== '')
+                item.answerVotes = answerData[2].trim()
+            item.setAnswerVotingButtonsStatus(upVote, downVote)
+            item.setGravatarImagesUrls(answerData[3].trim(), answerData[4].trim())
+            item.setKarma(answerData[5].trim())
+            item.setAcceptedAnswerFlag(answerData[6].trim() === "true")
+        })
+    }
+    function get_comment_data(comment_id, item, failCallback) {
+        var script = "(function() { \
+                      var commentElem = document.getElementById('comment-" + comment_id + "'); \
+                      var commentSubs = commentElem.getElementsByTagName('div'); \
+                      var numberOfVotes = 0; \
+                      var iHaveUpvoted = false; \
+                      for (var i = 0; i < commentSubs.length; i++) { \
+                          if (commentSubs[i].getAttribute('class') === 'upvote upvoted') { \
+                              iHaveUpvoted = true; \
+                              numberOfVotes = commentSubs[i].childNodes[0].nodeValue; \
+                          } \
+                          if (commentSubs[i].getAttribute('class') === 'upvote') { \
+                              numberOfVotes = commentSubs[i].childNodes[0].nodeValue; \
+                          } \
+                      } \
+                      if (numberOfVotes === '') { \
+                          numberOfVotes = 0; \
+                      } \
+                      return iHaveUpvoted + ',' + numberOfVotes; \
+                      })()"
+        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
+            if (result === undefined) {
+                console.log("Failed to get comment data..." + comment_id)
+                if (failCallback !== undefined) {
+                    failCallback(item)
+                    return
+                }
+            }
+            console.log("Comment: " + comment_id + ", result: " + result)
+            var commentData = result.split(',')
+            item.setCommentVotesData(commentData[0].trim() === "true",
+                                     commentData[1].trim())
+        })
+    }
+    function pressSeeMoreCommentsButton(item) {
+        var answer_id = item.getRelatedAnswerNumber()
+        var script = "(function() { \
+                      var addMoreButton = document.getElementById('add-comment-to-post-" + answer_id + "'); \
+                      if (addMoreButton.childNodes[0].nodeValue === 'see more comments') { \
+                          addMoreButton.click(); \
+                      } \
+                      })()"
+        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
+            console.log("add-comment-to-post- button pressed, update comment data again")
+            item.startWebTimer()
+        })
+    }
 
     function getPageTextFontSize() {
         //return Theme.fontSizeTiny
@@ -178,7 +246,13 @@ Page {
     function hasTags() {
         return tagsArray.length > 0 && tagsArray[0] !== ""
     }
-
+    function amILoggedIn(error_text) {
+        if (!questionsModel.isUserLoggedIn()) {
+            infoBanner.showText(error_text)
+            return false
+        }
+        return true
+    }
 
     Connections {
         id: connections
@@ -224,7 +298,7 @@ Page {
                 anchors.topMargin: Theme.paddingSmall
                 anchors.rightMargin: Theme.paddingSmall
                 color: Theme.secondaryColor
-                font.pixelSize: Theme.fontSizeExtraSmall
+                font.pixelSize: Theme.fontSizeSmall
                 text: "<b>" + userName + "</b>"
             }
             Label {
@@ -384,7 +458,8 @@ Page {
                 anchors.fill: parent
                 enabled: ! infoBanner.visible()
                 onClicked: {
-                    followQuestion()
+                    if (amILoggedIn(qsTr("Please login to follow/un-follow questions!")))
+                        followQuestion()
                 }
             }
         }
@@ -400,83 +475,37 @@ Page {
             anchors.right: parent.right
             anchors.rightMargin: Theme.paddingMedium
         }
-
         // Voting buttons
-        Image {
+        VotingButton {
             id: voteUpButton
             enabled: voteStatusLoaded
             visible: voteStatusLoaded
-            function refreshSource() {
-                voteUpButton.source = upVoteOn ? "qrc:/qml/images/arrow-right-vote-up.png" : "qrc:/qml/images/arrow-right.png"
-            }
             anchors.bottom: statsRow.top
             anchors.right: parent.right
             anchors.rightMargin: Theme.paddingLarge
-            source: upVoteOn ? "qrc:/qml/images/arrow-right-vote-up.png" : "qrc:/qml/images/arrow-right.png"
-            rotation: -90
-            scale: 1.2
-            MouseArea {
-                anchors.fill: parent
-                onPressed: {
-                    if (questionsModel.isUserLoggedIn()) {
-                        if (!upVoteOn)
-                            voteUpButton.source = "qrc:/qml/images/arrow-right-pressed.png"
-                        else {
-                            //notif to user
-                            infoBanner.showText(qsTr("Already voted up!"))
-                        }
-                    }
-                    else {
-                        infoBanner.showText(qsTr("Please login to vote!"))
-                    }
-                }
-                onReleased: {
-                    if (!upVoteOn && questionsModel.isUserLoggedIn()) {
-                        voteUpButton.refreshSource()
-                        console.log("voting up")
-                        question_vote_up(qid)
-                    }
-                }
-            }
+
+            buttonType: voteUpButton.question_vote_up
+            userLoggedIn: questionsModel.isUserLoggedIn()
+            userNotifObject: infoBanner
+            oppositeVoteButton: voteDownButton
+            initialVotes: votes
+            votingTargetId: qid
         }
-        Image {
+        VotingButton {
             id: voteDownButton
             enabled: voteStatusLoaded
             visible: voteStatusLoaded
-            function refreshSource() {
-                voteDownButton.source = downVoteOn ? "qrc:/qml/images/arrow-right-vote-down.png" : "qrc:/qml/images/arrow-right.png"
-            }
             anchors.top: statsRow.bottom
             anchors.right: parent.right
             anchors.rightMargin: Theme.paddingLarge
-            source: downVoteOn ? "qrc:/qml/images/arrow-right-vote-down.png" : "qrc:/qml/images/arrow-right.png"
-            rotation: +90
-            scale: 1.2
-            MouseArea {
-                anchors.fill: parent
-                onPressed: {
-                    if (questionsModel.isUserLoggedIn()) {
-                        if (!downVoteOn)
-                            voteDownButton.source = "qrc:/qml/images/arrow-right-pressed.png"
-                        else {
-                            //notif to user
-                            infoBanner.showText(qsTr("Already voted down!"))
-                        }
-                    }
-                    else {
-                        infoBanner.showText(qsTr("Please login to vote!"))
-                    }
-                }
-                onReleased: {
-                    if (!downVoteOn && questionsModel.isUserLoggedIn()) {
-                        voteDownButton.refreshSource()
-                        console.log("voting down")
-                        question_vote_down(qid)
-                    }
-                }
-            }
-        }
 
+            buttonType: voteUpButton.question_vote_down
+            userLoggedIn: questionsModel.isUserLoggedIn()
+            userNotifObject: infoBanner
+            oppositeVoteButton: voteUpButton
+            initialVotes: votes
+            votingTargetId: qid
+        }
         Item {
             id: filler
             width: 1
@@ -560,15 +589,26 @@ Page {
 
             Repeater {
                 id: answersAndCommentsList
+                property string commentRelatedToquestionOrAnswer: qid
                 visible: finalRssModel.ready && answersAndCommentsOpen
                 width: parent.width
-                height: answersAndCommentsOpen ? childrenRect.height : 0
+                height: childrenRect.height
                 anchors.left: parent.left
                 anchors.right: parent.right
-                model: answersAndCommentsOpen ? finalRssModel : undefined
+                model: finalRssModel
                 clip: true
                 delegate: AnswersAndCommentsDelegate { }
                 onItemAdded: {
+                    if (item.isAnswer()) {
+                        commentRelatedToquestionOrAnswer = item.getAnswerOrCommentNumber()
+                        //console.log("Answer added, answerNbr: " + item.getAnswerOrCommentNumber())
+                        get_answer_data(item.getAnswerOrCommentNumber(), item)
+                    }
+                    else { // Comment
+                        item.setRelatedAnswerNumber(commentRelatedToquestionOrAnswer)
+                        get_comment_data(item.getAnswerOrCommentNumber(), item, pressSeeMoreCommentsButton)
+                    }
+
                     if (index === (pagingListModel.pageStopIndex - 1)) {
                         urlLoading = false
                         endTime = Date.now()

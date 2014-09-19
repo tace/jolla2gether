@@ -5,5 +5,7 @@
         <file>qml/images/arrow-right-pressed.png</file>
         <file>qml/images/arrow-right-vote-down.png</file>
         <file>qml/images/arrow-right-vote-up.png</file>
+        <file>qml/images/answer-accepted.png</file>
+        <file>qml/images/answer-not-accepted.png</file>
     </qresource>
 </RCC>

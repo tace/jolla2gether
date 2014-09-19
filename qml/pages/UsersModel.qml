@@ -60,7 +60,7 @@ ListModel {
         return Askbot.get_user(user, userFunc)
     }
     function changeImageLinkSize(link, size) {
-        var pattern = /(.+)\?s=48\&(.+)/gim;
+        var pattern = /(.+)\?s=[0-9]{2,2}\&(.+)/gim;
         return link
         .replace(pattern, '$1' + '?s=' + size + '&' + '$2')
     }

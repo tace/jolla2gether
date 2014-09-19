@@ -67,6 +67,10 @@ Page {
                 onClicked: Clipboard.text = siteURL
             }
             MenuItem {
+                text: qsTr("Refresh")
+                onClicked: webview.reload()
+            }
+            MenuItem {
                 text: qsTr(browseBackText)
                 onClicked: {
                     setBackNavigation(true)

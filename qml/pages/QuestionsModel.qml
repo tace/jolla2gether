@@ -88,7 +88,7 @@ ListModel {
         }
         if (pageStack.currentPage.objectName === "QuestionViewPage") {
             callbacksList.push(getVotingDataFromWebViewCallback(getQuestionId(),
-                                                                pageStack.currentPage.votingResultsCallback))
+                                                                pageStack.currentPage.getVotingResultsCallback()))
             callbacksList.push(getFollowedStatusFromWebViewCallback(pageStack.currentPage.followedStatusCallback))
         }
         if (callbacksList.length > 0) {
