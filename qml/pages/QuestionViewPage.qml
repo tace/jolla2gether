@@ -28,7 +28,7 @@ Page {
     property bool openExternalLinkOnWebview: false
     property string externalUrl: ""
     property bool answersAndCommentsOpen: false
-    property bool answersAndCommentsLoaded: false
+    property bool answersAndCommentsClicked: false
     property string rssFeedUrl: siteBaseUrl + "/feeds/question/" + qid + "/"
     property bool upVoteOn: false
     property bool downVoteOn: false
@@ -69,18 +69,25 @@ Page {
     }
 
     onFollowedStatusLoadedChanged: {
-        if (followedStatusLoaded)
-            rssFeedModel.source = rssFeedUrl
+        if (followedStatusLoaded) {
+            if (answersAndCommentsClicked) {
+                // If user has already clicked answersAndComments open, do it actually just now after
+                // followedStatus loading is finished to make sure webview is ready for it.
+                rssFeedModel.source = rssFeedUrl
+            }
+        }
     }
 
     function loadAnswersAndComments() {
         startTime = Date.now()
-        if (!answersAndCommentsLoaded) {
+        if (!answersAndCommentsClicked) {
             urlLoading = true
-            // Start loading RssFeed only after webview is surely loaded,
-            // so link it to the followed status which is the last callback run on webview start
-            //rssFeedModel.source = rssFeedUrl
-            answersAndCommentsLoaded = true
+            answersAndCommentsClicked = true
+            if (followedStatusLoaded) {
+                // Start loading RssFeed only after webview is surely loaded,
+                // so link it to the followed status which is the last callback run on webview start
+                rssFeedModel.source = rssFeedUrl
+            }
         }
         if (answersAndCommentsOpen) {
             answersAndCommentsOpen = false
@@ -88,8 +95,10 @@ Page {
         }
         else {
             answersAndCommentsOpen = true
-            if (finalRssModel.ready)
+            if (finalRssModel.ready) {
+                // Load only if model ready, otherwice it's ongoing
                 rssFeedModel.fillRssModel(finalRssModel)
+            }
         }
     }
 
