@@ -35,6 +35,7 @@ Page {
     id: pageFirst
     objectName: "FirstPage"
     allowedOrientations: Orientation.All
+    forwardNavigation: false
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
@@ -74,6 +75,7 @@ Page {
                 text: qsTr("Questions")
                 onClicked:
                 {
+                    unattachWebview()
                     questionsModel.refresh()
                     pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
                 }
@@ -138,8 +140,9 @@ Page {
     onStatusChanged: {
         if (status === PageStatus.Active) {
             infoModel.get_info()
-            webviewAttached = false
+            //webviewAttached = false
             urlLoading = false
+            attachWebview()
         }
     }
 }

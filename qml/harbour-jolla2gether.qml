@@ -198,7 +198,8 @@ ApplicationWindow
     }
     function onPageAllowedtoAttachWebview() {
         if (pageStack.currentPage.objectName === "Users" ||
-                pageStack.currentPage.objectName === "QuestionViewPage") {
+            pageStack.currentPage.objectName === "FirstPage" ||
+            pageStack.currentPage.objectName === "QuestionViewPage") {
             return true
         }
         return false
