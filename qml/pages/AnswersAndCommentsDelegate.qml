@@ -20,6 +20,7 @@ ListItem  {
     property bool upvotedThisComment: false
     property int numberOfCommentUpVotes: 0
     property string relatedQuestionOrAnswerNumber: qid // Relevant for comments only
+    property string answerUserName: "" // Relevant for answer wiki posts where answer updating user is set here
 
     Timer {
         id: waitingWebResultsTimer
@@ -299,13 +300,16 @@ ListItem  {
             return "<font color=\"orange\">Answer</font> by"
         return "<font size=\"1\">Comment by</font>"
     }
+    function getOrigUserFromTitle() {
+        return title.split(" ")[2]
+    }
     // E.g. "Comment by tace ..."
     function getUser() {
-        return title.split(" ")[2]
+        return updatedAnswerUser() ? answerUserName : getOrigUserFromTitle()
     }
     function getUserFormatted() {
         if (isAnswer())
-            return ""
+            return updatedAnswerUser() ?  " " + getOrigUserFromTitle() + " Updated by" : ""
         return " <b>" + getUser() + "</b>"
     }
     function getTimeString() {
@@ -337,6 +341,15 @@ ListItem  {
         answeredUserPic.source = "http:" + usersModel.changeImageLinkSize(gravatarUrl, 80)
         if (flagUrl !== "")
             answerFlagImage.source = siteBaseUrl + flagUrl
+    }
+    function setAnswerUserName(user) {
+        answerUserName = user
+    }
+    // for wiki posts answers can be updated by anyone and then answered user changes
+    function updatedAnswerUser() {
+        if ((answerUserName !== "") && (answerUserName !== getOrigUserFromTitle()))
+            return true
+        return false
     }
     function setKarma(karma) {
         karmaLabel.text = "Karma: " + karma

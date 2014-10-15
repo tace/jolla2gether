@@ -158,10 +158,12 @@ Page {
                       var answerPost = document.getElementById('post-id-" + answer_id + "'); \
                       var images = answerPost.getElementsByTagName('img'); \
                       var gravatarUrl = ''; \
+                      var userName = ''; \
                       var flagUrl = ''; \
                       for (var i = 0; i < images.length; i++) { \
                           if (images[i].getAttribute('class') === 'gravatar' && gravatarUrl === '') { \
                               gravatarUrl = images[i].getAttribute('src'); \
+                              userName = images[i].getAttribute('title'); \
                           } \
                           if (images[i].getAttribute('class') === 'flag' && flagUrl === '') { \
                               flagUrl = images[i].getAttribute('src'); \
@@ -177,7 +179,7 @@ Page {
                       if (answerAcceptedElem.getAttribute('title') === 'this answer has been selected as correct') { \
                           answerAccepted = true; \
                       } \
-                      return upvoteOn + ',' + downvoteOn + ',' + votes + ',' + gravatarUrl + ',' + flagUrl + ',' + karma + ',' + answerAccepted \
+                      return upvoteOn + ',' + downvoteOn + ',' + votes + ',' + gravatarUrl + ',' + flagUrl + ',' + userName + ',' + karma + ',' + answerAccepted \
                       })()"
         pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
             console.log("Answer: " + answer_id + ", result: " + result)
@@ -192,8 +194,9 @@ Page {
                 item.answerVotes = answerData[2].trim()
             item.setAnswerVotingButtonsStatus(upVote, downVote)
             item.setGravatarImagesUrls(answerData[3].trim(), answerData[4].trim())
-            item.setKarma(answerData[5].trim())
-            item.setAcceptedAnswerFlag(answerData[6].trim() === "true")
+            item.setAnswerUserName(answerData[5].trim())
+            item.setKarma(answerData[6].trim())
+            item.setAcceptedAnswerFlag(answerData[7].trim() === "true")
         })
     }
     function get_comment_data(comment_id, item, failCallback) {
