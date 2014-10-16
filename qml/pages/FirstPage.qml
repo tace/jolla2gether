@@ -48,17 +48,22 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: qsTr("About")
-                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+                onClicked: {
+                    unattachWebview()
+                    pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+                }
             }
             MenuItem {
                 text: qsTr("Settings")
                 onClicked: {
+                    unattachWebview()
                     pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
                 }
             }
             MenuItem {
                 text: qsTr("Login")
                 onClicked: {
+                    unattachWebview()
                     siteURL = loginURL
                     questionsModel.pushWebviewWithCustomScript()
                     webviewAttached = true
@@ -67,6 +72,7 @@ Page {
             MenuItem {
                 text: qsTr("Users")
                 onClicked: {
+                    unattachWebview()
                     usersModel.refresh()
                     pageStack.push(Qt.resolvedUrl("UsersPage.qml"))
                 }

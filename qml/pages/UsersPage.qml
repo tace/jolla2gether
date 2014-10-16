@@ -68,11 +68,17 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: qsTr("Search...")
-                onClicked: pageStack.push(Qt.resolvedUrl("SearchUsers.qml"))
+                onClicked: {
+                    unattachWebview()
+                    pageStack.push(Qt.resolvedUrl("SearchUsers.qml"))
+                }
             }
             MenuItem {
                 text: qsTr("Sort by...")
-                onClicked: pageStack.push(Qt.resolvedUrl("SortUsers.qml"))
+                onClicked: {
+                    unattachWebview()
+                    pageStack.push(Qt.resolvedUrl("SortUsers.qml"))
+                }
             }
             MenuItem {
                 text: qsTr("Refresh")
