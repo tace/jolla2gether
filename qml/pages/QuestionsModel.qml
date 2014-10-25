@@ -34,6 +34,9 @@ ListModel {
     // Search
     property string searchCriteria: ""
     property string ownUserIdValue: ""
+    property string ownUserName: ""  // shown login info
+    property string ownKarma: ""  // shown login info
+    property string ownBadges: ""  // shown login info
     property string userIdSearchCriteria: ""
     property bool userQuestionsAsked: false
     property bool includeTagsChanged: false
@@ -122,12 +125,32 @@ ListModel {
         return function(webview) {
             var scriptToRun = "(function() { \
             var userElem = document.getElementById('userToolsNav'); \
-            var firstHref = userElem.getElementsByTagName('a')[0].getAttribute('href'); \
-            return firstHref.split('/')[2]; \
+            var aelements = userElem.getElementsByTagName('a'); \
+            var firstHref = aelements[0].getAttribute('href'); \
+            var userId = firstHref.split('/')[2]; \
+            var userName = ''; \
+            var karma = ''; \
+            var badges = ''; \
+            if (userId !== 'signin') { \
+                userName = firstHref.split('/')[3]; \
+                for (var i = 0; i < aelements.length; i++) { \
+                    if (aelements[i].getAttribute('class') === 'user-micro-info reputation') { \
+                        karma = aelements[i].childNodes[0].nodeValue; \
+                    } \
+                    if (aelements[i].getAttribute('class') === 'user-micro-info') { \
+                        var badgeElems = aelements[i].getElementsByTagName('span'); \
+                        badges = badgeElems[0].getAttribute('title'); \
+                    } \
+                } \
+            }; \
+            return userId + ',' + userName + ',' + karma + ',' + badges; \
             })()"
             var handleResult = function(result) {
-                questionsModel.ownUserIdValue = result
-                console.log( "Got userId from webview: " + result );
+                var resData = result.split(',')
+                setUserLoginInfo(resData[0].trim(), resData[1].trim(), resData[2].trim(), resData[3].trim())
+                console.log( "Got userId,userName,karma,badges from webview: "
+                            + questionsModel.ownUserIdValue + "," + questionsModel.ownUserName + "," + questionsModel.ownKarma
+                            + "," + questionsModel.ownBadges);
             }
             webview.evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
         }
@@ -234,6 +257,24 @@ ListModel {
             return true
         }
         return false
+    }
+    function loginFailed() {
+        if (questionsModel.ownUserIdValue === "signin")
+            return true
+        return false
+    }
+
+    function setUserLoginInfo(userId, userName, karma, badges) {
+        questionsModel.ownUserIdValue = userId
+        questionsModel.ownUserName = userName
+        if (karma !== "") {
+            var tmp = karma.split(":")
+            if (tmp.length === 2) {
+                karma = tmp[1].trim()
+            }
+        }
+        questionsModel.ownKarma = karma
+        questionsModel.ownBadges = badges.split(questionsModel.ownUserName + " has ")[1]
     }
     function setUserIdSearchCriteria(userId) {
         console.log("Userid: "+userId)

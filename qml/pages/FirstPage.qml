@@ -36,14 +36,57 @@ Page {
     objectName: "FirstPage"
     allowedOrientations: Orientation.All
     forwardNavigation: false
+    property int ownPicSize: 128
+    property string userId: questionsModel.ownUserIdValue
+
+    onUserIdChanged: {
+        console.log("userId changed: " + userId)
+        if (questionsModel.ownUserIdValue === "signin") {
+            loginLabel.text = qsTr("Not logged in")
+            loginLabel.color = "red"
+            loginLabel.font.bold = true
+            ownPic.source = appicon
+        }
+        if (questionsModel.isUserLoggedIn()) {
+            loginLabel.text = qsTr("Logged in as ")
+            loginLabel.color = Theme.primaryColor
+            loginLabel.font.bold = false
+            usersModel.get_user(userId, function(user_data) {
+                ownPic.source = "http:" + usersModel.changeImageLinkSize(user_data.avatar, ownPicSize)
+            })
+        }
+    }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
         anchors.fill: parent
+        width: parent.width
         PageHeader {
-            title: qsTr("Jolla Together")
+            id: header
+            height: headerRow.height
+            Row {
+                id: headerRow
+                height: childrenRect.height
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingLarge
+                y: Theme.itemSizeLarge/2 - height/2
+                Image{
+                    source: "image://theme/icon-m-jolla"
+                    height: 70
+                    width: 70
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true
+                }
+                Label {
+                    font {
+                        pixelSize: Theme.fontSizeLarge
+                        family: Theme.fontFamilyHeading
+                    }
+                    color: Theme.highlightColor
+                    text: "Together"
+                }
+            }
         }
-
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
@@ -89,19 +132,77 @@ Page {
         }
 
         Column {
+            id: contentColumn
             spacing: 20
+            anchors.top: header.bottom
             anchors.centerIn: parent
             anchors.leftMargin: Theme.paddingMedium
             anchors.rightMargin: Theme.paddingMedium
-            id: infoCol
-            height: Theme.itemSizeLarge * 3
-            Image{
-                source: appicon
-                height: 128
-                width: 128
-                fillMode: Image.PreserveAspectFit
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
+            height: childrenRect.height
+            width: parent.width
+            Separator {
+                width: parent.width
+                horizontalAlignment: Qt.AlignCenter
+                color: Theme.secondaryColor
+                height: 2
+            }
+            Row {
+                id: userDataRow
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: Theme.paddingLarge
+                anchors.rightMargin: Theme.paddingLarge
+                width: parent.width
+                Image{
+                    id: ownPic
+                    source: appicon
+                    height: ownPicSize
+                    width: ownPicSize
+                    smooth: true
+                    fillMode: Image.PreserveAspectFit
+                }
+                Item {
+                    width: Theme.paddingMedium
+                    height: 1
+                }
+                Column {
+                    Row {
+                        Label {
+                            id: loginLabel
+                            color: Theme.primaryColor
+                            font.pixelSize: Theme.fontSizeSmall
+                            text: qsTr("Fetching login data...")
+                        }
+                        Label {
+                            color: Theme.highlightColor
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.bold: true
+                            text: questionsModel.ownUserName
+                            visible: questionsModel.isUserLoggedIn()
+                        }
+                    }
+                    Label {
+                        visible: questionsModel.isUserLoggedIn()
+                        color: Theme.primaryColor
+                        font.pixelSize: Theme.fontSizeSmall
+                        text: qsTr("Karma: ") + questionsModel.ownKarma
+                    }
+                    Label {
+                        width: userDataRow.width - ownPic.width - Theme.paddingLarge
+                        visible: questionsModel.isUserLoggedIn()
+                        color: Theme.primaryColor
+                        font.pixelSize: Theme.fontSizeTiny
+                        wrapMode: Text.Wrap
+                        text: qsTr("You have ") + questionsModel.ownBadges
+                    }
+                }
+                Item {
+                    width: Theme.paddingMedium
+                    height: 1
+                }
+                BusyIndicator {
+                    size: BusyIndicatorSize.Small
+                    running: questionsModel.ownUserIdValue === ""
                 }
             }
             Separator {
@@ -110,29 +211,114 @@ Page {
                 color: Theme.secondaryColor
                 height: 2
             }
-            Label {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Groups: " + infoModel.groups
-                color: Theme.primaryColor
+
+            Rectangle {
+                id: togetherInfoStats
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 2*Theme.paddingLarge
+                anchors.rightMargin: 2*Theme.paddingLarge
+                color: "transparent"
+                width: getStatLabelMaxWidth()
+                height: childrenRect.height
+                Label {
+                    id: infoUsersText
+                    anchors.left: parent.left
+                    horizontalAlignment: Text.AlignLeft
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: qsTr("Users") + ":"
+                }
+                Label {
+                    id: infoUsersValue
+                    anchors.top: infoUsersText.top
+                    anchors.left: infoUsersText.right
+                    anchors.right: parent.right
+                    horizontalAlignment: Text.AlignRight
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: infoModel.users
+                }
+                Label {
+                    id: infoQuestionsText
+                    anchors.left: parent.left
+                    anchors.top: infoUsersValue.bottom
+                    horizontalAlignment: Text.AlignLeft
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: qsTr("Questions") + ":"
+                }
+                Label {
+                    id: infoQuestionsValue
+                    anchors.left: infoQuestionsText.right
+                    anchors.right: parent.right
+                    anchors.top: infoQuestionsText.top
+                    horizontalAlignment: Text.AlignRight
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: infoModel.questions
+                }
+                Label {
+                    id: infoAnswersText
+                    anchors.left: parent.left
+                    anchors.top: infoQuestionsValue.bottom
+                    horizontalAlignment: Text.AlignLeft
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: qsTr("Answers") + ":"
+                }
+                Label {
+                    id: infoAnswersValue
+                    anchors.left: infoAnswersText.right
+                    anchors.right: parent.right
+                    anchors.top: infoAnswersText.top
+                    horizontalAlignment: Text.AlignRight
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: infoModel.answers
+                }
+                Label {
+                    id: infoCommentsText
+                    anchors.left: parent.left
+                    anchors.top: infoAnswersValue.bottom
+                    horizontalAlignment: Text.AlignLeft
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: qsTr("Comments") + ":"
+                }
+                Label {
+                    id: infoCommentsValue
+                    anchors.left: infoCommentsText.right
+                    anchors.right: parent.right
+                    anchors.top: infoCommentsText.top
+                    horizontalAlignment: Text.AlignRight
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: infoModel.comments
+                }
             }
-            Label {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Users: " + infoModel.users
-            }
-            Label {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Questions: " + infoModel.questions
-            }
-            Label {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Answers: " + infoModel.answers
-            }
-            Label {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Comments: " + infoModel.comments
+            Separator {
+                width: parent.width
+                horizontalAlignment: Qt.AlignCenter
+                color: Theme.secondaryColor
+                height: 2
             }
         }
     }
+
+    function getStatLabelMaxWidth() {
+        var res_width = 0
+        if (infoUsersText.paintedWidth + infoUsersValue.paintedWidth > res_width)
+            res_width = infoUsersText.width + infoUsersValue.width
+        if (infoQuestionsText.paintedWidth + infoQuestionsValue.paintedWidth > res_width)
+            res_width = infoQuestionsText.width + infoQuestionsValue.width
+        if (infoAnswersText.paintedWidth + infoAnswersValue.paintedWidth > res_width)
+            res_width = infoAnswersText.width + infoAnswersValue.width
+        if (infoCommentsText.paintedWidth + infoCommentsValue.paintedWidth > res_width)
+            res_width = infoCommentsText.width + infoCommentsValue.width
+        return res_width
+    }
+
 
     Connections {
         target: coverProxy
@@ -145,10 +331,9 @@ Page {
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
-            infoModel.get_info()
-            //webviewAttached = false
-            urlLoading = false
             attachWebview()
+            infoModel.get_info()
+            urlLoading = false
         }
     }
 }
