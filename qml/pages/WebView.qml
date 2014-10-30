@@ -24,7 +24,7 @@ Page {
             else
                 setUrlLoadding(false)
             if (loadRequest.status === WebView.LoadSucceededStatus) {
-                console.log("webview load succeeded")
+                console.log("webview succeeded to load url " + url)
                 setUrlLoadding(false)
                 webviewPage.forceActiveFocus()
                 if (callbacks !== null){

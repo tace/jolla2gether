@@ -43,6 +43,9 @@ Page {
             }
             attachWebview({browseBackText: "Users"})
         }
+        if (status === PageStatus.Inactive) {
+            unattachWebview()
+        }
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable

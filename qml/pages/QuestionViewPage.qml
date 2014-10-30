@@ -470,7 +470,7 @@ Page {
                 anchors.fill: parent
                 enabled: ! infoBanner.visible()
                 onClicked: {
-                    if (amILoggedIn(qsTr("Please login to follow/un-follow questions!")))
+                    if (amILoggedIn(qsTr("Please log in to follow/un-follow questions!")))
                         followQuestion()
                 }
             }

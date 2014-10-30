@@ -41,11 +41,12 @@ Page {
 
     onUserIdChanged: {
         console.log("userId changed: " + userId)
-        if (questionsModel.ownUserIdValue === "signin") {
+        if (!questionsModel.isUserLoggedIn()) {
             loginLabel.text = qsTr("Not logged in")
             loginLabel.color = "red"
             loginLabel.font.bold = true
             ownPic.source = appicon
+            loginIndicator.running = false
         }
         if (questionsModel.isUserLoggedIn()) {
             loginLabel.text = qsTr("Logged in as ")
@@ -104,12 +105,34 @@ Page {
                 }
             }
             MenuItem {
-                text: qsTr("Login")
+                text: qsTr("Log in")
+                visible: !questionsModel.isUserLoggedIn()
                 onClicked: {
                     unattachWebview()
+                    attachWebview()
                     siteURL = loginURL
-                    questionsModel.pushWebviewWithCustomScript()
-                    webviewAttached = true
+                    forwardNavigation = true
+                    pageStack.navigateForward()
+                }
+            }
+            MenuItem {
+                text: qsTr("Log out")
+                visible: questionsModel.isUserLoggedIn()
+                onClicked: {
+                    questionsModel.logOut()
+                }
+            }
+            MenuItem {
+                visible: false
+                enabled: questionsModel.isUserLoggedIn()                
+                text: qsTr("Followed Questions")
+                onClicked: {
+                    unattachWebview()
+                    siteURL = siteBaseUrl + "/users/" +
+                            questionsModel.ownUserIdValue + "/" +
+                            questionsModel.ownUserName + "/?sort=favorites"
+                    attachWebview({callbacks: [questionsModel.get_followed_questions_callback()]})
+                    pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
                 }
             }
             MenuItem {
@@ -201,6 +224,7 @@ Page {
                     height: 1
                 }
                 BusyIndicator {
+                    id: loginIndicator
                     size: BusyIndicatorSize.Small
                     running: questionsModel.ownUserIdValue === ""
                 }
@@ -334,6 +358,7 @@ Page {
             attachWebview()
             infoModel.get_info()
             urlLoading = false
+            forwardNavigation = false
         }
     }
 }

@@ -169,17 +169,12 @@ ApplicationWindow
     function unattachWebview() {
         if (webviewAttached) {
             if (pageStack.currentPage.objectName === "WebView") {
-                if (siteURL === loginURL) {
-                    pageStack.pop()
-                }
-                else {
-                    // Save back browsing text and move away from webview
-                    webviewBrowseBackText = pageStack.currentPage.browseBackText
-                    webviewWasActiveWhenUnattached = true
-                    pageStack.currentPage.backNavigation = true
-                    pageStack.navigateBack(PageStackAction.Immediate)
-                    console.log("Webview was active while unattaching")
-                }
+                // Save back browsing text and move away from webview
+                webviewBrowseBackText = pageStack.currentPage.browseBackText
+                webviewWasActiveWhenUnattached = true
+                pageStack.currentPage.backNavigation = true
+                pageStack.navigateBack(PageStackAction.Immediate)
+                console.log("Webview was active while unattaching")
             }
             else {
                 var page = pageStack.find(onPageAllowedtoAttachWebview)
@@ -198,8 +193,8 @@ ApplicationWindow
     }
     function onPageAllowedtoAttachWebview() {
         if (pageStack.currentPage.objectName === "Users" ||
-            pageStack.currentPage.objectName === "FirstPage" ||
-            pageStack.currentPage.objectName === "QuestionViewPage") {
+                pageStack.currentPage.objectName === "FirstPage" ||
+                pageStack.currentPage.objectName === "QuestionViewPage") {
             return true
         }
         return false

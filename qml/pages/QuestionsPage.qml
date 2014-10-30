@@ -212,7 +212,7 @@ Page {
                             questionsModel.myQuestionsToggle = true
                         }
                         else {
-                            infoDrawer.show(qsTr("Please login from login page to list your own questions!"))
+                            infoDrawer.show(qsTr("Please log in from login page to list your own questions!"))
                         }
                     }
                 }

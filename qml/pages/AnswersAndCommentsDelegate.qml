@@ -125,7 +125,7 @@ ListItem  {
                             enabled: ! infoBanner.visible()
                             anchors.fill: parent
                             onClicked: {
-                                if (amILoggedIn(qsTr("Please login to upvote comments!")))
+                                if (amILoggedIn(qsTr("Please log in to upvote comments!")))
                                     voteUpComment(getAnswerOrCommentNumber())
                             }
                         }

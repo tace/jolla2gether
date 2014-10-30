@@ -41,7 +41,7 @@ Image {
             }
             else {
                 if (userNotifObject !== null)
-                    userNotifObject.showText(qsTr("Please login to vote!"))
+                    userNotifObject.showText(qsTr("Please log in to vote!"))
             }
         }
         onReleased: {

@@ -82,8 +82,7 @@ ListModel {
     function pushWebviewWithCustomScript(attached, props) {
         var callbacksList = []
         var properties = {}
-        if (((questionsModel.ownUserIdValue === "" ||
-              questionsModel.ownUserIdValue === "signin") &&
+        if ((!questionsModel.isUserLoggedIn() &&
              loginRetryCount < loginRetryCountMaximum) ||
                 !attached) {
             callbacksList.push(getUserIdFromWebViewCallback())
@@ -111,6 +110,117 @@ ListModel {
 
     function getQuestionId() {
         return questionsModel.get(questionsModel.listViewCurrentIndex).id
+    }
+
+    //
+    // When calling this, webview must be first directed to page
+    // https://together.jolla.com/users/497/tace/?sort=favorites
+    // where 497 is the userid and 'tace' is the username of the person who's
+    // followed questions are fetched.
+    function get_followed_questions_callback(followedQuestionsResultCallback) {
+        return function(webview) {
+            var script = "(function() { \
+            var content = document.getElementById('ContentFull'); \
+            var divs = content.getElementsByTagName('div'); \
+            var retQuestions = ''; \
+            for (var i = 0; i < divs.length; i++) { \
+                if (divs[i].getAttribute('class') === 'short-summary narrow') { \
+                    var qId = divs[i].getAttribute('id').split('question-')[1]; \
+                    retQuestions = retQuestions + qId + ','; \
+                    var qTitle = divs[i].getElementsByTagName('h2')[0].getElementsByTagName('a')[0].childNodes[0].nodeValue; \
+                    var counts = divs[i].getElementsByClassName('counts')[0].getElementsByTagName('div'); \
+                    var qViews = ''; \
+                    var qAnswers = ''; \
+                    var qVotes = ''; \
+                    var qUserId = ''; \
+                    var qUserName = ''; \
+                    var qUpdateTime = ''; \
+                    for (var x = 0; x < counts.length; x++) { \
+                        if (counts[x].hasAttribute('class')) { \
+                            if (counts[x].getAttribute('class').substring(0, 'views'.length) === 'views') { \
+                                qViews = counts[x].getElementsByClassName('item-count')[0].childNodes[0].nodeValue; \
+                            } \
+                            if (counts[x].getAttribute('class').substring(0, 'answers'.length) === 'answers') { \
+                                qAnswers = counts[x].getElementsByClassName('item-count')[0].childNodes[0].nodeValue; \
+                            } \
+                            if (counts[x].getAttribute('class').substring(0, 'votes'.length) === 'votes') { \
+                                qVotes = counts[x].getElementsByClassName('item-count')[0].childNodes[0].nodeValue; \
+                            } \
+                            if (counts[x].getAttribute('class') === 'userinfo') { \
+                                var qUserInfo = counts[x].getElementsByTagName('a')[0].getAttribute('href'); \
+                                qUserId = qUserInfo.split('/')[2]; \
+                                qUserName = qUserInfo.split('/')[3]; \
+                                qUpdateTime = counts[x].getElementsByTagName('abbr')[0].getAttribute('title'); \
+                            } \
+                        } \
+                    } \
+                    retQuestions = retQuestions + qViews + ','; \
+                    retQuestions = retQuestions + qAnswers + ','; \
+                    retQuestions = retQuestions + qVotes + ','; \
+                    retQuestions = retQuestions + qUserId + ','; \
+                    retQuestions = retQuestions + qUserName + ','; \
+                    retQuestions = retQuestions + qUpdateTime + ','; \
+                    var qTags = ''; \
+                    var tagElems = divs[i].getElementsByClassName('tags')[0].getElementsByClassName('tag tag-right'); \
+                    for (var j = 0; j < tagElems.length; j++) { \
+                        if (j === 0) { \
+                            qTags = tagElems[j].childNodes[0].nodeValue; \
+                        } \
+                        else { \
+                            qTags = qTags + ' ' + tagElems[j].childNodes[0].nodeValue; \
+                        } \
+                    } \
+                    retQuestions = retQuestions + qTags + ','; \
+                    retQuestions = retQuestions + qTitle + '|_|'; \
+                } \
+            } \
+            return retQuestions; \
+            })()"
+            webview.evaluateJavaScriptOnWebPage(script,  function(result) {
+                console.log("got: " + result)
+                clear()
+                //followedQuestionsResultCallback(result)
+                var questionsSplit = result.split('|_|')
+                for (var i = 0; i < questionsSplit.length; i++) {
+                    // Stats contain 8 fields: questionId,views,answers,votes,userId,userName,updateTime,tags
+                    var statsPart = questionsSplit[i].split(',', 8)
+                    var qId = statsPart[0]
+                    if (qId.trim() === "")
+                        continue
+                    var qViews = statsPart[1]
+                    var qAnswers = statsPart[2]
+                    var qVotes = statsPart[3]
+                    var qUserId = statsPart[4]
+                    var qUserName = statsPart[5]
+                    var qUpdateTime = statsPart[6]
+                    var qTags = statsPart[7]
+                    // title as a last part of each question data to get it right.
+                    var qTitle = questionsSplit[i].split(statsPart.join(',') + ',')[1]
+                    var presentedTime = Askbot.getTimeDurationAsString(Date.parse(qUpdateTime))
+                    console.log("presentedTime: "+presentedTime)
+                    listModel.append({
+                                         "id" : qId,
+                                         "title" : qTitle,
+                                         "url" : siteBaseUrl + "/question/" + qId,
+                                         "author" : qUserName,  // this is user who last updated the q
+                                         "author_id" : qUserId,
+                                         "author_page_url" : siteBaseUrl + "/users/" + qUserId + "/" + qUserName,
+                                         "answer_count" : qAnswers,
+                                         "view_count" : qViews,
+                                         "votes" : qVotes,
+                                         "tags" : qTags.split(" ").join(','),
+                                         "text": "",
+                                         "has_accepted_answer": false,
+                                         "closed": false,
+                                         "created" : presentedTime,
+                                         "updated" : presentedTime,
+                                         "created_date" : "",
+                                         "updated_date" : "",
+                                     })
+
+                }
+            })
+        }
     }
 
     // Custom javascript to executein webview. Picks userId field from together.jolla.com
@@ -156,6 +266,28 @@ ListModel {
         }
     }
 
+    function logOut() {
+        var scriptToRun = "(function() { \
+            var userElem = document.getElementById('userToolsNav'); \
+            var aelements = userElem.getElementsByTagName('a'); \
+            for (var i = 0; i < aelements.length; i++) { \
+                if (aelements[i].childNodes[0].nodeValue === 'sign out') { \
+                    aelements[i].click(); \
+                } \
+            } \
+            })()"
+        var handleResult = function(result) {
+            questionsModel.ownUserIdValue = ""
+            loginRetryCount = 0
+            console.log("Signed out!")
+        }
+        pageStack.nextPage().evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
+    }
+
+    //
+    // When calling this, webview must be directed first to page matching given questionId e.g.
+    // https://together.jolla.com/question/59380/native-app-request-spreadsheet/ where
+    // 59380 is questionId last part of url is question title.
     function getVotingDataFromWebViewCallback(questionId, votingResultsCallback) {
         return function(webview) {
             var scriptToRun = "(function() { \
@@ -256,11 +388,6 @@ ListModel {
         if (questionsModel.ownUserIdValue !== "" && questionsModel.ownUserIdValue !== "signin") {
             return true
         }
-        return false
-    }
-    function loginFailed() {
-        if (questionsModel.ownUserIdValue === "signin")
-            return true
         return false
     }
 
