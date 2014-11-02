@@ -177,7 +177,7 @@ ListModel {
             return retQuestions; \
             })()"
             webview.evaluateJavaScriptOnWebPage(script,  function(result) {
-                console.log("got: " + result)
+                //console.log("got: " + result)
                 clear()
                 //followedQuestionsResultCallback(result)
                 var questionsSplit = result.split('|_|')
@@ -196,8 +196,8 @@ ListModel {
                     var qTags = statsPart[7]
                     // title as a last part of each question data to get it right.
                     var qTitle = questionsSplit[i].split(statsPart.join(',') + ',')[1]
-                    var presentedTime = Askbot.getTimeDurationAsString(Date.parse(qUpdateTime))
-                    console.log("presentedTime: "+presentedTime)
+                    //var presentedTime = Askbot.getTimeDurationAsString(Date.parse(qUpdateTime))
+                    //console.log("presentedTime: "+presentedTime)
                     listModel.append({
                                          "id" : qId,
                                          "title" : qTitle,
@@ -212,13 +212,16 @@ ListModel {
                                          "text": "",
                                          "has_accepted_answer": false,
                                          "closed": false,
-                                         "created" : presentedTime,
-                                         "updated" : presentedTime,
+                                         "created" : qUpdateTime,
+                                         "updated" : qUpdateTime,
                                          "created_date" : "",
                                          "updated_date" : "",
                                      })
 
                 }
+                pagesCount = 1
+                currentPageNum = 1
+                questionsCount = listModel.count
             })
         }
     }
@@ -261,6 +264,11 @@ ListModel {
                 console.log( "Got userId,userName,karma,badges from webview: "
                             + questionsModel.ownUserIdValue + "," + questionsModel.ownUserName + "," + questionsModel.ownKarma
                             + "," + questionsModel.ownBadges);
+                if (pageStack.currentPage.objectName === "WebView") {
+                    if (questionsModel.isUserLoggedIn()) {
+                        pageStack.navigateBack()
+                    }
+                }
             }
             webview.evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
         }

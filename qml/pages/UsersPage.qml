@@ -35,6 +35,7 @@ Page {
     id: usersPage
     objectName: "Users"
     allowedOrientations: Orientation.All
+    property bool navigatedForward: false
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
@@ -42,9 +43,11 @@ Page {
                 questionsModel.restoreModel()
             }
             attachWebview({browseBackText: "Users"})
+            navigatedForward = false
         }
         if (status === PageStatus.Inactive) {
-            unattachWebview()
+            if (! navigatedForward)
+                unattachWebview()
         }
     }
 

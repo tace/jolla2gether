@@ -8,7 +8,11 @@ ListItem  {
     contentHeight: Theme.itemSizeLarge
     menu: contextMenu
 
-    onClicked: { siteURL = url; pageStack.navigateForward(); }
+    onClicked: {
+        siteURL = url
+        navigatedForward = true
+        pageStack.navigateForward()
+    }
 
     Column{
         Row{
