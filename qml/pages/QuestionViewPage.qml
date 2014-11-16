@@ -13,7 +13,7 @@ Page {
     property string title: questionsModel.get(index).title
     property string text: questionsModel.get(index).text
     property string url: questionsModel.get(index).url
-    property string asked: questionsModel.get(index).created_date
+    property string created: questionsModel.get(index).created_date
     property string updated: questionsModel.get(index).updated_date
     property string userId: questionsModel.get(index).author_id
     property string userName: questionsModel.get(index).author
@@ -65,7 +65,10 @@ Page {
         var props = {
             "index": idx
         };
-        pageStack.replace("QuestionViewPage.qml", props);
+        questionsModel.loadQuestionViewpage(questionsModel.getQuestionIdOfIndex(idx),
+                                            idx,
+                                            true,
+                                            props)
     }
 
     onFollowedStatusLoadedChanged: {
@@ -439,7 +442,7 @@ Page {
                 horizontalAlignment: Text.AlignRight
                 color: Theme.secondaryColor
                 font.pixelSize: Theme.fontSizeTiny
-                text: asked
+                text: created
             }
             Label {
                 id: updatedLabel

@@ -21,13 +21,10 @@ ListItem  {
             "index": questionListView.currentIndex
         };
         unattachWebview()
-        if (questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS) {
-            questionsModel.update_question(id, index, function() {
-                pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
-            })
-        }
-        else
-            pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+        questionsModel.loadQuestionViewpage(id,
+                                            index,
+                                            false,
+                                            props)
         questionViewed = true
     }
 

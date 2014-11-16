@@ -61,12 +61,19 @@ Page {
         }
         onRefresh: {
             if (activateCoverSignals()) {
-                var closure = function(x) {
-                    return function() {
-                        changeListItemFromCover(x);
-                    }
-                };
-                questionsModel.refresh(questionsModel.currentPageNum, closure(questionListView.currentIndex))
+                if (questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS) {
+                    // Commented out as webview cannot be used when app unactivated (cover actions)
+                    // So for now do nothing in refresh from cover for followed questions.
+                    //loadFollowedQuestions()
+                }
+                else {
+                    var closure = function(x) {
+                        return function() {
+                            changeListItemFromCover(x);
+                        }
+                    };
+                    questionsModel.refresh(questionsModel.currentPageNum, closure(questionListView.currentIndex))
+                }
             }
         }
         onNextItem: {
@@ -89,7 +96,7 @@ Page {
     // and also we want signals to be executed if QuestionViewPage is active
     function activateCoverSignals() {
         if (status === PageStatus.Active ||
-            (pageStack.currentPage.objectName === "QuestionViewPage") && (pageStack.depth - pageCounter) === 2) {
+                (pageStack.currentPage.objectName === "QuestionViewPage") && (pageStack.depth - pageCounter) === 2) {
             return true
         }
         return false

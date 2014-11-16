@@ -112,6 +112,25 @@ ListModel {
     function getQuestionId() {
         return questionsModel.get(questionsModel.listViewCurrentIndex).id
     }
+    function getQuestionIdOfIndex(index) {
+        return questionsModel.get(index).id
+    }
+
+    function loadQuestionViewpage(questionId, index_in_model, replace, props) {
+        if (questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS) {
+            questionsModel.update_question(questionId, index_in_model, function() {
+                if (replace)
+                    pageStack.replace(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+                else
+                    pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+            })
+        }
+        else
+            if (replace)
+                pageStack.replace(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+            else
+                pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+    }
 
     //
     // When calling this, webview must be first directed to page
