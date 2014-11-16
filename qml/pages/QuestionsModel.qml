@@ -47,12 +47,10 @@ ListModel {
     property int loginRetryCountMaximum: 3
 
     // Header
-    property string pageHeader_ALL_QUESTIONS: "All questions"  // Default
-    property string pageHeader_MY_QUESTIONS:  "My questions"
+    property string pageHeader_ALL_QUESTIONS: qsTr("All questions")  // Default
+    property string pageHeader_MY_QUESTIONS:  qsTr("My questions")
+    property string pageHeader_FOLLOWED_QUESTIONS:  qsTr("Followed questions")
     property string pageHeader: pageHeader_ALL_QUESTIONS
-
-    // Toggle for all/My questions
-    property bool myQuestionsToggle: false
 
     function refresh(page, onLoadedCallback)
     {
@@ -77,6 +75,9 @@ ListModel {
     function get_questions(page, onLoadedCallback)
     {
         Askbot.get_questions(listModel, page, onLoadedCallback)
+    }
+    function update_question(questionId, index_in_model, callback) {
+        Askbot.update_question(listModel, index_in_model, questionId, callback)
     }
 
     function pushWebviewWithCustomScript(attached, props) {
@@ -117,7 +118,9 @@ ListModel {
     // https://together.jolla.com/users/497/tace/?sort=favorites
     // where 497 is the userid and 'tace' is the username of the person who's
     // followed questions are fetched.
-    function get_followed_questions_callback(followedQuestionsResultCallback) {
+    function get_followed_questions_callback() {
+        clear()
+        urlLoading = true
         return function(webview) {
             var script = "(function() { \
             var content = document.getElementById('ContentFull'); \
@@ -178,8 +181,6 @@ ListModel {
             })()"
             webview.evaluateJavaScriptOnWebPage(script,  function(result) {
                 //console.log("got: " + result)
-                clear()
-                //followedQuestionsResultCallback(result)
                 var questionsSplit = result.split('|_|')
                 for (var i = 0; i < questionsSplit.length; i++) {
                     // Stats contain 8 fields: questionId,views,answers,votes,userId,userName,updateTime,tags
@@ -193,17 +194,32 @@ ListModel {
                     var qUserId = statsPart[4]
                     var qUserName = statsPart[5]
                     var qUpdateTime = statsPart[6]
+                    var splittedUpdateTime = qUpdateTime.split(" ")
+                    var qModUpdateTime = splittedUpdateTime[0] + "T" + splittedUpdateTime[1]
+                    // Get hour part from timezone string. E.g. +0200 -> get 02
+                    var timeZoneHourPart = splittedUpdateTime[2].substring(1, 3)
+                    // Get + or - from timezone string
+                    var timeZoneAddOrMinus = splittedUpdateTime[2].substring(0, 1)
+                    var timeZonePartSeconds = parseInt(timeZoneHourPart) * 60 * 60
+                    var totalUpdateTimeSeconds = parseInt(Date.parse(qModUpdateTime) / 1000)
+                    if (timeZoneAddOrMinus === "+") {
+                        totalUpdateTimeSeconds -= timeZonePartSeconds
+                    }
+                    if (timeZoneAddOrMinus === "-") {
+                        totalUpdateTimeSeconds += timeZonePartSeconds
+                    }
+                    var qUpdateTimeDuration = Askbot.getTimeDurationAsString(totalUpdateTimeSeconds)
                     var qTags = statsPart[7]
                     // title as a last part of each question data to get it right.
                     var qTitle = questionsSplit[i].split(statsPart.join(',') + ',')[1]
                     //var presentedTime = Askbot.getTimeDurationAsString(Date.parse(qUpdateTime))
                     //console.log("presentedTime: "+presentedTime)
                     listModel.append({
-                                         "id" : qId,
+                                         "id" : Number(qId),
                                          "title" : qTitle,
                                          "url" : siteBaseUrl + "/question/" + qId,
                                          "author" : qUserName,  // this is user who last updated the q
-                                         "author_id" : qUserId,
+                                         "author_id" : Number(qUserId),
                                          "author_page_url" : siteBaseUrl + "/users/" + qUserId + "/" + qUserName,
                                          "answer_count" : qAnswers,
                                          "view_count" : qViews,
@@ -212,8 +228,8 @@ ListModel {
                                          "text": "",
                                          "has_accepted_answer": false,
                                          "closed": false,
-                                         "created" : qUpdateTime,
-                                         "updated" : qUpdateTime,
+                                         "created" : qUpdateTimeDuration,
+                                         "updated" : qUpdateTimeDuration,
                                          "created_date" : "",
                                          "updated_date" : "",
                                      })
@@ -222,6 +238,10 @@ ListModel {
                 pagesCount = 1
                 currentPageNum = 1
                 questionsCount = listModel.count
+
+                // All done, get rid of webview
+                pageStack.popAttached()
+                urlLoading = false
             })
         }
     }
@@ -494,8 +514,6 @@ ListModel {
         c.loginRetryCount = p.loginRetryCount
 
         c.pageHeader = p.pageHeader
-
-        c.myQuestionsToggle = p.myQuestionsToggle
     }
     function wiki2Html(text) {
         return Askbot.wiki2Html(text)

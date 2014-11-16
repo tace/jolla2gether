@@ -11,6 +11,7 @@ ListItem  {
     menu: contextMenu
     property string tagsString: tags
     property var tagsArray: null
+    property bool questionViewed: false
 
 
     onClicked: {
@@ -19,7 +20,15 @@ ListItem  {
         var props = {
             "index": questionListView.currentIndex
         };
-        pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+        unattachWebview()
+        if (questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS) {
+            questionsModel.update_question(id, index, function() {
+                pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+            })
+        }
+        else
+            pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+        questionViewed = true
     }
 
     function getListItemContentHeight() {
@@ -141,9 +150,21 @@ ListItem  {
         font.bold: true
         text: author + "  "
     }
+    Label {
+        id: updaterLabelForFollowedQuestions
+        visible: questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS &&
+                 !questionViewed
+        anchors.top: isTagsShown() ? tagsFlowColumn.bottom : titleText.bottom
+        anchors.left: authorLabel.right
+        font.pixelSize: Theme.fontSizeTiny
+        color: Theme.secondaryColor
+        text: qsTr("(last updated by)")
+    }
 
     StatsRow {
         id: staticticsRow
+        createTimeVisible: questionsModel.pageHeader !== questionsModel.pageHeader_FOLLOWED_QUESTIONS ||
+                           questionViewed
         parentWidth: background.width - authorLabel.width
         anchors.top: authorLabel.top
         anchors.left: authorLabel.right

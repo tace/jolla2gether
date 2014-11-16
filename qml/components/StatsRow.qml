@@ -4,6 +4,7 @@ import Sailfish.Silica 1.0
 Row {
     property int parentWidth
     property bool timesVisible: true
+    property bool createTimeVisible: true
     property bool votesVisible: true
     property bool answersVisible: true
     property bool viewsVisible: true
@@ -20,7 +21,7 @@ Row {
     StatsRectangle {
         id: timesRectangle
         visible: timesVisible
-        topLabelText: timesVisible ? "c: " + created : ""
+        topLabelText: createTimeVisible ? "c: " + created : ""
         topLabelFontColor: Theme.secondaryColor
         bottomLabelText: "u: " + updated
         bottomLabelFontColor: Theme.secondaryColor

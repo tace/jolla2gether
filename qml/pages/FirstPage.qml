@@ -123,19 +123,6 @@ Page {
                 }
             }
             MenuItem {
-                visible: false
-                enabled: questionsModel.isUserLoggedIn()                
-                text: qsTr("Followed Questions")
-                onClicked: {
-                    unattachWebview()
-                    siteURL = siteBaseUrl + "/users/" +
-                            questionsModel.ownUserIdValue + "/" +
-                            questionsModel.ownUserName + "/?sort=favorites"
-                    attachWebview({callbacks: [questionsModel.get_followed_questions_callback()]})
-                    pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
-                }
-            }
-            MenuItem {
                 text: qsTr("Users")
                 onClicked: {
                     unattachWebview()
@@ -148,6 +135,9 @@ Page {
                 onClicked:
                 {
                     unattachWebview()
+                    // Make default always to all questions
+                    questionsModel.resetUserIdSearchCriteria()
+                    questionsModel.pageHeader = questionsModel.pageHeader_ALL_QUESTIONS
                     questionsModel.refresh()
                     pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
                 }

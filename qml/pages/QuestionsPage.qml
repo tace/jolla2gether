@@ -114,7 +114,14 @@ Page {
         coverProxy.pageCount = questionsModel.pagesCount
         coverProxy.title = questionsModel.get(index).title;
     }
-
+    function loadFollowedQuestions() {
+        questionsModel.pageHeader = questionsModel.pageHeader_FOLLOWED_QUESTIONS
+        siteURL = siteBaseUrl + "/users/" +
+                questionsModel.ownUserIdValue + "/" +
+                questionsModel.ownUserName + "/?sort=favorites"
+        unattachWebview()
+        attachWebview({callbacks: [questionsModel.get_followed_questions_callback()]})
+    }
 
     Drawer {
         id: infoDrawer
@@ -194,22 +201,21 @@ Page {
             // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
             PullDownMenu {
                 MenuItem {
-                    text: qsTr("All questions")
-                    visible: questionsModel.myQuestionsToggle && !userIdSearch
+                    text: questionsModel.pageHeader_ALL_QUESTIONS
+                    visible: (questionsModel.pageHeader !== questionsModel.pageHeader_ALL_QUESTIONS) && !userIdSearch
                     onClicked: {
                         questionsModel.resetUserIdSearchCriteria()
+                        questionsModel.pageHeader = questionsModel.pageHeader_ALL_QUESTIONS
                         questionsModel.refresh()
-                        questionsModel.myQuestionsToggle = false
                     }
                 }
                 MenuItem {
-                    text: qsTr("My questions")
-                    visible: !questionsModel.myQuestionsToggle && !userIdSearch
+                    text: questionsModel.pageHeader_MY_QUESTIONS
+                    visible: (questionsModel.pageHeader !== questionsModel.pageHeader_MY_QUESTIONS) && !userIdSearch
                     onClicked: {
                         if (questionsModel.setUserIdSearchCriteria(questionsModel.ownUserIdValue)) {
                             questionsModel.pageHeader = questionsModel.pageHeader_MY_QUESTIONS
                             questionsModel.refresh()
-                            questionsModel.myQuestionsToggle = true
                         }
                         else {
                             infoDrawer.show(qsTr("Please log in from login page to list your own questions!"))
@@ -217,7 +223,20 @@ Page {
                     }
                 }
                 MenuItem {
-                    visible: questionsModel.isSearchCriteriaActive()
+                    text: questionsModel.pageHeader_FOLLOWED_QUESTIONS
+                    visible: (questionsModel.pageHeader !== questionsModel.pageHeader_FOLLOWED_QUESTIONS) && !userIdSearch
+                    onClicked: {
+                        if (questionsModel.isUserLoggedIn()) {
+                            loadFollowedQuestions()
+                        }
+                        else {
+                            infoDrawer.show(qsTr("Please log in from login page to list your followed questions!"))
+                        }
+                    }
+                }
+                MenuItem {
+                    visible: questionsModel.isSearchCriteriaActive() &&
+                             questionsModel.pageHeader !== questionsModel.pageHeader_FOLLOWED_QUESTIONS
                     text: qsTr("Reset Search/Filter")
                     onClicked: {
                         questionsModel.resetSearchCriteria()
@@ -225,17 +244,26 @@ Page {
                     }
                 }
                 MenuItem {
+                    visible: questionsModel.pageHeader !== questionsModel.pageHeader_FOLLOWED_QUESTIONS
                     text: qsTr("Search/Filter...")
                     onClicked: pageStack.push(Qt.resolvedUrl("SearchQuestions.qml"))
                 }
                 MenuItem {
                     text: qsTr("Refresh")
-                    onClicked: questionsModel.refresh()
+                    onClicked: {
+                        if (questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS) {
+                            loadFollowedQuestions()
+                        }
+                        else {
+                            questionsModel.refresh()
+                        }
+                    }
                 }
             }
 
             Row {
                 id: searchActiveBanner
+                visible: questionsModel.pageHeader !== questionsModel.pageHeader_FOLLOWED_QUESTIONS
                 width: parent.width
                 height: childrenRect.height
                 anchors.right: parent.right

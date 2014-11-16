@@ -87,7 +87,7 @@ Image {
         }
     }
     function setVotesToQuestionModel(votes) {
-        questionsModel.set(index, {"votes": votes})
+        questionsModel.set(index, {"votes": votes.toString()})
     }
     function vote(id) {
         var script =""
@@ -107,7 +107,7 @@ Image {
             setOppositeVoteButtonStatus(false)
             refreshSource()
             if (!isAnswerTypeButton())
-                setVotesToQuestionModel(initialVotes + (isUpOrDownButton() ? 1 : -1))
+                setVotesToQuestionModel(parseInt(initialVotes) + (isUpOrDownButton() ? 1 : -1))
             console.log("Voted " + id + ", result: " + voteOn)
             voted()
         })

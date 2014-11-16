@@ -238,9 +238,9 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                                      "author" : ginfo.author.username,
                                      "author_id" : ginfo.author.id,
                                      "author_page_url" : siteBaseUrl + "/users/" + ginfo.author.id + "/" + ginfo.author.username,
-                                     "answer_count" : ginfo.answer_count,
-                                     "view_count" : ginfo.view_count,
-                                     "votes" : ginfo.score,
+                                     "answer_count" : ginfo.answer_count.toString(),
+                                     "view_count" : ginfo.view_count.toString(),
+                                     "votes" : ginfo.score.toString(),
                                      "tags" : stringifyJsonArray(ginfo.tags),
                                      "text": wiki2Html(ginfo.text),
                                      "has_accepted_answer": ginfo.has_accepted_answer,
@@ -267,6 +267,50 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
     xhr.ontimeout = function () { console.log("Timed out!!!"); }
     xhr.send();
 }
+
+function update_question(model, index_in_model, questionId, callback)
+{
+    var xhr = new XMLHttpRequest();
+    var url = "https://together.jolla.com/api/v1/questions/" + questionId + "/"
+    urlLoading = true
+    console.log("Update question: "+url)
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function()
+    {
+        if ( xhr.readyState == xhr.DONE)
+        {
+            if ( xhr.status == 200)
+            {
+                var response =  JSON.parse(xhr.responseText);
+                model.set(index_in_model, {
+                                 "author" : response.author.username,
+                                 "author_id" : response.author.id,
+                                 "author_page_url" : siteBaseUrl + "/users/" + response.author.id + "/" + response.author.username,
+                                 "answer_count" : response.answer_count.toString(),
+                                 "view_count" : response.view_count.toString(),
+                                 "votes" : response.score.toString(),
+                                 "text": wiki2Html(response.text),
+                                 "has_accepted_answer": response.has_accepted_answer,
+                                 "closed": response.closed,
+                                 "created" : getTimeDurationAsString(response.added_at),
+                                 "updated" : getTimeDurationAsString(response.last_activity_at),
+                                 "created_date" : getDateAndTimeStamp(response.added_at),
+                                 "updated_date" : getDateAndTimeStamp(response.last_activity_at),
+                             })
+                callback()
+            }
+            else
+            {
+                console.log("Error: " + xhr.status)
+            }
+            urlLoading = false
+        }
+    }
+    xhr.timeout = 4000;
+    xhr.ontimeout = function () { console.log("Timed out!!!"); }
+    xhr.send();
+}
+
 
 // Make json array to comma separated stringto save it to listmodel easier
 function stringifyJsonArray(array) {
@@ -503,7 +547,7 @@ function secondsToDurationStringMoreRounded(seconds)
 
 
 function getCurrentTimeAsSeconds() {
-    return Date.now() / 1000;
+    return parseInt(Date.now() / 1000);
 }
 
 function getDateAndTimeStamp(seconds) {

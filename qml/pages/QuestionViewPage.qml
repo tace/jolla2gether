@@ -18,7 +18,7 @@ Page {
     property string userId: questionsModel.get(index).author_id
     property string userName: questionsModel.get(index).author
     property string userPageUrl: questionsModel.get(index).author_page_url
-    property int votes: questionsModel.get(index).votes
+    property string votes: questionsModel.get(index).votes.toString()
     property string answer_count: questionsModel.get(index).answer_count
     property string view_count: questionsModel.get(index).view_count
     property string tags: questionsModel.get(index).tags
@@ -275,8 +275,12 @@ Page {
     }
 
     Component.onCompleted: {
-        usersModel.get_user(userId, setUserData)
         tagsArray = getTagsArray()
+    }
+
+    onUserIdChanged: {
+        console.log("UserId Changed to: " + userId)
+        usersModel.get_user(userId, setUserData)
     }
 
     onStatusChanged: {

@@ -135,13 +135,13 @@ ApplicationWindow
             unattachWebview()
         }
         else {
-            attachWebview()
+            attachWebview({attachRequestedByAppActive: true})
         }
     }
 
     function attachWebview(props) {
         if (!webviewAttached && Qt.application.active) {
-            if (onPageAllowedtoAttachWebview()) {
+            if (onPageAllowedtoAttachWebview(props)) {
                 if (siteURL === loginURL)
                     siteURL = siteBaseUrl
                 var properties = props
@@ -191,9 +191,12 @@ ApplicationWindow
             console.log("WebView unattached")
         }
     }
-    function onPageAllowedtoAttachWebview() {
+    function onPageAllowedtoAttachWebview(props) {
+        var attachRequestedByAppActive = questionsModel.getProp("attachRequestedByAppActive", props)
         if (pageStack.currentPage.objectName === "Users" ||
                 pageStack.currentPage.objectName === "FirstPage" ||
+                // In Questionspage webview attach not allowed when app is getting active
+                (pageStack.currentPage.objectName === "Questions" && attachRequestedByAppActive === undefined) ||
                 pageStack.currentPage.objectName === "QuestionViewPage") {
             return true
         }
