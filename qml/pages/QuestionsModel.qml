@@ -247,7 +247,7 @@ ListModel {
                                          "text": "",
                                          "has_accepted_answer": false,
                                          "closed": false,
-                                         "created" : qUpdateTimeDuration,
+                                         "created" : "",
                                          "updated" : qUpdateTimeDuration,
                                          "created_date" : "",
                                          "updated_date" : "",

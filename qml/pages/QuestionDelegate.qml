@@ -11,8 +11,6 @@ ListItem  {
     menu: contextMenu
     property string tagsString: tags
     property var tagsArray: null
-    property bool questionViewed: false
-
 
     onClicked: {
         questionListView.currentIndex = index
@@ -25,7 +23,6 @@ ListItem  {
                                             index,
                                             false,
                                             props)
-        questionViewed = true
     }
 
     function getListItemContentHeight() {
@@ -150,7 +147,7 @@ ListItem  {
     Label {
         id: updaterLabelForFollowedQuestions
         visible: questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS &&
-                 !questionViewed
+                 created === ""
         anchors.top: isTagsShown() ? tagsFlowColumn.bottom : titleText.bottom
         anchors.left: authorLabel.right
         font.pixelSize: Theme.fontSizeTiny
@@ -161,7 +158,7 @@ ListItem  {
     StatsRow {
         id: staticticsRow
         createTimeVisible: questionsModel.pageHeader !== questionsModel.pageHeader_FOLLOWED_QUESTIONS ||
-                           questionViewed
+                           created !== ""
         parentWidth: background.width - authorLabel.width
         anchors.top: authorLabel.top
         anchors.left: authorLabel.right
