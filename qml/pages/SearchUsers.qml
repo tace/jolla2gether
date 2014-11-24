@@ -5,7 +5,7 @@ Dialog {
     id: searchPage
     allowedOrientations: Orientation.All
     property string newSearchString: ""
-    property string searchUrlBase: "https://together.jolla.com/users/?t=user&query="
+    property string searchUrlBase: siteBaseUrl + "/users/?t=user&query="
 
     SilicaFlickable {
         anchors.fill: parent
