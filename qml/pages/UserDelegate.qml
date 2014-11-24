@@ -21,7 +21,7 @@ ListItem  {
                 id: userPic
                 width: 110
                 height: 110
-                source: "http:" + usersModel.changeImageLinkSize(avatar, 110)
+                source: usersModel.changeImageLinkSize(avatar_url, 110)
             }
             Label {
                 id: userLabel

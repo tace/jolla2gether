@@ -397,7 +397,7 @@ function get_users_httpReq(model, query_params)
 
                     model.append({"username" : uinfo.username,
                                      "reputation" : uinfo.reputation,
-                                     "avatar" : uinfo.avatar,
+                                     "avatar_url": uinfo.avatar_url,
                                      "last_seen_at" : getTimeDurationAsString(uinfo.last_seen_at),
                                      "joined_at" : getTimeDurationAsString(uinfo.joined_at),
                                      "id" : uinfo.id,

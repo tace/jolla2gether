@@ -53,7 +53,7 @@ Page {
             loginLabel.color = Theme.primaryColor
             loginLabel.font.bold = false
             usersModel.get_user(userId, function(user_data) {
-                ownPic.source = "http:" + usersModel.changeImageLinkSize(user_data.avatar, ownPicSize)
+                ownPic.source = usersModel.changeImageLinkSize(user_data.avatar_url, ownPicSize)
             })
         }
     }
