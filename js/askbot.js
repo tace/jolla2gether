@@ -36,7 +36,7 @@ function wiki2Html(text) {
 function get_info(model)
 {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://together.jolla.com//api/v1/info/",true);
+    xhr.open("GET", siteBaseUrl + "/api/v1/info/",true);
     xhr.onreadystatechange = function()
     {
         if ( xhr.readyState == xhr.DONE)
@@ -171,7 +171,7 @@ function get_questions(model, page, onLoadedCallback) {
 function get_questions_httpReq(model, query_params, onLoadedCallback)
 {
     var xhr = new XMLHttpRequest();
-    var url = "https://together.jolla.com/api/v1/questions/" + query_params
+    var url = siteBaseUrl + "/api/v1/questions/" + query_params
     urlLoading = true
     console.log(url)
     xhr.open("GET", url, true);
@@ -271,7 +271,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
 function update_question(model, index_in_model, questionId, callback)
 {
     var xhr = new XMLHttpRequest();
-    var url = "https://together.jolla.com/api/v1/questions/" + questionId + "/"
+    var url = siteBaseUrl + "/api/v1/questions/" + questionId + "/"
     urlLoading = true
     console.log("Update question: "+url)
     xhr.open("GET", url, true);
@@ -397,7 +397,7 @@ function get_users_httpReq(model, query_params)
 
                     model.append({"username" : uinfo.username,
                                      "reputation" : uinfo.reputation,
-                                     "avatar" : uinfo.avatar,
+                                     "avatar_url": uinfo.avatar_url,
                                      "last_seen_at" : getTimeDurationAsString(uinfo.last_seen_at),
                                      "joined_at" : getTimeDurationAsString(uinfo.joined_at),
                                      "id" : uinfo.id,

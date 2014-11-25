@@ -110,7 +110,7 @@ Page {
     // after answer got from asyncronous (get_user) http request.
     function setUserData(user_data) {
         userKarma = user_data.reputation
-        userAvatarUrl = "http:" + usersModel.changeImageLinkSize(user_data.avatar, 100) //match this size to userPic size
+        userAvatarUrl = usersModel.changeImageLinkSize(user_data.avatar_url, 100) //match this size to userPic size
         //console.log("avatar: "+userAvatarUrl)
     }
     function getLabelMaxWidth() {
