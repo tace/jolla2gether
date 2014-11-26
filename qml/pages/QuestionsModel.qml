@@ -38,6 +38,9 @@ ListModel {
     property string ownKarma: ""  // shown login info
     property string ownBadges: ""  // shown login info
     property string userIdSearchCriteria: ""
+    property string userIdSearchFilterType: userIdSearchFilter_AUTHOR_QUESTIONS
+    property string userIdSearchFilter_AUTHOR_QUESTIONS: "author"
+    property string userIdSearchFilter_ANSWERED_QUESTIONS: "answered"
     property bool userQuestionsAsked: false
     property bool includeTagsChanged: false
     property bool ignoreTagsChanged: false
@@ -55,9 +58,13 @@ ListModel {
     function refresh(page, onLoadedCallback)
     {
         clear()
-        get_questions(page, onLoadedCallback) // goes to first page if page not given
+        if (isUserIdSearchCriteriaActive()) {
+            get_all_questions(onLoadedCallback)
+        }
+        else
+            get_questions(page, onLoadedCallback) // goes to first page if page not given
     }
-    function get_nextPageQuestions(params)
+    function get_nextPageQuestions(onLoadedCallback)
     {
         var askedPage = 0
         if (currentPageNum < pagesCount) {
@@ -68,9 +75,12 @@ ListModel {
         }
         if (currentPageNum === pagesCount) {
             console.log("no more pages to load!")
+            return false
         }
-        else
-            get_questions(askedPage, params)
+        else {
+            get_questions(askedPage, onLoadedCallback)
+            return true
+        }
     }
     function get_questions(page, onLoadedCallback)
     {
@@ -78,6 +88,28 @@ ListModel {
     }
     function update_question(questionId, index_in_model, callback) {
         Askbot.update_question(listModel, index_in_model, questionId, callback)
+    }
+    function get_all_questions(onLoadedCallback) {
+        var totalFilterCount = 0
+        get_questions(1, function(filteredCount) {
+            get_next_questions_recursive(filteredCount, onLoadedCallback)
+        })
+    }
+    function get_next_questions_recursive(currentfilteredCount, onLoadedCallback) {
+        var totalFilteredCount = currentfilteredCount
+        var wasCalled = get_nextPageQuestions(function(filteredCount) {
+            totalFilteredCount += filteredCount
+            get_next_questions_recursive(totalFilteredCount)
+        })
+        if (!wasCalled) {
+            console.log("Got all questions and filtered " + totalFilteredCount)
+            questionsModel.questionsCount -= totalFilteredCount
+            if (onLoadedCallback)
+                onLoadedCallback()
+        }
+        else {
+            console.log("Called nextPage questions and filterCount is " + totalFilteredCount)
+        }
     }
 
     function pushWebviewWithCustomScript(attached, props) {
@@ -458,6 +490,9 @@ ListModel {
         }
         return false
     }
+    function isUserIdSearchCriteriaActive() {
+        return questionsModel.userIdSearchCriteria !== ""
+    }
     function isSearchCriteriaActive() {
         if (questionsModel.searchCriteria !== "" ||
                 isFilterCriteriasActive() ||
@@ -476,6 +511,7 @@ ListModel {
     function resetUserIdSearchCriteria() {
         questionsModel.userIdSearchCriteria = ""
         questionsModel.pageHeader = questionsModel.pageHeader_ALL_QUESTIONS
+        questionsModel.userIdSearchFilterType = questionsModel.userIdSearchFilter_AUTHOR_QUESTIONS
     }
     function resetSearchCriteria() {
         questionsModel.searchCriteria = ""
@@ -527,6 +563,7 @@ ListModel {
         c.searchCriteria = p.searchCriteria
         c.ownUserIdValue = p.ownUserIdValue
         c.userIdSearchCriteria = p.userIdSearchCriteria
+        c.userIdSearchFilterType = p.userIdSearchFilterType
         c.includeTagsChanged = p.includeTagsChanged
         c.ignoreTagsChanged = p.ignoreTagsChanged
 

@@ -30,6 +30,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 Page {
     id: questionsPage
@@ -68,7 +69,8 @@ Page {
                 }
                 else {
                     var closure = function(x) {
-                        return function() {
+                        return function(filteredCount) {
+                            //console.log("filteredCount: "+filteredCount)
                             changeListItemFromCover(x);
                         }
                     };
@@ -267,6 +269,11 @@ Page {
                     }
                 }
             }
+            QuestionTypeSelector {
+                id: questionTypeSelector
+                anchors.top: header.bottom
+                visible: userIdSearch || questionsModel.pageHeader === questionsModel.pageHeader_MY_QUESTIONS
+            }
 
             Row {
                 id: searchActiveBanner
@@ -275,7 +282,7 @@ Page {
                 height: childrenRect.height
                 anchors.right: parent.right
                 anchors.left: parent.left
-                anchors.top: header.bottom
+                anchors.top: questionTypeSelector.bottom
                 Column {
                     id: imageColumn
                     Image {

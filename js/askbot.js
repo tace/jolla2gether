@@ -186,6 +186,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                 // Pick global count values (non-page related)
                 model.pagesCount = response.pages;
                 model.questionsCount = response.count;
+                var filteredCount = 0;
                 // Fix currentpage if got less pages
                 if (model.pagesCount < model.currentPageNum) {
                     model.currentPageNum = model.pagesCount
@@ -197,10 +198,33 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                 {
                     var ginfo = qs[index]
 
+                    // Filter out questions according to author when userId search has been set
+                    if (model.userIdSearchCriteria !== "") {
+                        if (model.userIdSearchFilterType === model.userIdSearchFilter_AUTHOR_QUESTIONS) {
+                            // Filter out questions where author is not a target userId (show author's questions only)
+                            if (model.userIdSearchCriteria !== ginfo.author.id.toString()) {
+                                console.log("Filtering question as userId != authorID: " + model.userIdSearchCriteria + " != " + ginfo.author.id)
+                                //model.questionsCount = model.questionsCount - 1
+                                filteredCount += 1
+                                continue
+                            }
+                        }
+                        if (model.userIdSearchFilterType === model.userIdSearchFilter_ANSWERED_QUESTIONS) {
+                            // Filter out questions where author is a target userId (show users's other questions i.e. answered questions only)
+                            if (model.userIdSearchCriteria === ginfo.author.id.toString()) {
+                                console.log("Filtering question as userId == authorID: " + model.userIdSearchCriteria + " == " + ginfo.author.id)
+                                //model.questionsCount = model.questionsCount - 1
+                                filteredCount += 1
+                                continue
+                            }
+                        }
+                    }
+
                     // Filter out closed questions
                     if (!model.closedQuestionsFilter) {
                         if (ginfo.closed) {
                             model.questionsCount = model.questionsCount - 1
+                            filteredCount += 1
                             continue
                         }
                     }
@@ -208,6 +232,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                     if (!model.answeredQuestionsFilter) {
                         if (ginfo.has_accepted_answer) {
                             model.questionsCount = model.questionsCount - 1
+                            filteredCount += 1
                             continue
                         }
                     }
@@ -227,6 +252,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                         }
                         if (found) {
                             model.questionsCount = model.questionsCount - 1
+                            filteredCount += 1
                             continue
                         }
                     }
@@ -254,7 +280,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
 
                 // Data is loaded, call user given callback
                 if (onLoadedCallback)
-                    onLoadedCallback()
+                    onLoadedCallback(filteredCount)
             }
             else
             {
@@ -283,20 +309,20 @@ function update_question(model, index_in_model, questionId, callback)
             {
                 var response =  JSON.parse(xhr.responseText);
                 model.set(index_in_model, {
-                                 "author" : response.author.username,
-                                 "author_id" : response.author.id,
-                                 "author_page_url" : siteBaseUrl + "/users/" + response.author.id + "/" + response.author.username,
-                                 "answer_count" : response.answer_count.toString(),
-                                 "view_count" : response.view_count.toString(),
-                                 "votes" : response.score.toString(),
-                                 "text": wiki2Html(response.text),
-                                 "has_accepted_answer": response.has_accepted_answer,
-                                 "closed": response.closed,
-                                 "created" : getTimeDurationAsString(response.added_at),
-                                 "updated" : getTimeDurationAsString(response.last_activity_at),
-                                 "created_date" : getDateAndTimeStamp(response.added_at),
-                                 "updated_date" : getDateAndTimeStamp(response.last_activity_at),
-                             })
+                              "author" : response.author.username,
+                              "author_id" : response.author.id,
+                              "author_page_url" : siteBaseUrl + "/users/" + response.author.id + "/" + response.author.username,
+                              "answer_count" : response.answer_count.toString(),
+                              "view_count" : response.view_count.toString(),
+                              "votes" : response.score.toString(),
+                              "text": wiki2Html(response.text),
+                              "has_accepted_answer": response.has_accepted_answer,
+                              "closed": response.closed,
+                              "created" : getTimeDurationAsString(response.added_at),
+                              "updated" : getTimeDurationAsString(response.last_activity_at),
+                              "created_date" : getDateAndTimeStamp(response.added_at),
+                              "updated_date" : getDateAndTimeStamp(response.last_activity_at),
+                          })
                 callback()
             }
             else
