@@ -204,7 +204,6 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                             // Filter out questions where author is not a target userId (show author's questions only)
                             if (model.userIdSearchCriteria !== ginfo.author.id.toString()) {
                                 console.log("Filtering question as userId != authorID: " + model.userIdSearchCriteria + " != " + ginfo.author.id)
-                                //model.questionsCount = model.questionsCount - 1
                                 filteredCount += 1
                                 continue
                             }
@@ -213,7 +212,6 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                             // Filter out questions where author is a target userId (show users's other questions i.e. answered questions only)
                             if (model.userIdSearchCriteria === ginfo.author.id.toString()) {
                                 console.log("Filtering question as userId == authorID: " + model.userIdSearchCriteria + " == " + ginfo.author.id)
-                                //model.questionsCount = model.questionsCount - 1
                                 filteredCount += 1
                                 continue
                             }
@@ -223,7 +221,6 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                     // Filter out closed questions
                     if (!model.closedQuestionsFilter) {
                         if (ginfo.closed) {
-                            model.questionsCount = model.questionsCount - 1
                             filteredCount += 1
                             continue
                         }
@@ -231,7 +228,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                     // Filter out questions with accepted answer
                     if (!model.answeredQuestionsFilter) {
                         if (ginfo.has_accepted_answer) {
-                            model.questionsCount = model.questionsCount - 1
+                            //model.questionsCount = model.questionsCount - 1
                             filteredCount += 1
                             continue
                         }
@@ -251,7 +248,6 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                                 break
                         }
                         if (found) {
-                            model.questionsCount = model.questionsCount - 1
                             filteredCount += 1
                             continue
                         }

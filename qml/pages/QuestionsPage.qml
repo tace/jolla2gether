@@ -283,90 +283,82 @@ Page {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 anchors.top: questionTypeSelector.bottom
-                Column {
-                    id: imageColumn
-                    Image {
-                        visible: questionsModel.isSearchCriteriaActive()
-                        anchors.leftMargin: Theme.paddingLarge
-                        source: "image://theme/icon-s-task"
-                    }
+                Image {
+                    visible: questionsModel.isSearchCriteriaActive()
+                    anchors.leftMargin: Theme.paddingLarge
+                    source: "image://theme/icon-s-task"
                 }
-                Column {
-                    anchors.top: imageColumn.top
-                    anchors.left: imageColumn.right
-                    anchors.right: parent.right
-                    Flow {
-                        id: searchCriteriaRow
+                Flow {
+                    id: searchCriteriaRow
+                    width: parent.width
+                    spacing: 5
+                    Label {
+                        visible: questionsModel.searchCriteria !== ""
+                        font.pixelSize: Theme.fontSizeTiny
+                        color: Theme.highlightColor
+                        text: qsTr("Search: ")
+                    }
+                    Label {
+                        visible: questionsModel.searchCriteria !== ""
+                        font.pixelSize: Theme.fontSizeTiny
+                        text: questionsModel.searchCriteria
+                    }
+                    Label {
+                        visible: modelSearchTagsGlobal.count > 0 || ignoredSearchTagsGlobal.count > 0
+                        font.pixelSize: Theme.fontSizeTiny
+                        color: Theme.highlightColor
+                        text: qsTr("Tags: ")
+                    }
+                    Repeater {
+                        visible: modelSearchTagsGlobal.count > 0
+                        model: modelSearchTagsGlobal
+                        Label {
+                            font.pixelSize: Theme.fontSizeTiny
+                            text: modelData
+                        }
+                    }
+                    Repeater {
+                        visible: ignoredSearchTagsGlobal.count > 0
+                        model: ignoredSearchTagsGlobal
+                        Label {
+                            font.pixelSize: Theme.fontSizeTiny
+                            font.strikeout: true
+                            text: modelData
+                        }
+                    }
+                    Label {
+                        visible: questionsModel.isFilterCriteriasActive()
+                        font.pixelSize: Theme.fontSizeTiny
+                        color: Theme.highlightColor
+                        text: qsTr("Filters: ")
+                    }
+                    Label {
+                        visible: questionsModel.closedQuestionsFilter !== questionsModel.closedQuestionsFilter_DEFAULT
+                        font.pixelSize: Theme.fontSizeTiny
+                        font.strikeout: true
+                        color: "lightgreen"
+                        text: "[closed]"
+                    }
+                    Label {
+                        visible: (questionsModel.answeredQuestionsFilter !== questionsModel.answeredQuestionsFilter_DEFAULT) && !unansweredFilter.visible
+                        font.pixelSize: Theme.fontSizeTiny
+                        font.strikeout: true
+                        color: "orange"
+                        text: "[answered]"
+                    }
+                    Label {
+                        id: unansweredFilter
+                        visible: questionsModel.unansweredQuestionsFilter !== questionsModel.unansweredQuestionsFilter_DEFAULT
+                        font.pixelSize: Theme.fontSizeTiny
+                        color: "lightblue"
+                        text: "[UNANSWERED]"
+                    }
+                    Separator {
+                        visible: questionsModel.isSearchCriteriaActive()
                         width: parent.width
-                        spacing: 5
-                        Label {
-                            visible: questionsModel.searchCriteria !== ""
-                            font.pixelSize: Theme.fontSizeTiny
-                            color: Theme.highlightColor
-                            text: qsTr("Search: ")
-                        }
-                        Label {
-                            visible: questionsModel.searchCriteria !== ""
-                            font.pixelSize: Theme.fontSizeTiny
-                            text: questionsModel.searchCriteria
-                        }
-                        Label {
-                            visible: modelSearchTagsGlobal.count > 0 || ignoredSearchTagsGlobal.count > 0
-                            font.pixelSize: Theme.fontSizeTiny
-                            color: Theme.highlightColor
-                            text: qsTr("Tags: ")
-                        }
-                        Repeater {
-                            visible: modelSearchTagsGlobal.count > 0
-                            model: modelSearchTagsGlobal
-                            Label {
-                                font.pixelSize: Theme.fontSizeTiny
-                                text: modelData
-                            }
-                        }
-                        Repeater {
-                            visible: ignoredSearchTagsGlobal.count > 0
-                            model: ignoredSearchTagsGlobal
-                            Label {
-                                font.pixelSize: Theme.fontSizeTiny
-                                font.strikeout: true
-                                text: modelData
-                            }
-                        }
-                        Label {
-                            visible: questionsModel.isFilterCriteriasActive()
-                            font.pixelSize: Theme.fontSizeTiny
-                            color: Theme.highlightColor
-                            text: qsTr("Filters: ")
-                        }
-                        Label {
-                            visible: questionsModel.closedQuestionsFilter !== questionsModel.closedQuestionsFilter_DEFAULT
-                            font.pixelSize: Theme.fontSizeTiny
-                            font.strikeout: true
-                            color: "lightgreen"
-                            text: "[closed]"
-                        }
-                        Label {
-                            visible: (questionsModel.answeredQuestionsFilter !== questionsModel.answeredQuestionsFilter_DEFAULT) && !unansweredFilter.visible
-                            font.pixelSize: Theme.fontSizeTiny
-                            font.strikeout: true
-                            color: "orange"
-                            text: "[answered]"
-                        }
-                        Label {
-                            id: unansweredFilter
-                            visible: questionsModel.unansweredQuestionsFilter !== questionsModel.unansweredQuestionsFilter_DEFAULT
-                            font.pixelSize: Theme.fontSizeTiny
-                            color: "lightblue"
-                            text: "[UNANSWERED]"
-                        }
-                        Separator {
-                            visible: questionsModel.isSearchCriteriaActive()
-                            width: parent.width
-                            horizontalAlignment: Qt.AlignCenter
-                            color: Theme.secondaryColor
-                            height: 2
-                        }
+                        horizontalAlignment: Qt.AlignCenter
+                        color: Theme.secondaryColor
+                        height: 2
                     }
                 }
             }

@@ -61,8 +61,13 @@ ListModel {
         if (isUserIdSearchCriteriaActive()) {
             get_all_questions(onLoadedCallback)
         }
-        else
-            get_questions(page, onLoadedCallback) // goes to first page if page not given
+        else {
+            get_questions(page, function(filteredCount) {
+                questionsCount -= filteredCount
+                if (onLoadedCallback)
+                    onLoadedCallback(filteredCount)
+            })
+        }
     }
     function get_nextPageQuestions(onLoadedCallback)
     {
