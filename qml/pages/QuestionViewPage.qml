@@ -27,6 +27,7 @@ Page {
     property string userAvatarUrl: ""
     property bool openExternalLinkOnWebview: false
     property string externalUrl: ""
+    property bool openQuestionlOnJolla2getherApp: false
     property bool answersAndCommentsOpen: false
     property bool answersAndCommentsClicked: false
     property string rssFeedUrl: siteBaseUrl + "/feeds/question/" + qid + "/"
@@ -289,15 +290,29 @@ Page {
     onStatusChanged: {
         if (status === PageStatus.Active && (url !== "" || externalUrl !== ""))
         {
-            siteURL = page.url
-            attachWebview()
+            if (openQuestionlOnJolla2getherApp) {
+                openQuestionlOnJolla2getherApp = false
+                var props = {
+                    "index": questionsModel.getInAppClickedQuestionIndex()
+                }
+                unattachWebview()
+                questionsModel.loadQuestionViewpage(questionsModel.questionIdOfClickedTogetherLink,
+                                                    questionsModel.questionsCount,
+                                                    true,
+                                                    props)
+            }
+            else {
+                siteURL = page.url
+                attachWebview()
+                questionsModel.questionIdOfClickedTogetherLink = ""
 
-            if (openExternalLinkOnWebview) {
-                openExternalLinkOnWebview = false
-                siteURL = externalUrl
-                externalUrl = ""
-                console.log("Opening external url: " + siteURL)
-                pageStack.navigateForward()
+                if (openExternalLinkOnWebview) {
+                    openExternalLinkOnWebview = false
+                    siteURL = externalUrl
+                    externalUrl = ""
+                    console.log("Opening external url: " + siteURL)
+                    pageStack.navigateForward()
+                }
             }
         }
     }

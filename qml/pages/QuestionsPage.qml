@@ -46,6 +46,7 @@ Page {
                 questionsModel.restoreModel()
                 questionListView.positionViewAtIndex(questionsModel.listViewCurrentIndex, ListView.Center);
             }
+            questionsModel.removeInAppClickedQuestionFromModel()
         }
     }
     Component.onCompleted: {

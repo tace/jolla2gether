@@ -305,12 +305,16 @@ function update_question(model, index_in_model, questionId, callback)
             {
                 var response =  JSON.parse(xhr.responseText);
                 model.set(index_in_model, {
+                              "id" : response.id,
+                              "title" : response.title,
+                              "url" : response.url,
                               "author" : response.author.username,
                               "author_id" : response.author.id,
                               "author_page_url" : siteBaseUrl + "/users/" + response.author.id + "/" + response.author.username,
                               "answer_count" : response.answer_count.toString(),
                               "view_count" : response.view_count.toString(),
                               "votes" : response.score.toString(),
+                              "tags" : stringifyJsonArray(response.tags),
                               "text": wiki2Html(response.text),
                               "has_accepted_answer": response.has_accepted_answer,
                               "closed": response.closed,

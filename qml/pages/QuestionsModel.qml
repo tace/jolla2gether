@@ -55,6 +55,10 @@ ListModel {
     property string pageHeader_FOLLOWED_QUESTIONS:  qsTr("Followed questions")
     property string pageHeader: pageHeader_ALL_QUESTIONS
 
+    // Keep index and question ID of in-app clicked question
+    property int indexOfInAppClickedQuestion: -1
+    property string questionIdOfClickedTogetherLink: ""
+
     function refresh(page, onLoadedCallback)
     {
         clear()
@@ -147,6 +151,8 @@ ListModel {
     }
 
     function getQuestionId() {
+        if (questionIdOfClickedTogetherLink !== "")
+            return questionIdOfClickedTogetherLink
         return questionsModel.get(questionsModel.listViewCurrentIndex).id
     }
     function getQuestionIdOfIndex(index) {
@@ -154,7 +160,12 @@ ListModel {
     }
 
     function loadQuestionViewpage(questionId, index_in_model, replace, props) {
-        if (questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS) {
+        if (questionsModel.pageHeader === questionsModel.pageHeader_FOLLOWED_QUESTIONS ||
+           (index_in_model === questionsCount)) // clicked together link, add to model
+        {
+            if (index_in_model === questionsCount) {
+                index_in_model = getInAppClickedQuestionIndex()
+            }
             questionsModel.update_question(questionId, index_in_model, function() {
                 if (replace)
                     pageStack.replace(Qt.resolvedUrl("QuestionViewPage.qml"), props)
@@ -167,6 +178,18 @@ ListModel {
                 pageStack.replace(Qt.resolvedUrl("QuestionViewPage.qml"), props)
             else
                 pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+    }
+    function getInAppClickedQuestionIndex() {
+        if (indexOfInAppClickedQuestion !== -1)
+            return indexOfInAppClickedQuestion
+        indexOfInAppClickedQuestion = listModel.count
+        return listModel.count
+    }
+    function removeInAppClickedQuestionFromModel() {
+        if (indexOfInAppClickedQuestion !== -1) {
+            listModel.remove(indexOfInAppClickedQuestion)
+        }
+        indexOfInAppClickedQuestion = -1
     }
 
     //
@@ -373,6 +396,7 @@ ListModel {
     // https://together.jolla.com/question/59380/native-app-request-spreadsheet/ where
     // 59380 is questionId last part of url is question title.
     function getVotingDataFromWebViewCallback(questionId, votingResultsCallback) {
+        console.log("called getVotingDataFromWebViewCallback with qid: " + questionId)
         return function(webview) {
             var scriptToRun = "(function() { \
                         var upvoteElem = document.getElementById('question-img-upvote-" + questionId + "'); \

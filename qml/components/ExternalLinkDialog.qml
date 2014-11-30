@@ -4,15 +4,17 @@ import Sailfish.Silica 1.0
 Dialog {
 
     property string url
-    property string selectedAction: selected_WEBVIEW
+    property string selectedAction: ""
     property bool imageSaveSuccess: false
     property bool isImageUrl: isImage(url)
+    property bool isTogetherQuestionUrl: isQuestionUrl(url)
 
     // Action constants
     property string selected_WEBVIEW: "webview"
     property string selected_BROWSER: "browser"
     property string selected_COPYCLIPBOARD : "copytoclipboard"
     property string selected_SAVETOGALLERY: "savetogallery"
+    property string selected_JOLLA2GETHER: "jolla2getherapp"
 
     Column {
         spacing: 2
@@ -33,15 +35,29 @@ Dialog {
         }
 
         TextSwitch {
+            id: jolla2getherapp
+            visible: isTogetherQuestionUrl
+            automaticCheck: false
+            text: qsTr("Open with jolla2gether app")
+            description: qsTr("Replaces currently opened question")
+            onClicked: {
+                jolla2getherapp.checked = true
+                webview.checked = false
+                browser.checked = false
+                copyLink.checked = false
+                saveImage.checked = false
+            }
+        }
+        TextSwitch {
             id: webview
             automaticCheck: false
             text: qsTr("Open with webview")
             onClicked: {
                 webview.checked = true
+                jolla2getherapp.checked = false
                 browser.checked = false
                 copyLink.checked = false
                 saveImage.checked = false
-                selectedAction = selected_WEBVIEW
             }
         }
         TextSwitch {
@@ -50,10 +66,10 @@ Dialog {
             text: qsTr("Open with default browser")
             onClicked: {
                 browser.checked = true
+                jolla2getherapp.checked = false
                 webview.checked = false
                 copyLink.checked = false
                 saveImage.checked = false
-                selectedAction = selected_BROWSER
             }
         }
         TextSwitch {
@@ -62,10 +78,10 @@ Dialog {
             text: qsTr("Copy to clipboard")
             onClicked: {
                 copyLink.checked = true
+                jolla2getherapp.checked = false
                 browser.checked = false
                 webview.checked = false
                 saveImage.checked = false
-                selectedAction = selected_COPYCLIPBOARD
             }
         }
         TextSwitch {
@@ -75,10 +91,10 @@ Dialog {
             text: qsTr("Save image to gallery")
             onClicked: {
                 saveImage.checked = true
+                jolla2getherapp.checked = false
                 browser.checked = false
                 webview.checked = false
                 copyLink.checked = false
-                selectedAction = selected_SAVETOGALLERY
             }
         }
         Separator {
@@ -106,19 +122,24 @@ Dialog {
         }
 
     }
-    Component.onCompleted: {
-        // set default as webview
-        webview.checked = true
+    Component.onCompleted: {     
+        if (isTogetherQuestionUrl)
+            jolla2getherapp.checked = true
+        else
+            webview.checked = true
     }
 
     onAccepted: {
         if (webview.checked) {
             siteURL = url
+            selectedAction = selected_WEBVIEW
         }
         if (browser.checked) {
+            selectedAction = selected_BROWSER
             Qt.openUrlExternally(url)
         }
         if (copyLink.checked) {
+            selectedAction = selected_COPYCLIPBOARD
             Clipboard.text = url
         }
         if (saveImage.checked) {
@@ -131,6 +152,10 @@ Dialog {
                 console.log(fileName  +" image saving failed!")
                 imageSaveSuccess = false
             }
+            selectedAction = selected_SAVETOGALLERY
+        }
+        if (jolla2getherapp.checked) {
+            selectedAction = selected_JOLLA2GETHER
         }
     }
     function getFilenameFromUrl(url) {
@@ -148,5 +173,16 @@ Dialog {
     }
     function strEndsWith(str, suffix) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1
+    }
+    function isQuestionUrl(url) {
+        var pattern = /http[s]?:\/\/together\.jolla\.com\/question\/\d+\/.+\//;
+        var match = url.match(pattern)
+        if (match !== null) {
+            if (match[0] === url) {
+                console.log("Clicked url is together.com question url")
+                return true
+            }
+        }
+        return false
     }
 }
