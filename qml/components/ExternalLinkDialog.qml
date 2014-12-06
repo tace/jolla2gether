@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Dialog {
-
+    allowedOrientations: Orientation.All
     property string url
     property string selectedAction: ""
     property bool imageSaveSuccess: false
@@ -175,7 +175,7 @@ Dialog {
         return str.indexOf(suffix, str.length - suffix.length) !== -1
     }
     function isQuestionUrl(url) {
-        var pattern = /http[s]?:\/\/together\.jolla\.com\/question\/\d+\/.+\//;
+        var pattern = /http[s]?:\/\/together\.jolla\.com\/question\/\d+\/([^\/]+\/?)?/;
         var match = url.match(pattern)
         if (match !== null) {
             if (match[0] === url) {
