@@ -20,6 +20,8 @@ Dialog {
             id: content_column
             spacing: 2
             width: parent.width
+            anchors.rightMargin: Theme.paddingMedium
+            anchors.leftMargin: Theme.paddingMedium
 
             DialogHeader {
                 id: header;
@@ -232,13 +234,11 @@ Dialog {
             Label {
                 id: notesubSearchReset
                 anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignRight
-                verticalAlignment: Text.AlignHCenter
+                horizontalAlignment: Text.AlignCenter
                 font.pixelSize: Theme.fontSizeTiny
                 font.italic: true
                 color: Theme.secondaryHighlightColor
-                width: parent.width
-                height: 150
+                width: parent.width - 2 * Theme.paddingMedium
                 wrapMode: Text.Wrap
                 text: qsTr("Questions of given user can be listed in Users page or Questions page by long pressing list item. With this setting, existing search criteria (if set) can be applied also to users's all questions or resetted. Note that on users's all questions page you can freely change/reset search criteria and it do not affect to original search criteria i.e. when returning back to main questions list the original search criteria is returned.")
             }

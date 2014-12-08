@@ -101,7 +101,7 @@ Page {
                 height: 500
                 wrapMode: Text.WordWrap
                 text: qsTr("Jolla Together is a client application for https://together.jolla.com site which can be used to browse questions and users and see main statistics of questions.
- \nNOTE: jolla2gether is using webview component where you can login with your own Jolla credentials. When logged in, be carefull concerning actions on page to avoid accidental cliks.")
+ \nNOTE: jolla2gether is using webview component where you can login with your own together.jolla.com credentials. When logged in, be carefull concerning actions on page to avoid accidental cliks.")
             }
         }
     }

@@ -103,7 +103,7 @@ ListItem  {
         id: contextMenu
         ContextMenu {
             MenuItem {
-                text: qsTr("Copy url")
+                text: qsTr("Copy url to clipboard")
                 onClicked: Clipboard.text = url
             }
             MenuItem {

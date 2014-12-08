@@ -27,7 +27,7 @@ Row {
             MenuItem {
                 id: authorQuestions
                 text: qsTr("author")
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeMedium
                 onClicked: {
                     qTypeSelectionBox.description = ""
                     questionsModel.userIdSearchFilterType = questionsModel.userIdSearchFilter_AUTHOR_QUESTIONS
@@ -37,7 +37,7 @@ Row {
             MenuItem {
                 id: answeredQuestions
                 text: qsTr("answered")
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeMedium
                 onClicked: {
                     qTypeSelectionBox.description = qsTr("excluding wikiposts")
                     questionsModel.userIdSearchFilterType = questionsModel.userIdSearchFilter_ANSWERED_QUESTIONS
