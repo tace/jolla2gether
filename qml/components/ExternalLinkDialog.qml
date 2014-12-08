@@ -16,119 +16,129 @@ Dialog {
     property string selected_SAVETOGALLERY: "savetogallery"
     property string selected_JOLLA2GETHER: "jolla2getherapp"
 
-    Column {
-        spacing: 2
-        width: parent.width
-
-        DialogHeader {
-            title: qsTr("Clicked link")
-            acceptText: qsTr("Action");
-        }
-
-        Label {
+    SilicaFlickable {
+        id: mainFlic
+        anchors.fill: parent
+        contentHeight: content_column.height
+        contentWidth: width
+        Column {
+            id: content_column
+            spacing: 2
             width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: Theme.fontSizeMedium
-            color: Theme.highlightColor
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            text: url
-        }
 
-        TextSwitch {
-            id: jolla2getherapp
-            visible: isTogetherQuestionUrl
-            automaticCheck: false
-            text: qsTr("Open with jolla2gether app")
-            description: qsTr("Replaces currently opened question")
-            onClicked: {
-                jolla2getherapp.checked = true
-                webview.checked = false
-                browser.checked = false
-                copyLink.checked = false
-                saveImage.checked = false
+            DialogHeader {
+                title: qsTr("Clicked link")
+                acceptText: qsTr("Action");
             }
-        }
-        TextSwitch {
-            id: webview
-            automaticCheck: false
-            text: qsTr("Open with webview")
-            onClicked: {
-                webview.checked = true
-                jolla2getherapp.checked = false
-                browser.checked = false
-                copyLink.checked = false
-                saveImage.checked = false
-            }
-        }
-        TextSwitch {
-            id: browser
-            automaticCheck: false
-            text: qsTr("Open with default browser")
-            onClicked: {
-                browser.checked = true
-                jolla2getherapp.checked = false
-                webview.checked = false
-                copyLink.checked = false
-                saveImage.checked = false
-            }
-        }
-        TextSwitch {
-            id: copyLink
-            automaticCheck: false
-            text: qsTr("Copy to clipboard")
-            onClicked: {
-                copyLink.checked = true
-                jolla2getherapp.checked = false
-                browser.checked = false
-                webview.checked = false
-                saveImage.checked = false
-            }
-        }
-        TextSwitch {
-            id: saveImage
-            automaticCheck: false
-            visible: isImageUrl
-            text: qsTr("Save image to gallery")
-            onClicked: {
-                saveImage.checked = true
-                jolla2getherapp.checked = false
-                browser.checked = false
-                webview.checked = false
-                copyLink.checked = false
-            }
-        }
-        Separator {
-            visible: isImageUrl
-            width: parent.width
-            horizontalAlignment: Qt.AlignCenter
-            color: Theme.secondaryHighlightColor
-        }
 
-        Canvas {
-            id: imageCanvas
-            visible: isImageUrl
-            width: imgLoader.sourceSize.width
-            height: imgLoader.sourceSize.height
-            renderStrategy: Canvas.Immediate
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.drawImage(imgLoader, 0, 0)
+            Label {
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.highlightColor
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                text: url
+            }
+
+            TextSwitch {
+                id: jolla2getherapp
+                visible: isTogetherQuestionUrl
+                automaticCheck: false
+                text: qsTr("Open with jolla2gether app")
+                description: qsTr("Replaces currently opened question")
+                onClicked: {
+                    jolla2getherapp.checked = true
+                    webview.checked = false
+                    browser.checked = false
+                    copyLink.checked = false
+                    saveImage.checked = false
+                }
+            }
+            TextSwitch {
+                id: webview
+                automaticCheck: false
+                text: qsTr("Open with webview")
+                onClicked: {
+                    webview.checked = true
+                    jolla2getherapp.checked = false
+                    browser.checked = false
+                    copyLink.checked = false
+                    saveImage.checked = false
+                }
+            }
+            TextSwitch {
+                id: browser
+                automaticCheck: false
+                text: qsTr("Open with default browser")
+                onClicked: {
+                    browser.checked = true
+                    jolla2getherapp.checked = false
+                    webview.checked = false
+                    copyLink.checked = false
+                    saveImage.checked = false
+                }
+            }
+            TextSwitch {
+                id: copyLink
+                automaticCheck: false
+                text: qsTr("Copy to clipboard")
+                onClicked: {
+                    copyLink.checked = true
+                    jolla2getherapp.checked = false
+                    browser.checked = false
+                    webview.checked = false
+                    saveImage.checked = false
+                }
+            }
+            TextSwitch {
+                id: saveImage
+                automaticCheck: false
+                visible: isImageUrl
+                text: qsTr("Save image to gallery")
+                onClicked: {
+                    saveImage.checked = true
+                    jolla2getherapp.checked = false
+                    browser.checked = false
+                    webview.checked = false
+                    copyLink.checked = false
+                }
+            }
+            Separator {
+                visible: isImageUrl
+                width: parent.width
+                horizontalAlignment: Qt.AlignCenter
+                color: Theme.secondaryHighlightColor
+            }
+
+            Canvas {
+                id: imageCanvas
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: isImageUrl
+                width: imgLoader.sourceSize.width
+                height: imgLoader.sourceSize.height
+                renderStrategy: Canvas.Immediate
+                onPaint: {
+                    var ctx = getContext("2d")
+                    ctx.drawImage(imgLoader, 0, 0)
+                }
+            }
+            Image {
+                id: imgLoader
+                visible: false
+                source: isImageUrl ? url : ""
+            }
+            Item {
+                width: 1
+                height: 10
             }
         }
-        Image {
-            id: imgLoader
-            visible: false
-            source: isImageUrl ? url : ""
-        }
-
     }
-    Component.onCompleted: {     
+    Component.onCompleted: {
         if (isTogetherQuestionUrl)
             jolla2getherapp.checked = true
         else
             webview.checked = true
     }
-
     onAccepted: {
         if (webview.checked) {
             siteURL = url
