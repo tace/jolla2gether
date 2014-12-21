@@ -38,7 +38,49 @@
 #include <QGuiApplication>
 #include <QtQuick>
 #include <QStandardPaths>
+#include <QString>
+#include <QStringList>
+#include <QDir>
 #include "settings.h"
+#include "dateparser.h"
+
+
+/* Clears the web cache, because Qt 5.2 WebView chokes on caches from
+ * older Qt versions.
+ */
+void clearWebCache()
+{
+    const QStringList cachePaths = QStandardPaths::standardLocations(
+                QStandardPaths::CacheLocation);
+
+    if (cachePaths.size())
+    {
+        // some very old versions of SailfishOS may not find this cache,
+        // but that's OK since they don't have the web cache bug anyway
+        const QString webCache =
+                QDir(cachePaths.at(0)).filePath(".QtWebKit");
+        QDir cacheDir(webCache);
+        if (cacheDir.exists())
+        {
+            if (cacheDir.removeRecursively())
+            {
+                qDebug() << "Cleared web cache:" << webCache;
+            }
+            else
+            {
+                qDebug() << "Failed to clear web cache:" << webCache;
+            }
+        }
+        else
+        {
+            qDebug() << "Web cache does not exist:" << webCache;
+        }
+    }
+    else
+    {
+        qDebug() << "No web cache available.";
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -54,14 +96,17 @@ int main(int argc, char *argv[])
     // return SailfishApp::main(argc, argv);
 
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
+    clearWebCache();
     QScopedPointer<QQuickView> view(SailfishApp::createView());
     view->rootContext()->setContextProperty("APP_VERSION", APP_VERSION);
 
     QString pictureGalleryDirectoryLocation = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
     view->rootContext()->setContextProperty("pictureGalleryDirectoryLocation", pictureGalleryDirectoryLocation);
 
+    DateParser dateParser;
     Settings* settings = new Settings(app.data());
     view->rootContext()->setContextProperty("Settings", settings);
+    view->rootContext()->setContextProperty("dateParser", &dateParser);
     view->setSource(SailfishApp::pathTo("qml/harbour-jolla2gether.qml"));
     view->showFullScreen();
     return app->exec();

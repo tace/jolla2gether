@@ -15,8 +15,8 @@ SOURCES += src/harbour-jolla2gether.cpp
 OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/cover/CoverPage.qml \
     qml/pages/FirstPage.qml \
-    rpm/harbour-jolla2gether.spec \
     rpm/harbour-jolla2gether.yaml \
+    rpm/harbour-jolla2gether.spec \
     harbour-jolla2gether.desktop \
     js/askbot.js \
     qml/pages/AboutPage.qml \
@@ -63,6 +63,7 @@ RESOURCES += \
     qrc.qrc
 
 HEADERS += \
-    src/settings.h
+    src/settings.h \
+    src/dateparser.h
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"

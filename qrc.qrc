@@ -7,6 +7,5 @@
         <file>qml/images/arrow-right-vote-up.png</file>
         <file>qml/images/answer-accepted.png</file>
         <file>qml/images/answer-not-accepted.png</file>
-        <file>qml/images/answer-accepted.png</file>
     </qresource>
 </RCC>

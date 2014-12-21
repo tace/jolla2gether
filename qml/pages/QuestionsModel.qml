@@ -604,7 +604,10 @@ ListModel {
         return Askbot.wiki2Html(text)
     }
     function rssPubDate2Seconds(rssPubDate) {
-        var date = new Date(rssPubDate);
+        // Qt5.2 fix (fixed in Qt5.3)
+        // See: https://bugreports.qt-project.org/browse/QTBUG-38011
+        //var date = new Date(rssPubDate);
+        var date = dateParser.parse(rssPubDate)
         return date.getTime() / 1000; // seconds since midnight, 1 Jan 1970
     }
     function rssPubdate2ElapsedTimeString(rssPubDate) {
