@@ -608,7 +608,16 @@ ListModel {
         // See: https://bugreports.qt-project.org/browse/QTBUG-38011
         //var date = new Date(rssPubDate);
         var date = dateParser.parse(rssPubDate)
-        return date.getTime() / 1000; // seconds since midnight, 1 Jan 1970
+
+        // dateParser returns date as converted to local time (e.g. to be shown in GUI),
+        // but timezone information is still available.
+        // To make returned seconds comparable to current time (seconds), we need to
+        // change time to UTC as it's compared to current time (returned by JavaScript Date.now())
+        // which is also in UTC.
+        var currentDate = date;
+        var currentTime = currentDate.getTime(); // this ignores timezone
+        var localOffset =  date.getTimezoneOffset() * 60000; // timezone seconds
+        return Math.round(new Date(currentTime + localOffset).getTime() / 1000);
     }
     function rssPubdate2ElapsedTimeString(rssPubDate) {
         var seconds = rssPubDate2Seconds(rssPubDate)
