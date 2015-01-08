@@ -528,6 +528,7 @@ function secondsToDurationStringMoreRounded(seconds)
     if (numyears > 0) {
         value = value + numyears + "y ";
         nummonths = nummonths - (numyears * 12)
+        numdays = numdays - (numyears * 365)
         amountOfUnitsAdded = amountOfUnitsAdded + 1
     }
     if (nummonths > 0) {
