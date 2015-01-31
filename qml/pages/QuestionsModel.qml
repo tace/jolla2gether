@@ -365,6 +365,7 @@ ListModel {
                             + "," + questionsModel.ownBadges);
                 if (pageStack.currentPage.objectName === "WebView") {
                     if (questionsModel.isUserLoggedIn()) {
+                        pageStack.currentPage.backNavigation = true
                         pageStack.navigateBack()
                     }
                 }
