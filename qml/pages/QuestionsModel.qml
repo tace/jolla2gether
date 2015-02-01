@@ -68,12 +68,17 @@ ListModel {
         else {
             get_questions(page, function(filteredCount) {
                 questionsCount -= filteredCount
-                if (onLoadedCallback)
-                    onLoadedCallback(filteredCount)
+                if (listModel.count < 30) {
+                    get_next_questions_recursive(0, onLoadedCallback, 30)
+                }
+                else {
+                    if (onLoadedCallback)
+                        onLoadedCallback(filteredCount)
+                }
             })
         }
     }
-    function get_nextPageQuestions(onLoadedCallback)
+    function get_nextPageQuestions(onLoadedCallback, questionAmountFilter)
     {
         var askedPage = 0
         if (currentPageNum < pagesCount) {
@@ -87,6 +92,12 @@ ListModel {
             return false
         }
         else {
+            if (questionAmountFilter) {
+                if (listModel.count >= questionAmountFilter) {
+                    console.log("Hit question amount filter. View already contains " + listModel.count + " questions, which is >= " + questionAmountFilter + ". Stop loading more pages!")
+                    return false
+                }
+            }
             get_questions(askedPage, onLoadedCallback)
             return true
         }
@@ -104,12 +115,12 @@ ListModel {
             get_next_questions_recursive(filteredCount, onLoadedCallback)
         })
     }
-    function get_next_questions_recursive(currentfilteredCount, onLoadedCallback) {
+    function get_next_questions_recursive(currentfilteredCount, onLoadedCallback, questionAmountFilter) {
         var totalFilteredCount = currentfilteredCount
         var wasCalled = get_nextPageQuestions(function(filteredCount) {
             totalFilteredCount += filteredCount
-            get_next_questions_recursive(totalFilteredCount)
-        })
+            get_next_questions_recursive(totalFilteredCount, undefined, questionAmountFilter)
+        }, questionAmountFilter)
         if (!wasCalled) {
             console.log("Got all questions and filtered " + totalFilteredCount)
             questionsModel.questionsCount -= totalFilteredCount
