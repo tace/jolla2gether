@@ -315,7 +315,7 @@ Page {
                         model: modelSearchTagsGlobal
                         Label {
                             font.pixelSize: Theme.fontSizeTiny
-                            text: modelData
+                            text: modelSearchTagsGlobal.get(index).tag
                         }
                     }
                     Repeater {
@@ -324,7 +324,7 @@ Page {
                         Label {
                             font.pixelSize: Theme.fontSizeTiny
                             font.strikeout: true
-                            text: modelData
+                            text: ignoredSearchTagsGlobal.get(index).tag
                         }
                     }
                     Label {

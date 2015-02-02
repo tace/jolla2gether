@@ -60,12 +60,12 @@ CoverBackground {
             height: Theme.paddingSmall
         }
 
-        Label {
-            width: parent.width
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeSmall
-            text: "Groups: " + infoModel.groups
-        }
+//        Label {
+//            width: parent.width
+//            color: Theme.highlightColor
+//            font.pixelSize: Theme.fontSizeSmall
+//            text: "Groups: " + infoModel.groups
+//        }
         Label {
             width: parent.width
             color: Theme.highlightColor
