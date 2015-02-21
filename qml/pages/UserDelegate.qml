@@ -59,12 +59,14 @@ ListItem  {
                         height: 60
                         radius: 10
                         Label {
+                            visible: joined_at !== undefined
                             font.pixelSize: Theme.fontSizeSmall
                             anchors.top: parent.top
                             anchors.right: parent.right
                             text: "joined: " + joined_at + "  "
                         }
                         Label {
+                            visible: joined_at !== undefined
                             font.pixelSize: Theme.fontSizeSmall
                             anchors.bottom: parent.bottom
                             anchors.right: parent.right

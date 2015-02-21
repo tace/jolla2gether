@@ -64,4 +64,82 @@ ListModel {
         return link
         .replace(pattern, '$1' + '?s=' + size + '&' + '$2')
     }
+
+    //
+    // When calling this, webview must be first directed to page
+    // https://together.jolla.com/users/by-group/2/everyone/?t=user&query=pekka
+    // where 'pekka' is the serach string used to search users
+    function get_user_list_from_user_search_result_page_callback() {
+        clear()
+        urlLoading = true
+        return function(webview) {
+            var script = "(function() { \
+            var retUsersData = ''; \
+            var content = document.getElementById('ContentLeft'); \
+            var user_list_root = content.getElementsByTagName('ul')[0]; \
+            if (user_list_root.getAttribute('class') === 'user-list') { \
+                var user_list = user_list_root.getElementsByTagName('li'); \
+                for (var i = 0; i < user_list.length; i++) { \
+                    var uId = ''; \
+                    var uGravatar = ''; \
+                    var uName = ''; \
+                    var uKarma = ''; \
+                    a_list = user_list[i].getElementsByTagName('a'); \
+                    for (var k = 0; k < a_list.length; k++) { \
+                        if (a_list[k].getAttribute('class') === 'avatar-box') { \
+                            uId = a_list[k].getAttribute('href'); \
+                            img_list = a_list[k].getElementsByTagName('img'); \
+                            for (var j = 0; j < img_list.length; j++) { \
+                                if (img_list[j].getAttribute('class') === 'gravatar') { \
+                                    uGravatar = img_list[j].getAttribute('src'); \
+                                    uName = img_list[j].getAttribute('title'); \
+                                } \
+                            } \
+                        } \
+                    } \
+                    span_list = user_list[i].getElementsByTagName('span'); \
+                    for (var j = 0; j < span_list.length; j++) { \
+                        if (span_list[j].getAttribute('class') === 'reputation-score') { \
+                            uKarma = span_list[j].childNodes[0].nodeValue; \
+                        } \
+                    } \
+                    retUsersData = retUsersData + uId + ','; \
+                    retUsersData = retUsersData + uGravatar + ','; \
+                    retUsersData = retUsersData + uName + ','; \
+                    retUsersData = retUsersData + uKarma + '|_|'; \
+                } \
+            } \
+            return retUsersData; \
+            })()"
+            webview.evaluateJavaScriptOnWebPage(script, function(result) {
+                if (result !== undefined) {
+                    listModel.pagesCount = 1
+                    listModel.currentPageNum = 1
+                    listModel.usersCount = 0
+                    var usersSplit = result.split('|_|')
+                    for (var i = 0; i < usersSplit.length; i++) {
+                        // Stats contain 4 fields: userId,gravatar,username,karma
+                        var statsPart = usersSplit[i].split(',', 4)
+                        var userId = statsPart[0].split("/")[2]  // Userid in format "/users/856/pekkap/"
+                        if (userId.trim() === "")
+                            continue
+                        var gravatar = statsPart[1]
+                        var username = statsPart[2]
+                        var karma = statsPart[3]
+                        console.log("Item: " + userId + "," + username + "," + karma + "," + gravatar)
+                        listModel.append({
+                                             "id" : Number(userId),
+                                             "username" : username,
+                                             "avatar_url" : "https:" + gravatar,
+                                             "reputation" : Number(karma),
+                                             "url" : siteBaseUrl + "/users/" + userId + "/" + username,
+                                        })
+                        listModel.usersCount += 1
+                    }
+                }
+                urlLoading = false
+            })
+        }
+    }
+
 }

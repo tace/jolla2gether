@@ -36,13 +36,24 @@ Page {
     objectName: "Users"
     allowedOrientations: Orientation.All
     property bool navigatedForward: false
+    property bool userSearchActive: false
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
             if (questionsModel.userQuestionsAsked) {
                 questionsModel.restoreModel()
             }
-            attachWebview({browseBackText: "Users"})
+            var props = {}
+            if (userSearchActive) {
+                props = {callbacks: [usersModel.get_user_list_from_user_search_result_page_callback()],
+                         browseBackText: "Users"}
+                userSearchActive = false
+                console.log("Users searched")
+            }
+            else {
+                props = {browseBackText: "Users"}
+            }
+            attachWebview(props)
             navigatedForward = false
         }
         if (status === PageStatus.Inactive) {
@@ -76,7 +87,10 @@ Page {
                 text: qsTr("Search...")
                 onClicked: {
                     unattachWebview()
-                    pageStack.push(Qt.resolvedUrl("SearchUsers.qml"))
+                    var dialog = pageStack.push(Qt.resolvedUrl("SearchUsers.qml"))
+                    dialog.accepted.connect(function() {
+                        userSearchActive = true
+                    })
                 }
             }
             MenuItem {

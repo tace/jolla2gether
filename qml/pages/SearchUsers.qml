@@ -5,7 +5,7 @@ Dialog {
     id: searchPage
     allowedOrientations: Orientation.All
     property string newSearchString: ""
-    property string searchUrlBase: siteBaseUrl + "/users/?t=user&query="
+    property string searchUrlBase: siteBaseUrl + "/users/by-group/2/everyone/?t=user&query="
 
     SilicaFlickable {
         anchors.fill: parent
@@ -29,7 +29,7 @@ Dialog {
                 newSearchString = searchBox.text
             }
             Keys.onReturnPressed: {
-                makeSearch()
+                searchPage.accept()
             }
         }
 
@@ -58,12 +58,6 @@ Dialog {
     }
 
     onAccepted: {
-        makeSearch()
-    }
-
-    function makeSearch() {
-        searchPage.forceActiveFocus()
         siteURL = searchUrlBase + newSearchString
-        pageStack.push(Qt.resolvedUrl("WebView.qml"))
     }
 }
