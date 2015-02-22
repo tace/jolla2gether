@@ -76,7 +76,11 @@ ListModel {
             var script = "(function() { \
             var retUsersData = ''; \
             var content = document.getElementById('ContentLeft'); \
-            var user_list_root = content.getElementsByTagName('ul')[0]; \
+            var root_list = content.getElementsByTagName('ul'); \
+            if (root_list.length === 0) { \
+                return 'Nothing found'; \
+            } \
+            var user_list_root = root_list[0]; \
             if (user_list_root.getAttribute('class') === 'user-list') { \
                 var user_list = user_list_root.getElementsByTagName('li'); \
                 for (var i = 0; i < user_list.length; i++) { \
@@ -116,25 +120,30 @@ ListModel {
                     listModel.pagesCount = 1
                     listModel.currentPageNum = 1
                     listModel.usersCount = 0
-                    var usersSplit = result.split('|_|')
-                    for (var i = 0; i < usersSplit.length; i++) {
-                        // Stats contain 4 fields: userId,gravatar,username,karma
-                        var statsPart = usersSplit[i].split(',', 4)
-                        var userId = statsPart[0].split("/")[2]  // Userid in format "/users/856/pekkap/"
-                        if (userId.trim() === "")
-                            continue
-                        var gravatar = statsPart[1]
-                        var username = statsPart[2]
-                        var karma = statsPart[3]
-                        console.log("Item: " + userId + "," + username + "," + karma + "," + gravatar)
-                        listModel.append({
-                                             "id" : Number(userId),
-                                             "username" : username,
-                                             "avatar_url" : "https:" + gravatar,
-                                             "reputation" : Number(karma),
-                                             "url" : siteBaseUrl + "/users/" + userId + "/" + username,
-                                        })
-                        listModel.usersCount += 1
+                    if (result !== "Nothing found") {
+                        var usersSplit = result.split('|_|')
+                        for (var i = 0; i < usersSplit.length; i++) {
+                            // Stats contain 4 fields: userId,gravatar,username,karma
+                            var statsPart = usersSplit[i].split(',', 4)
+                            var userId = statsPart[0].split("/")[2]  // Userid in format "/users/856/pekkap/"
+                            if (userId.trim() === "")
+                                continue
+                            var gravatar = statsPart[1]
+                            var username = statsPart[2]
+                            var karma = statsPart[3]
+                            console.log("Found user: " + userId + "," + username + "," + karma + "," + gravatar)
+                            listModel.append({
+                                                 "id" : Number(userId),
+                                                 "username" : username,
+                                                 "avatar_url" : "https:" + gravatar,
+                                                 "reputation" : Number(karma),
+                                                 "url" : siteBaseUrl + "/users/" + userId + "/" + username,
+                                            })
+                            listModel.usersCount += 1
+                        }
+                    }
+                    else {
+                        console.log("No users found!")
                     }
                 }
                 urlLoading = false

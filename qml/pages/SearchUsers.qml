@@ -43,17 +43,8 @@ Dialog {
                 top: searchBox.bottom
                 horizontalCenter: parent.horizontalCenter
             }
-            height: 3
+            height: 1
             width: parent.width-64
-        }
-        Label {
-            anchors.top: bottomRec.bottom
-            font.pixelSize: Theme.fontSizeTiny
-            font.italic: true
-            color: Theme.secondaryHighlightColor
-            width: searchPage.width
-            wrapMode: Text.Wrap
-            text: qsTr("Note: User search supported only by web portal (not by API).")
         }
     }
 
