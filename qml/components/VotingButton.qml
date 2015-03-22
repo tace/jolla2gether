@@ -35,8 +35,14 @@ Image {
                 if (!voteOn)
                     voteButton.source = voteButtonPressedImage
                 else {
-                    if (userNotifObject !== null)
-                        userNotifObject.showText(qsTr("Already voted up!"))
+                    if (userNotifObject !== null) {
+                        var msg = "";
+                        if (isUpOrDownButton())
+                            msg = qsTr("Already voted up!")
+                        else
+                            msg = qsTr("Already voted down!")
+                        userNotifObject.showText(msg)
+                    }
                 }
             }
             else {
