@@ -1,5 +1,6 @@
 import QtQuick 2.1
 import Sailfish.Silica 1.0
+import "../components"
 
 Dialog {
     id: searchFilterPage
@@ -7,6 +8,10 @@ Dialog {
     property string newSearchString: questionsModel.searchCriteria
     property string newSortingCriteria: questionsModel.sortingCriteriaQuestions
     property string newSortingOrder: questionsModel.sortingOrder
+
+    ListModel {
+        id: selectedTags
+    }
 
     SilicaFlickable {
         id: mainFlic
@@ -57,6 +62,21 @@ Dialog {
                 id: tagsLabel
                 text: qsTr("Tags search criteria")
             }
+
+            ItemFlowColumn {
+                id: includedTags
+                width: parent.width - 6 * Theme.paddingMedium
+                anchors.horizontalCenter: parent.horizontalCenter
+                itemsArrayModel: getIncludedTags()
+            }
+            ItemFlowColumn {
+                id: ignoredTags
+                width: parent.width - 6 * Theme.paddingMedium
+                dynTextStrikeOut: true
+                anchors.horizontalCenter: parent.horizontalCenter
+                itemsArrayModel: getIgnoredTags()
+            }
+
             Button {
                 id: tagButton
                 text: qsTr("Add/Modify tags to search")
@@ -198,6 +218,21 @@ Dialog {
     Component.onCompleted: {
         sorting.set_value(questionsModel.sortingCriteriaQuestions)
         sortingOrder.set_value(questionsModel.sortingOrder)
+    }
+
+    function getIncludedTags() {
+        var tagsArray = []
+        for (var i = 0; i < modelSearchTagsGlobal.count; i++) {
+            tagsArray[i] = modelSearchTagsGlobal.get(i).tag.toLowerCase()
+        }
+        return tagsArray
+    }
+    function getIgnoredTags() {
+        var tagsArray = []
+        for (var i = 0; i < ignoredSearchTagsGlobal.count; i++) {
+            tagsArray[i] = ignoredSearchTagsGlobal.get(i).tag.toLowerCase()
+        }
+        return tagsArray
     }
 
     function searchStringsChanged() {

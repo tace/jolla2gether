@@ -554,7 +554,6 @@ Page {
             anchors.top: filler.bottom
             anchors.left: parent.left
             anchors.right: voteDownButton.left
-
         }
 
         Column {

@@ -233,7 +233,6 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                             continue
                         }
                     }
-
                     // Filter out questions having ignored tag
                     if (ignoredSearchTagsGlobal.count > 0 && ginfo.tags.length > 0) {
                         var found = false
@@ -248,6 +247,13 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                                 break
                         }
                         if (found) {
+                            filteredCount += 1
+                            continue
+                        }
+                    }
+                    // Filter out questions not matching votes filter (if set)
+                    if (model.numberOfVotesFilter > -1) {
+                        if (ginfo.score < model.numberOfVotesFilter) {
                             filteredCount += 1
                             continue
                         }

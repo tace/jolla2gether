@@ -6,6 +6,8 @@ Rectangle {
     property alias labelText: label.text
     property alias labelFontSize: label.font.pixelSize
     property alias labelColor: label.color
+    property alias labelTextStrikeOut: label.font.strikeout
+
     color: "transparent"
     smooth: true
     border.width: 1
@@ -17,6 +19,7 @@ Rectangle {
         id: label
         anchors.centerIn: parent
         font.pixelSize: Theme.fontSizeTiny
+        font.strikeout: false
         color: Theme.secondaryColor
         text: ""
     }

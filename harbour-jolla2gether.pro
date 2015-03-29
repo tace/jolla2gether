@@ -13,19 +13,17 @@ CONFIG += sailfishapp webkit
 SOURCES += src/harbour-jolla2gether.cpp
 
 OTHER_FILES += qml/harbour-jolla2gether.qml \
-    qml/cover/CoverPage.qml \
-    qml/pages/FirstPage.qml \
     rpm/harbour-jolla2gether.yaml \
     rpm/harbour-jolla2gether.spec \
     harbour-jolla2gether.desktop \
-    js/askbot.js \
+    harbour-jolla2gether.png \
+    harbour-jolla2gether.svg \
+    qml/cover/CoverPage.qml \
+    qml/pages/FirstPage.qml \
     qml/pages/AboutPage.qml \
     qml/pages/QuestionDelegate.qml \
     qml/pages/InfoPage.qml \
-    harbour-jolla2gether.png \
-    harbour-jolla2gether.svg \
     qml/pages/WebView.qml \
-    qml/pages/CreditsModel.qml \
     qml/pages/LicensePage.qml \
     qml/pages/UsersPage.qml \
     qml/pages/UserDelegate.qml \
@@ -33,17 +31,20 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/SortUsers.qml \
     qml/pages/SearchUsers.qml \
     qml/pages/SearchQuestions.qml \
-    qml/pages/QuestionsModel.qml \
-    qml/pages/UsersModel.qml \
-    qml/pages/InfoModel.qml \
     qml/pages/TagSearch.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/Settings.qml \
     qml/pages/QuestionViewPage.qml \
-    js/Markdown.Converter.js \
     qml/pages/AnswersAndCommentsDelegate.qml \
-    qml/components/ItemFlowColumn.qml \
     qml/pages/SelectTags.qml \
+    qml/models/RssFeedModel.qml \
+    qml/models/QuestionsModel.qml \
+    qml/models/UsersModel.qml \
+    qml/models/InfoModel.qml \
+    qml/models/CreditsModel.qml \
+    js/askbot.js \
+    js/Markdown.Converter.js \
+    qml/components/ItemFlowColumn.qml \
     qml/components/ExternalLinkDialog.qml \
     qml/components/ShowRichText.qml \
     qml/components/ShowRichTextWithLinkActions.qml \
@@ -51,7 +52,6 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/components/DynamicTextRectangle.qml \
     qml/components/StatsRectangle.qml \
     qml/components/StatsRow.qml \
-    qml/models/RssFeedModel.qml \
     qml/components/SearchBanner.qml \
     qml/components/VotingButton.qml \
     qml/components/QuestionTypeSelector.qml

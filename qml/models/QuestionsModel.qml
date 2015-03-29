@@ -4,6 +4,8 @@ import "../../js/askbot.js" as Askbot
 ListModel {
     id: listModel
 
+    property string webviewRelativeUrl: "../pages/WebView.qml"
+    property string questionViewPageRelativeUrl: "../pages/QuestionViewPage.qml"
     // Questions counters
     property int pagesCount: 0;
     property int currentPageNum: 1;
@@ -17,6 +19,7 @@ ListModel {
     property bool answeredQuestionsFilter: answeredQuestionsFilter_DEFAULT
     property bool unansweredQuestionsFilter_DEFAULT: false
     property bool unansweredQuestionsFilter: unansweredQuestionsFilter_DEFAULT
+    property int numberOfVotesFilter: -1
 
     // Sorting questions
     property string sort_ACTIVITY:      "activity"
@@ -97,8 +100,13 @@ ListModel {
                     console.log("Hit question amount filter. View already contains " + listModel.count + " questions, which is >= " + questionAmountFilter + ". Stop loading more pages!")
                     return false
                 }
+                console.log("Requesting questions for page " + askedPage + ", with qamountFilter " + questionAmountFilter)
+                get_questions(askedPage, onLoadedCallback)
             }
-            get_questions(askedPage, onLoadedCallback)
+            else {
+                console.log("Requesting questions recursively for page " + askedPage + ", upto " + listModel.count + " + 30")
+                get_next_questions_recursive(0, onLoadedCallback, listModel.count + 30)
+            }
             return true
         }
     }
@@ -119,6 +127,7 @@ ListModel {
         var totalFilteredCount = currentfilteredCount
         var wasCalled = get_nextPageQuestions(function(filteredCount) {
             totalFilteredCount += filteredCount
+            console.log("Got results of get_nextPageQuestions. Filtered " + filteredCount)
             get_next_questions_recursive(totalFilteredCount, undefined, questionAmountFilter)
         }, questionAmountFilter)
         if (!wasCalled) {
@@ -128,7 +137,7 @@ ListModel {
                 onLoadedCallback()
         }
         else {
-            console.log("Called nextPage questions and filterCount is " + totalFilteredCount)
+            console.log("Called nextPage questions...")
         }
     }
 
@@ -154,10 +163,10 @@ ListModel {
 
         //printProps(properties)
         if (attached) {
-            return pageStack.pushAttached(Qt.resolvedUrl("WebView.qml"), properties)
+            return pageStack.pushAttached(Qt.resolvedUrl(webviewRelativeUrl), properties)
         }
         else {
-            return pageStack.push(Qt.resolvedUrl("WebView.qml"), properties)
+            return pageStack.push(Qt.resolvedUrl(webviewRelativeUrl), properties)
         }
     }
 
@@ -179,16 +188,16 @@ ListModel {
             }
             questionsModel.update_question(questionId, index_in_model, function() {
                 if (replace)
-                    pageStack.replace(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+                    pageStack.replace(Qt.resolvedUrl(questionViewPageRelativeUrl), props)
                 else
-                    pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+                    pageStack.push(Qt.resolvedUrl(questionViewPageRelativeUrl), props)
             })
         }
         else
             if (replace)
-                pageStack.replace(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+                pageStack.replace(Qt.resolvedUrl(questionViewPageRelativeUrl), props)
             else
-                pageStack.push(Qt.resolvedUrl("QuestionViewPage.qml"), props)
+                pageStack.push(Qt.resolvedUrl(questionViewPageRelativeUrl), props)
     }
     function getInAppClickedQuestionIndex() {
         if (indexOfInAppClickedQuestion !== -1)

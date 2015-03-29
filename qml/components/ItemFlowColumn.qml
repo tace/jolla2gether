@@ -7,6 +7,7 @@ Column {
     height: childrenRect.height
     property alias itemsArrayModel: flowRepeater.model
     property alias flowSpacing: flowIt.spacing
+    property bool dynTextStrikeOut: false
     anchors.leftMargin: Theme.paddingMedium
     anchors.rightMargin: Theme.paddingMedium
 
@@ -23,6 +24,7 @@ Column {
             delegate:
                 DynamicTextRectangle {
                 id: dynamicRec
+                labelTextStrikeOut: dynTextStrikeOut
                 visible: itemsArrayModel.length > 0 && itemsArrayModel[0] !== ""
                 labelText: modelData
             }

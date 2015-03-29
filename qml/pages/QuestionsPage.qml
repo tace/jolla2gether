@@ -198,7 +198,7 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignHCenter
-                text: questionsModel.questionsCount +
+                text: questionListView.count + "/" + questionsModel.questionsCount +
                       " questions (pages loaded " +
                       questionsModel.currentPageNum + "/" +
                       questionsModel.pagesCount + ")"

@@ -236,8 +236,27 @@ Page {
                 width: getStatLabelMaxWidth()
                 height: childrenRect.height
                 Label {
+                    id: infoGroupsText
+                    anchors.left: parent.left
+                    horizontalAlignment: Text.AlignLeft
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: qsTr("Groups") + ":"
+                }
+                Label {
+                    id: infoGroupsValue
+                    anchors.top: infoGroupsText.top
+                    anchors.left: infoGroupsText.right
+                    anchors.right: parent.right
+                    horizontalAlignment: Text.AlignRight
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: infoModel.groups
+                }
+                Label {
                     id: infoUsersText
                     anchors.left: parent.left
+                    anchors.top: infoGroupsValue.bottom
                     horizontalAlignment: Text.AlignLeft
                     color: Theme.secondaryColor
                     font.pixelSize: Theme.fontSizeSmall
@@ -322,6 +341,8 @@ Page {
 
     function getStatLabelMaxWidth() {
         var res_width = 0
+        if (infoGroupsText.paintedWidth + infoGroupsValue.paintedWidth > res_width)
+            res_width = infoGroupsText.width + infoGroupsValue.width
         if (infoUsersText.paintedWidth + infoUsersValue.paintedWidth > res_width)
             res_width = infoUsersText.width + infoUsersValue.width
         if (infoQuestionsText.paintedWidth + infoQuestionsValue.paintedWidth > res_width)
