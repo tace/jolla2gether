@@ -39,6 +39,7 @@ Page {
     property bool followed: false
     property var startTime
     property var endTime
+    property int landScapeMode: phoneOrientation
 
     InfoBanner {
         id: infoBanner
@@ -70,16 +71,6 @@ Page {
                                             idx,
                                             true,
                                             props)
-    }
-
-    onFollowedStatusLoadedChanged: {
-        if (followedStatusLoaded) {
-            if (answersAndCommentsClicked) {
-                // If user has already clicked answersAndComments open, do it actually just now after
-                // followedStatus loading is finished to make sure webview is ready for it.
-                rssFeedModel.source = rssFeedUrl
-            }
-        }
     }
 
     function loadAnswersAndComments() {
@@ -286,6 +277,37 @@ Page {
         console.log("UserId Changed to: " + userId)
         usersModel.get_user(userId, setUserData)
     }
+
+    onFollowedStatusLoadedChanged: {
+        if (followedStatusLoaded) {
+            if (answersAndCommentsClicked) {
+                // If user has already clicked answersAndComments open, do it actually just now after
+                // followedStatus loading is finished to make sure webview is ready for it.
+                rssFeedModel.source = rssFeedUrl
+            }
+        }
+    }
+
+    onLandScapeModeChanged: {
+        if (landScapeMode === Orientation.Landscape ||
+            landScapeMode === Orientation.LandscapeInverted) {
+            console.log("turning to landscape mode")
+            voteUpButton.anchors.bottom = undefined
+            voteUpButton.anchors.top = askedAdUpdatedTimesRec.top
+
+            statsRow.anchors.bottom = undefined
+            statsRow.anchors.top = voteUpButton.bottom
+        }
+        else {
+            console.log("turning to normal mode")
+            statsRow.anchors.top = undefined
+            statsRow.anchors.bottom = askedAdUpdatedTimesRec.bottom
+
+            voteUpButton.anchors.top = undefined
+            voteUpButton.anchors.bottom = statsRow.top
+        }
+    }
+
 
     onStatusChanged: {
         if (status === PageStatus.Active && (url !== "" || externalUrl !== ""))
@@ -498,17 +520,6 @@ Page {
             }
         }
 
-        StatsRow {
-            id: statsRow
-            timesVisible: false
-            parentWidth: parent.width -
-                         askedAdUpdatedTimesRec.width -
-                         followedIcon.width -
-                         Theme.paddingMedium    // left of askedAdUpdatedTimesRec
-            anchors.bottom: askedAdUpdatedTimesRec.bottom
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.paddingMedium
-        }
         // Voting buttons
         VotingButton {
             id: voteUpButton
@@ -524,6 +535,17 @@ Page {
             oppositeVoteButton: voteDownButton
             initialVotes: votes
             votingTargetId: qid
+        }
+        StatsRow {
+            id: statsRow
+            timesVisible: false
+            parentWidth: parent.width -
+                         askedAdUpdatedTimesRec.width -
+                         followedIcon.width -
+                         Theme.paddingMedium    // left of askedAdUpdatedTimesRec
+            anchors.bottom: askedAdUpdatedTimesRec.bottom
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.paddingMedium
         }
         VotingButton {
             id: voteDownButton
