@@ -87,7 +87,8 @@ ListItem  {
         var color = Theme.primaryColor
         // If item selected either from list or Cover, make color highlighted
         if (background.highlighted ||
-                (index === coverProxy.currentQuestion - 1)) {
+            (index === coverProxy.currentQuestion - 1) ||
+            (questionListView.currentIndex === index)) {
             color = Theme.highlightColor
         }
         return color
@@ -180,7 +181,10 @@ ListItem  {
         ContextMenu {
             MenuItem {
                 text: qsTr("Copy url to clipboard")
-                onClicked: Clipboard.text = url
+                onClicked: {
+                    Clipboard.text = url
+                    questionListView.currentIndex = index
+                }
             }
             MenuItem {
                 visible: !userIdSearch  // disable rerursive user selections

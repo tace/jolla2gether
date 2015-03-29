@@ -44,6 +44,7 @@ Page {
             connections.target = coverProxy
             if (!userIdSearch && questionsModel.userQuestionsAsked) {
                 questionsModel.restoreModel()
+                questionListView.currentIndex = questionsModel.listViewCurrentIndex
                 questionListView.positionViewAtIndex(questionsModel.listViewCurrentIndex, ListView.Center);
             }
             questionsModel.removeInAppClickedQuestionFromModel()
