@@ -589,6 +589,17 @@ Page {
                 height: hasTags() ? Theme.paddingLarge : 0
             }
 
+            // Show question status (closed/answered)
+            Label {
+                id: questionStatusLabel
+                visible: questionsModel.getQuestionClosedAnsweredStatusAsText(index) !== ""
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.paddingMedium
+                font.pixelSize: getPageTextFontSize()
+                width: parent.width
+                text: questionsModel.getQuestionClosedAnsweredStatusAsText(index)
+            }
+
             ShowRichTextWithLinkActions {
                 id: questionText
                 fontSize: getPageTextFontSize()

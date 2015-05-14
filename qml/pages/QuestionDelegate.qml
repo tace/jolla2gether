@@ -93,16 +93,6 @@ ListItem  {
         }
         return color
     }
-    function getStatusPrefixText() {
-        var ret_text = ""
-        if(closed) {
-            ret_text = "<font color=\"lightgreen\" size=\"1\">[closed] </font>"
-        }
-        if (has_accepted_answer) {
-            ret_text = ret_text + "<font color=\"orange\" size=\"1\">[answered] </font>"
-        }
-        return ret_text
-    }
     function is2LinesForTitle() {
         if (appSettings.qUESTION_LIST_TITLE_SPACE_VALUE === appSettings.qUESTION_LIST_TITLE_SPACE_VALUE_ONE_LINE)
             return false
@@ -122,7 +112,7 @@ ListItem  {
         maximumLineCount: is2LinesForTitle() ? 2 : 1
         elide: is2LinesForTitle() ? Text.ElideRight : Text.ElideNone
         wrapMode: is2LinesForTitle() ? Text.WrapAtWordBoundaryOrAnywhere : Text.NoWrap
-        text: getStatusPrefixText() + title
+        text: questionsModel.getQuestionClosedAnsweredStatusAsText(index) + title
     }
     ItemFlowColumn {
         id: tagsFlowColumn

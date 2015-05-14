@@ -644,4 +644,16 @@ ListModel {
         var seconds = rssPubDate2Seconds(rssPubDate)
         return Askbot.getTimeDurationAsString(seconds).trim()
     }
+
+    // Returns question status (closed/answered or both) as formatted text to be shown in ui
+    function getQuestionClosedAnsweredStatusAsText(index_in_model) {
+        var ret_text = ""
+        if(get(index_in_model).closed) {
+            ret_text = "<font color=\"lightgreen\" size=\"1\">[closed] </font>"
+        }
+        if (get(index_in_model).has_accepted_answer) {
+            ret_text = ret_text + "<font color=\"orange\" size=\"1\">[answered] </font>"
+        }
+        return ret_text
+    }
 }
