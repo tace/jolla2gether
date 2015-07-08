@@ -30,6 +30,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 Page {
     id: usersPage
@@ -81,16 +82,13 @@ Page {
             title: qsTr("Users")
         }
 
+
         // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
                 text: qsTr("Search...")
                 onClicked: {
-                    unattachWebview()
-                    var dialog = pageStack.push(Qt.resolvedUrl("SearchUsers.qml"))
-                    dialog.accepted.connect(function() {
-                        userSearchActive = true
-                    })
+                    searchUsers()
                 }
             }
             MenuItem {
@@ -120,6 +118,33 @@ Page {
             delegate: UserDelegate { id: userDelegate }
             VerticalScrollDecorator { flickable: usersListView }
 
+            focus: true
+            Keys.onEscapePressed: {
+                pageStack.navigateBack()
+            }
+            Keys.onUpPressed: {
+                decrementCurrentIndex()
+            }
+            Keys.onDownPressed: {
+                incrementCurrentIndex()
+                if ((currentIndex + 1) === count) {
+                    usersModel.get_nextPageUsers()
+                }
+            }
+            CtrlPlusKeyPressed {
+                id: ctrlHandler
+                key: Qt.Key_F
+                onCtrlKeyPressed: {
+                    searchUsers()
+                }
+            }
+            Keys.onPressed: {
+                ctrlHandler.Keys.pressed(event)
+            }
+            Keys.onReleased: {
+                ctrlHandler.Keys.released(event)
+            }
+
             onMovementEnded: {
                 if(atYEnd) {
                     usersModel.get_nextPageUsers()
@@ -127,6 +152,14 @@ Page {
             }
         }
     }
+    function searchUsers() {
+        unattachWebview()
+        var dialog = pageStack.push(Qt.resolvedUrl("SearchUsers.qml"))
+        dialog.accepted.connect(function() {
+            userSearchActive = true
+        })
+    }
+
 }
 
 

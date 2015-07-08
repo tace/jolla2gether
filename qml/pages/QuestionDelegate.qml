@@ -12,6 +12,10 @@ ListItem  {
     property string tagsString: tags
     property var tagsArray: null
 
+    Keys.onReturnPressed: {
+        clicked(MouseArea)
+    }
+
     onClicked: {
         questionListView.currentIndex = index
         siteURL = url;

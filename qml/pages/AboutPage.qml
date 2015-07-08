@@ -12,6 +12,10 @@ Page {
         anchors.top: parent.top
         anchors.topMargin: Theme.paddingLarge * 3
         contentHeight: column1.height
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
 
         Column{
             id: column1

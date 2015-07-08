@@ -17,6 +17,21 @@ Dialog {
         id: mainFlic
         anchors.fill: parent
         contentHeight: content_column.height
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
+        function ensureVisible(r)
+        {
+            if (contentX >= r.x)
+                contentX = r.x;
+            else if (contentX+width <= r.x+r.width)
+                contentX = r.x+r.width-width;
+            if (contentY >= r.y)
+                contentY = r.y;
+            else if (contentY+height <= r.y+r.height)
+                contentY = r.y+r.height-height;
+        }
 
         PullDownMenu {
             MenuItem {
@@ -50,12 +65,11 @@ Dialog {
                 onTextChanged: {
                     newSearchString = searchBox.text
                 }
-                Keys.onEnterPressed: {
-                    searchFilterPage.forceActiveFocus()
-                }
                 Keys.onReturnPressed: {
                     searchFilterPage.forceActiveFocus()
                 }
+                focus: true
+                KeyNavigation.down: tagButton
             }
 
             SectionHeader {
@@ -87,6 +101,14 @@ Dialog {
                     questionsModel.includeTagsChanged = false
                     questionsModel.ignoreTagsChanged = false
                 }
+                KeyNavigation.up: searchBox
+                KeyNavigation.down: closedSwitch
+                Keys.onReturnPressed: {
+                    clicked(MouseArea)
+                }
+                onFocusChanged: {
+                    mainFlic.ensureVisible(tagButton)
+                }
             }
 
             SectionHeader {
@@ -97,18 +119,42 @@ Dialog {
                 checked: questionsModel.closedQuestionsFilter
                 description: qsTr("List also closed questions")
                 text: qsTr("Closed questions")
+                KeyNavigation.up: tagButton
+                KeyNavigation.down: answeredSwitch
+                Keys.onReturnPressed: {
+                    checked = !checked
+                }
+                onFocusChanged: {
+                    mainFlic.ensureVisible(closedSwitch)
+                }
             }
             TextSwitch {
                 id: answeredSwitch
                 checked: questionsModel.answeredQuestionsFilter
                 description: qsTr("List also questions having accepted answers")
                 text: qsTr("Answered questions")
+                KeyNavigation.up: closedSwitch
+                KeyNavigation.down: unansweredSwitch
+                Keys.onReturnPressed: {
+                    checked = !checked
+                }
+                onFocusChanged: {
+                    mainFlic.ensureVisible(answeredSwitch)
+                }
             }
             TextSwitch {
                 id: unansweredSwitch
                 checked: questionsModel.unansweredQuestionsFilter
                 description: qsTr("List only questions having no answers yet. (Overrides 'Answered questions' selection)")
                 text: qsTr("Unanswered questions")
+                KeyNavigation.up: answeredSwitch
+                KeyNavigation.down: sorting
+                Keys.onReturnPressed: {
+                    checked = !checked
+                }
+                onFocusChanged: {
+                    mainFlic.ensureVisible(unansweredSwitch)
+                }
             }
 
             SectionHeader {
@@ -116,6 +162,15 @@ Dialog {
             }
             ComboBox {
                 id: sorting
+                KeyNavigation.up: unansweredSwitch
+                KeyNavigation.down: sortingOrder
+                Keys.onReturnPressed: {
+                    clicked(MouseArea)
+                }
+                onFocusChanged: {
+                    mainFlic.ensureVisible(sorting)
+                }
+
                 function set_value(value) {
                     var val = 0
                     if (value === questionsModel.sort_ACTIVITY)
@@ -130,29 +185,43 @@ Dialog {
                 }
                 label: qsTr("Sort by")
                 menu: ContextMenu {
-                    MenuItem {                        
+                    focus: true
+                    Keys.onEscapePressed: {
+                        close()
+                    }
+                    MenuItem {
+                        id: sortmenuDefault
                         text: qsTr("Activity (Default)")
                         onClicked: {
                             newSortingCriteria = questionsModel.sort_ACTIVITY
                         }
+                        KeyNavigation.down: sortmenuAge
                     }
                     MenuItem {
+                       id: sortmenuAge
                        text: qsTr("Date")
                        onClicked: {
                            newSortingCriteria = questionsModel.sort_AGE
                        }
+                       KeyNavigation.up: sortmenuDefault
+                       KeyNavigation.down: sortmenuAnswers
                     }
                     MenuItem {
+                       id: sortmenuAnswers
                        text: qsTr("Answers")
                        onClicked: {
                            newSortingCriteria = questionsModel.sort_ANSWERS
                        }
+                       KeyNavigation.up: sortmenuAge
+                       KeyNavigation.down: sortmenuVotes
                     }
                     MenuItem {
+                       id: sortmenuVotes
                        text: qsTr("Votes")
                        onClicked: {
                            newSortingCriteria = questionsModel.sort_VOTES
                        }
+                       KeyNavigation.up: sortmenuAnswers
                     }
                 }
             }
@@ -161,6 +230,14 @@ Dialog {
             }
             ComboBox {
                 id: sortingOrder
+                KeyNavigation.up: sorting
+                Keys.onReturnPressed: {
+                    clicked(MouseArea)
+                }
+                onFocusChanged: {
+                    mainFlic.ensureVisible(sortingOrder)
+                }
+
                 function set_value(value) {
                     var val = 0
                     if (value === questionsModel.sort_ORDER_DESC)
@@ -198,7 +275,7 @@ Dialog {
                 wrapMode: Text.Wrap
                 text: qsTr("Note: Search criterias are global among all questions and persists untill changed from this page")
             }
-        }
+        }        
     }
 
     onAccepted: {
@@ -218,6 +295,7 @@ Dialog {
     Component.onCompleted: {
         sorting.set_value(questionsModel.sortingCriteriaQuestions)
         sortingOrder.set_value(questionsModel.sortingOrder)
+        searchBox.forceActiveFocus()
     }
 
     function getIncludedTags() {

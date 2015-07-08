@@ -7,11 +7,23 @@ ListItem  {
     anchors.right: ListView.right
     contentHeight: Theme.itemSizeLarge
     menu: contextMenu
+    Keys.onReturnPressed: {
+        clicked(MouseArea)
+    }
 
     onClicked: {
         siteURL = url
         navigatedForward = true
         pageStack.navigateForward()
+    }
+    function getTitleColor() {
+        var color = Theme.primaryColor
+        // If item selected either from list or Cover, make color highlighted
+        if (background.highlighted ||
+            (usersListView.currentIndex === index)) {
+            color = Theme.highlightColor
+        }
+        return color
     }
 
     Column{
@@ -26,7 +38,7 @@ ListItem  {
             Label {
                 id: userLabel
                 font.pixelSize: Theme.fontSizeSmall
-                color: parent.highlighted ? Theme.highlightColor : Theme.primaryColor
+                color: getTitleColor()
                 font.bold: model.url === siteURL
                 text: " " + username
             }

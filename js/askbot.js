@@ -173,6 +173,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
     var xhr = new XMLHttpRequest();
     var url = siteBaseUrl + "/api/v1/questions/" + query_params
     urlLoading = true
+    model.loadingInProgress = true
     console.log(url)
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function()
@@ -289,6 +290,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                 console.log("Error: " + xhr.status)
             }
             urlLoading = false
+            model.loadingInProgress = false
         }
     }
     xhr.timeout = 4000;
@@ -403,6 +405,7 @@ function get_users_httpReq(model, query_params)
     var xhr = new XMLHttpRequest();
     var url = siteBaseUrl + "/api/v1/users/" + query_params
     urlLoading = true
+    model.loadingInProgress = true
     console.log(url)
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function()
@@ -442,6 +445,7 @@ function get_users_httpReq(model, query_params)
                 console.log("Error: " + xhr.status)
             }
             urlLoading = false
+            model.loadingInProgress = false
         }
     }
     xhr.timeout = 4000;

@@ -17,6 +17,11 @@ Page {
         overridePageStackNavigation: true
         width: webviewPage.orientation === Orientation.Portrait ? 540 : 960
         height: webviewPage.orientation === Orientation.Portrait ? 960 : 540
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
+
         onLoadingChanged:
         {
             if (loadRequest.status === WebView.LoadStartedStatus)
@@ -26,7 +31,7 @@ Page {
             if (loadRequest.status === WebView.LoadSucceededStatus) {
                 console.log("webview succeeded to load url " + url)
                 setUrlLoadding(false)
-                webviewPage.forceActiveFocus()
+                //webviewPage.forceActiveFocus()
                 if (callbacks !== null){
                     for (var i=0; i < callbacks.length; i++) {
                         console.log("run callback in webview")

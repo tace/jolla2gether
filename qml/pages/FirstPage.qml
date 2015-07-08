@@ -30,6 +30,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 Page {
     id: pageFirst
@@ -62,6 +63,30 @@ Page {
     SilicaFlickable {
         anchors.fill: parent
         width: parent.width
+        focus: true
+        CtrlPlusKeyPressed {
+            id: ctrlHandlerQuestions
+            key: Qt.Key_Q
+            onCtrlKeyPressed: {
+                selectQuestions()
+            }
+        }
+        CtrlPlusKeyPressed {
+            id: ctrlHandlerUsers
+            key: Qt.Key_U
+            onCtrlKeyPressed: {
+                selectUsers()
+            }
+        }
+        CtrlPlusKeyPressed {
+            id: ctrlHandlerSettings
+            key: Qt.Key_S
+            onCtrlKeyPressed: {
+                selectSettings()
+            }
+        }
+        Keys.forwardTo: [ctrlHandlerQuestions, ctrlHandlerUsers, ctrlHandlerSettings]
+
         PageHeader {
             id: header
             height: headerRow.height
@@ -70,6 +95,7 @@ Page {
                 height: childrenRect.height
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingLarge
+                anchors.bottomMargin: Theme.paddingLarge
                 y: Theme.itemSizeLarge/2 - height/2
                 Image{
                     source: "image://theme/icon-m-jolla"
@@ -100,8 +126,7 @@ Page {
             MenuItem {
                 text: qsTr("Settings")
                 onClicked: {
-                    unattachWebview()
-                    pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
+                    selectSettings()
                 }
             }
             MenuItem {
@@ -125,21 +150,14 @@ Page {
             MenuItem {
                 text: qsTr("Users")
                 onClicked: {
-                    unattachWebview()
-                    usersModel.refresh()
-                    pageStack.push(Qt.resolvedUrl("UsersPage.qml"))
+                    selectUsers()
                 }
             }
             MenuItem {
                 text: qsTr("Questions")
                 onClicked:
                 {
-                    unattachWebview()
-                    // Make default always to all questions
-                    questionsModel.resetUserIdSearchCriteria()
-                    questionsModel.pageHeader = questionsModel.pageHeader_ALL_QUESTIONS
-                    questionsModel.refresh()
-                    pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
+                    selectQuestions()
                 }
             }
         }
@@ -149,6 +167,7 @@ Page {
             spacing: 20
             anchors.top: header.bottom
             anchors.centerIn: parent
+            anchors.topMargin: Theme.paddingMedium
             anchors.leftMargin: Theme.paddingMedium
             anchors.rightMargin: Theme.paddingMedium
             height: childrenRect.height
@@ -354,6 +373,23 @@ Page {
         return res_width
     }
 
+    function selectQuestions() {
+        unattachWebview()
+        // Make default always to all questions
+        questionsModel.resetUserIdSearchCriteria()
+        questionsModel.pageHeader = questionsModel.pageHeader_ALL_QUESTIONS
+        questionsModel.refresh()
+        pageStack.push(Qt.resolvedUrl("QuestionsPage.qml"))
+    }
+    function selectUsers() {
+        unattachWebview()
+        usersModel.refresh()
+        pageStack.push(Qt.resolvedUrl("UsersPage.qml"))
+    }
+    function selectSettings() {
+        unattachWebview()
+        pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
+    }
 
     Connections {
         target: coverProxy

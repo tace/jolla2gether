@@ -10,6 +10,10 @@ Dialog {
     {
         anchors.fill: parent
         contentHeight: sortTypeColumn.height
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
 
         Column {
             id: sortTypeColumn

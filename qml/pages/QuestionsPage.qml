@@ -39,6 +39,10 @@ Page {
     property bool userIdSearch: false
     property var pageCounter: null // To keep track in whihc level of questionsPage we are
 
+    InfoBanner {
+        id: infoBanner
+    }
+
     onStatusChanged: {
         if (status === PageStatus.Active) {
             connections.target = coverProxy
@@ -375,6 +379,39 @@ Page {
                 anchors.leftMargin: Theme.paddingSmall
                 anchors.rightMargin: Theme.paddingSmall
                 clip: true //  to have the out of view items clipped nicely.
+
+                focus: true
+                Keys.onEscapePressed: {
+                    pageStack.navigateBack()
+                }
+                Keys.onUpPressed: {
+                    decrementCurrentIndex()
+                }
+                Keys.onDownPressed: {
+                    incrementCurrentIndex()
+                    if ((currentIndex + 1) === count) {
+                        questionsModel.get_nextPageQuestions()
+                    }
+                }
+                CtrlPlusKeyPressed {
+                    id: ctrlHandler
+                    key: Qt.Key_F
+                    onCtrlKeyPressed: {
+                        if (questionsModel.pageHeader !== questionsModel.pageHeader_FOLLOWED_QUESTIONS) {
+                            infoBanner.showText(qsTr("Ctrl+f pressed, opening search page..."))
+                            pageStack.push(Qt.resolvedUrl("SearchQuestions.qml"))
+                        }
+                        else {
+                            infoBanner.showText(qsTr("Ctrl+f pressed, cannot seach on followed questions, seach page not opened."))
+                        }
+                    }
+                }
+                Keys.onPressed: {
+                    ctrlHandler.Keys.pressed(event)
+                }
+                Keys.onReleased: {
+                    ctrlHandler.Keys.released(event)
+                }
 
                 model: questionsModel
                 onCurrentIndexChanged: questionsModel.listViewCurrentIndex = currentIndex

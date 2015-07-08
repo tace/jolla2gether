@@ -61,6 +61,7 @@ ListModel {
     // Keep index and question ID of in-app clicked question
     property int indexOfInAppClickedQuestion: -1
     property string questionIdOfClickedTogetherLink: ""
+    property bool loadingInProgress: false
 
     function refresh(page, onLoadedCallback)
     {
@@ -112,7 +113,11 @@ ListModel {
     }
     function get_questions(page, onLoadedCallback)
     {
-        Askbot.get_questions(listModel, page, onLoadedCallback)
+        if (!listModel.loadingInProgress) {
+            Askbot.get_questions(listModel, page, onLoadedCallback)
+        } else {
+            console.log("Questions loading in progress, cannot request new questions now!")
+        }
     }
     function update_question(questionId, index_in_model, callback) {
         Askbot.update_question(listModel, index_in_model, questionId, callback)

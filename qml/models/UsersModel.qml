@@ -16,6 +16,7 @@ ListModel {
     property string sort_USERNAME:      "username" // API doc (http://askbot.org/doc/api.html) has bug as it's "name" there.
 
     property string sortingCriteriaUsers:           sort_REPUTATION;
+    property bool loadingInProgress: false
 
     function refresh(page)
     {
@@ -35,11 +36,19 @@ ListModel {
             console.log("no more pages to load!")
         }
         else
-            get_users(askedPage)
+            if (!listModel.loadingInProgress) {
+                get_users(askedPage)
+            } else {
+                console.log("User loading in progress, cannot request new users now!")
+            }
     }
     function get_users(page)
     {
-        Askbot.get_users(listModel, page)
+        if (!listModel.loadingInProgress) {
+            Askbot.get_users(listModel, page)
+        } else {
+            console.log("User loading in progress, cannot request new users now!")
+        }
     }
 
     //

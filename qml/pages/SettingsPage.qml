@@ -16,6 +16,23 @@ Dialog {
         anchors.fill: parent
         contentHeight: content_column.height
 
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
+        Keys.onUpPressed: {
+            scrollUp()
+        }
+        Keys.onDownPressed: {
+            scrollDown()
+        }
+        function scrollDown () {
+            contentY = Math.min (contentY + (height / 4), contentHeight - height);
+        }
+        function scrollUp () {
+            contentY = Math.max (contentY - (height / 4), 0);
+        }
+
         Column {
             id: content_column
             spacing: 2

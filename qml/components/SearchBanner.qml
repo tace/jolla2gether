@@ -53,6 +53,7 @@ Drawer {
                         //resetMainSearch()
                         //resetModelSearch()
                         hide()
+                        mainFlickable.focus = true
                     }
                 }
                 IconButton {
@@ -76,6 +77,7 @@ Drawer {
                 anchors.horizontalCenter: parent.horizontalCenter
                 SearchField {
                     id: searchField
+                    focus: true
                     width: parent.width
                     font.pixelSize: Theme.fontSizeSmall
                     placeholderText: qsTr("Search...")

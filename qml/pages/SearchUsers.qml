@@ -9,6 +9,10 @@ Dialog {
 
     SilicaFlickable {
         anchors.fill: parent
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
 
         DialogHeader {
             id: header;

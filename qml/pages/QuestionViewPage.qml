@@ -44,6 +44,7 @@ Page {
     InfoBanner {
         id: infoBanner
     }
+
     ListModel {
         id: finalRssModel
         property bool ready: false
@@ -271,6 +272,7 @@ Page {
 
     Component.onCompleted: {
         tagsArray = getTagsArray()
+        contentFlickable.focus = true // Set focus for enabling keyboard presses
     }
 
     onUserIdChanged: {
@@ -344,6 +346,36 @@ Page {
         anchors.fill: parent
         contentHeight: heighBeforeTextContent() +
                        questionTextContentColumn.height
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
+        Keys.onUpPressed: {
+            scrollUp()
+        }
+        Keys.onDownPressed: {
+            scrollDown()
+        }
+        CtrlPlusKeyPressed {
+            id: ctrlHandler
+            key: Qt.Key_F
+            onCtrlKeyPressed: {
+                searchBanner.show()
+            }
+        }
+        Keys.onPressed: {
+            ctrlHandler.Keys.pressed(event)
+        }
+        Keys.onReleased: {
+            ctrlHandler.Keys.released(event)
+        }
+
+        function scrollDown () {
+            contentY = Math.min (contentY + (height / 4), contentHeight - height);
+        }
+        function scrollUp () {
+            contentY = Math.max (contentY - (height / 4), 0);
+        }
 
         PageHeader {
             id: pageHeader

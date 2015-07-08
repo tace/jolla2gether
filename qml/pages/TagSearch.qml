@@ -29,6 +29,11 @@ Page {
     SilicaFlickable {
         anchors.fill: parent
 
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
+
         PageHeader {
             id: header
             title: getPageHeaderText()
@@ -85,15 +90,13 @@ Page {
 
                     onTextChanged: {
                         modelSearchTags.get(index).tag = text
-                        addNewTagItem()
-                    }
-                    Keys.onEnterPressed: {
-                        addNewTagItem()
-                        tagSearchPage.forceActiveFocus()
                     }
                     Keys.onReturnPressed: {
                         addNewTagItem()
-                        tagSearchPage.forceActiveFocus()
+                        //tagSearchPage.forceActiveFocus()
+                    }
+                    Component.onCompleted: {
+                        forceActiveFocus()
                     }
                 }
                 IconButton {

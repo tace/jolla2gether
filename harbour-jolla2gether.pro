@@ -54,7 +54,8 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/components/StatsRow.qml \
     qml/components/SearchBanner.qml \
     qml/components/VotingButton.qml \
-    qml/components/QuestionTypeSelector.qml
+    qml/components/QuestionTypeSelector.qml \
+    qml/components/CtrlPlusKeyPressed.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}

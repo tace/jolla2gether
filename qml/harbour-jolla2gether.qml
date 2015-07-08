@@ -47,6 +47,7 @@ ApplicationWindow
     property bool webviewWasActiveWhenUnattached: false
     property int phoneOrientation: deviceOrientation
 
+
     Settings {
         id: appSettings
     }
