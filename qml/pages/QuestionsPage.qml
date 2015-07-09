@@ -149,13 +149,11 @@ Page {
             infoTextLabel.text = text
             infoDrawer.open = true
         }
-
         background: SilicaFlickable {
             id: drawerView
             anchors.fill: parent
             contentHeight: 340
             clip: true
-
             Item {
                 visible: infoDrawer.open
                 width: parent.width

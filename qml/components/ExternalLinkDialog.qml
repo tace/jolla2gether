@@ -21,6 +21,27 @@ Dialog {
         anchors.fill: parent
         contentHeight: content_column.height
         contentWidth: width
+        focus: true
+        Keys.onEscapePressed: {
+            pageStack.navigateBack()
+        }
+        Keys.onReturnPressed: {
+            accept()
+        }
+        KeyNavigation.down: webview
+
+        function ensureVisible(r)
+        {
+            if (contentX >= r.x)
+                contentX = r.x;
+            else if (contentX+width <= r.x+r.width)
+                contentX = r.x+r.width-width;
+            if (contentY >= r.y)
+                contentY = r.y;
+            else if (contentY+height <= r.y+r.height)
+                contentY = r.y+r.height-height;
+        }
+
         Column {
             id: content_column
             spacing: 2
@@ -53,6 +74,13 @@ Dialog {
                     copyLink.checked = false
                     saveImage.checked = false
                 }
+                KeyNavigation.down: webview
+                onFocusChanged: {
+                    if (focus) {
+                        mainFlic.ensureVisible(jolla2getherapp)
+                        clicked(MouseArea)
+                    }
+                }
             }
             TextSwitch {
                 id: webview
@@ -64,6 +92,14 @@ Dialog {
                     browser.checked = false
                     copyLink.checked = false
                     saveImage.checked = false
+                }
+                KeyNavigation.up: jolla2getherapp
+                KeyNavigation.down: browser
+                onFocusChanged: {
+                    if (focus) {
+                        mainFlic.ensureVisible(webview)
+                        clicked(MouseArea)
+                    }
                 }
             }
             TextSwitch {
@@ -77,6 +113,14 @@ Dialog {
                     copyLink.checked = false
                     saveImage.checked = false
                 }
+                KeyNavigation.up: webview
+                KeyNavigation.down: copyLink
+                onFocusChanged: {
+                    if (focus) {
+                        mainFlic.ensureVisible(browser)
+                        clicked(MouseArea)
+                    }
+                }
             }
             TextSwitch {
                 id: copyLink
@@ -88,6 +132,14 @@ Dialog {
                     browser.checked = false
                     webview.checked = false
                     saveImage.checked = false
+                }
+                KeyNavigation.up: browser
+                KeyNavigation.down: saveImage
+                onFocusChanged: {
+                    if (focus) {
+                        mainFlic.ensureVisible(copyLink)
+                        clicked(MouseArea)
+                    }
                 }
             }
             TextSwitch {
@@ -101,6 +153,13 @@ Dialog {
                     browser.checked = false
                     webview.checked = false
                     copyLink.checked = false
+                }
+                KeyNavigation.up: copyLink
+                onFocusChanged: {
+                    if (focus) {
+                        mainFlic.ensureVisible(saveImage)
+                        clicked(MouseArea)
+                    }
                 }
             }
             Separator {
