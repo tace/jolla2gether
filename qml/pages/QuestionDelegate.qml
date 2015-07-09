@@ -91,7 +91,6 @@ ListItem  {
         var color = Theme.primaryColor
         // If item selected either from list or Cover, make color highlighted
         if (background.highlighted ||
-            (index === coverProxy.currentQuestion - 1) ||
             (questionListView.currentIndex === index)) {
             color = Theme.highlightColor
         }
