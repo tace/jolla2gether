@@ -178,6 +178,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function()
     {
+        var success = false
         if ( xhr.readyState == xhr.DONE)
         {
             if ( xhr.status == 200)
@@ -280,10 +281,7 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
                                      "updated_date" : getDateAndTimeStamp(ginfo.last_activity_at),
                                  })
                 }
-
-                // Data is loaded, call user given callback
-                if (onLoadedCallback)
-                    onLoadedCallback(filteredCount)
+                success = true
             }
             else
             {
@@ -291,6 +289,10 @@ function get_questions_httpReq(model, query_params, onLoadedCallback)
             }
             urlLoading = false
             model.loadingInProgress = false
+            // Data is loaded, call user given callback
+            if (onLoadedCallback)
+                if (success)
+                    onLoadedCallback(filteredCount)
         }
     }
     xhr.timeout = 4000;
