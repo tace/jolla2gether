@@ -28,9 +28,6 @@ Page {
     property bool openExternalLinkOnWebview: false
     property string externalUrl: ""
     property bool openQuestionlOnJolla2getherApp: false
-    property bool answersAndCommentsOpen: false
-    property bool answersAndCommentsClicked: false
-    property string rssFeedUrl: siteBaseUrl + "/feeds/question/" + qid + "/"
     property bool upVoteOn: false
     property bool downVoteOn: false
     property bool voteStatusLoaded: false
@@ -45,23 +42,9 @@ Page {
         id: infoBanner
     }
 
-    ListModel {
-        id: finalRssModel
-        property bool ready: false
-    }
-    ListModel {
-        id: sortModel
-    }
-    ListModel {
-        id: pagingListModel
-        property int pageSize: 20 // 20 answers or comments at a time
-        property int currentIndex: 0 // Keep track of point in total rss feed index
-        property int pageStopIndex: 0
-    }
     RssFeedModel {
         id: rssFeedModel
-        pagingModel: pagingListModel
-        sortingModel: sortModel
+        rssFeedUrl: siteBaseUrl + "/feeds/question/" + qid + "/"
     }
 
     function goToItem(idx) {
@@ -73,31 +56,6 @@ Page {
                                             true,
                                             props)
     }
-
-    function loadAnswersAndComments() {
-        startTime = Date.now()
-        if (!answersAndCommentsClicked) {
-            urlLoading = true
-            answersAndCommentsClicked = true
-            if (followedStatusLoaded) {
-                // Start loading RssFeed only after webview is surely loaded,
-                // so link it to the followed status which is the last callback run on webview start
-                rssFeedModel.source = rssFeedUrl
-            }
-        }
-        if (answersAndCommentsOpen) {
-            answersAndCommentsOpen = false
-            rssFeedModel.initRssModel()
-        }
-        else {
-            answersAndCommentsOpen = true
-            if (finalRssModel.ready) {
-                // Load only if model ready, otherwice it's ongoing
-                rssFeedModel.fillRssModel(finalRssModel)
-            }
-        }
-    }
-
 
     // Set some properties
     // after answer got from asyncronous (get_user) http request.
@@ -273,21 +231,12 @@ Page {
     Component.onCompleted: {
         tagsArray = getTagsArray()
         contentFlickable.focus = true // Set focus for enabling keyboard presses
+        rssFeedModel.startLoadingRss()
     }
 
     onUserIdChanged: {
         console.log("UserId Changed to: " + userId)
         usersModel.get_user(userId, setUserData)
-    }
-
-    onFollowedStatusLoadedChanged: {
-        if (followedStatusLoaded) {
-            if (answersAndCommentsClicked) {
-                // If user has already clicked answersAndComments open, do it actually just now after
-                // followedStatus loading is finished to make sure webview is ready for it.
-                rssFeedModel.source = rssFeedUrl
-            }
-        }
     }
 
     onLandScapeModeChanged: {
@@ -326,6 +275,7 @@ Page {
                                                     props)
             }
             else {
+                console.log("attach back: " + url)
                 siteURL = page.url
                 attachWebview()
                 questionsModel.questionIdOfClickedTogetherLink = ""
@@ -383,7 +333,7 @@ Page {
                 id: userNameLabel
                 anchors.top: pageHeader.top
                 anchors.right: userPic.left
-                anchors.topMargin: Theme.paddingSmall
+                anchors.topMargin: Theme.paddingLarge
                 anchors.rightMargin: Theme.paddingSmall
                 color: Theme.secondaryColor
                 font.pixelSize: Theme.fontSizeSmall
@@ -402,8 +352,8 @@ Page {
                 id: userPic
                 anchors.top: pageHeader.top
                 anchors.right: pageHeader.right
-                anchors.rightMargin: Theme.paddingSmall
-                anchors.topMargin: Theme.paddingSmall
+                anchors.rightMargin: Theme.paddingLarge
+                anchors.topMargin: Theme.paddingLarge
                 width: 100
                 height: 100
                 smooth: true
@@ -449,6 +399,7 @@ Page {
         Item {
             id: questionTitleItem
             anchors.top: pageHeader.bottom
+            anchors.topMargin: Theme.paddingLarge
             anchors.left: parent.left
             anchors.right: voteUpButton.left
             anchors.leftMargin: Theme.paddingMedium
@@ -655,80 +606,103 @@ Page {
             }
             Item {
                 width: 1
-                height: Theme.paddingLarge
+                height: Theme.paddingLarge * 3
             }
+
+            RssFeedRepeater {
+                id: commentsFeed
+                visible: rssFeedModel.ready
+                buttonVisible: rssFeedModel.pagingModelQuestionComments.ready && rssFeedModel.getTotalQuestionCommentsCount() > 0
+                modelReady: rssFeedModel.pagingModelQuestionComments.ready
+                buttonActivated: rssFeedModel.questionCommentsListOpen && rssFeedModel.getQuestionCommentsCount() > 0
+                buttonLabelText: getButtonText()
+                repeaterModel: rssFeedModel.questionCommentsRssModel
+                repeaterDelegate: AnswersAndCommentsDelegate {}
+                onButtonPressed: {
+                    rssFeedModel.openAnswersOrCommentsRssFeedList(false)
+                }
+                onSortAscPressed: {
+                    rssFeedModel.triggerFeedWorker(rssFeedModel.commentFilter, rssFeedModel.sORT_ASC)
+                }
+                onSortDescPressed: {
+                    rssFeedModel.triggerFeedWorker(rssFeedModel.commentFilter, rssFeedModel.sORT_DESC)
+                }
+                function getButtonText() {
+                    if (!rssFeedModel.pagingModelQuestionComments.ready) {
+                        return qsTr("Loading Comments...")
+                    }
+                    if (rssFeedModel.getTotalQuestionCommentsCount() > 0) {
+                        var commentsText = rssFeedModel.getTotalQuestionCommentsCount() === 1 ? qsTr(" Comment") : qsTr(" Comments")
+                        return (!rssFeedModel.questionCommentsListOpen ? rssFeedModel.getTotalQuestionCommentsCount() : "") + commentsText + (rssFeedModel.questionCommentsListOpen ? " (" + rssFeedModel.getQuestionCommentsCount() + "/" + rssFeedModel.getTotalQuestionCommentsCount() + ")" : "")
+                    }
+                    else {
+                        return qsTr("No Comments")
+                    }
+                }
+            }
+
+            Item {
+                width: 1
+                height: Theme.paddingLarge * 2
+            }
+
+            RssFeedRepeater {
+                id: answersFeed
+                visible: rssFeedModel.ready
+                buttonVisible: rssFeedModel.pagingModelAnswers.ready && answer_count !== "0"
+                modelReady: rssFeedModel.pagingModelAnswers.ready
+                buttonActivated: rssFeedModel.answersListOpen && rssFeedModel.getAnswersCount() > 0
+                buttonLabelText: getButtonText()
+                repeaterModel: rssFeedModel.answersRssModel
+                repeaterDelegate: AnswerDelegate {}
+                onButtonPressed: {
+                    rssFeedModel.openAnswersOrCommentsRssFeedList(true)
+                }
+                onSortAscPressed: {
+                    rssFeedModel.triggerFeedWorker(rssFeedModel.answerFilter, rssFeedModel.sORT_ASC)
+                }
+                onSortDescPressed: {
+                    rssFeedModel.triggerFeedWorker(rssFeedModel.answerFilter, rssFeedModel.sORT_DESC)
+                }
+                function getButtonText() {
+                    if (!rssFeedModel.pagingModelAnswers.ready) {
+                        return qsTr("Loading Answers...")
+                    }
+                    if (answer_count !== "0") {
+                        var answerText = answer_count === "1" ? qsTr(" Answer") : qsTr(" Answers")
+                        return (!rssFeedModel.answersListOpen ? answer_count : "") + answerText + (rssFeedModel.answersListOpen ? " (" + rssFeedModel.getAnswersCount() + "/" + rssFeedModel.getTotalAnswersCount() + ")" : "")
+                    }
+                    else {
+                        return qsTr("No Answers")
+                    }
+                }
+            }
+            Label {
+                id: loadingRss
+                visible: !rssFeedModel.ready
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.italic: true
+                font.pixelSize: Theme.fontSizeMedium
+                text: qsTr("Loading Comments and Answers...")
+            }
+
             Item {
                 width: 1
                 height: Theme.paddingLarge
-            }
-
-            MouseArea {
-                id: clicker;
-                width: parent.width
-                height: 40
-                onClicked: { loadAnswersAndComments() }
-                Image {
-                    source: "qrc:/qml/images/arrow-right.png"
-                    anchors.leftMargin: Theme.paddingMedium
-                    rotation: answersAndCommentsOpen ? +90 : 0
-                    anchors.left: parent.left
-                    Behavior on rotation { NumberAnimation { duration: 180; } }
-                }
-                Label {
-                    anchors.centerIn: parent
-                    font.pixelSize: Theme.fontSizeMedium
-                    text: qsTr("Answers and Comments") + (answersAndCommentsOpen ? " (" + rssFeedModel.count + ")" : "")
-                }
-            }
-            Item {
-                width: 1
-                height: Theme.paddingExtraLarge
-            }
-
-            Repeater {
-                id: answersAndCommentsList
-                property string commentRelatedToquestionOrAnswer: qid
-                visible: finalRssModel.ready && answersAndCommentsOpen
-                width: parent.width
-                height: childrenRect.height
-                anchors.left: parent.left
-                anchors.right: parent.right
-                model: finalRssModel
-                clip: true
-                delegate: AnswersAndCommentsDelegate { }
-                onItemAdded: {
-                    if (item.isAnswer()) {
-                        commentRelatedToquestionOrAnswer = item.getAnswerOrCommentNumber()
-                        //console.log("Answer added, answerNbr: " + item.getAnswerOrCommentNumber())
-                        get_answer_data(item.getAnswerOrCommentNumber(), item)
-                    }
-                    else { // Comment
-                        item.setRelatedAnswerNumber(commentRelatedToquestionOrAnswer)
-                        get_comment_data(item.getAnswerOrCommentNumber(), item, pressSeeMoreCommentsButton)
-                    }
-
-                    if (index === (pagingListModel.pageStopIndex - 1)) {
-                        urlLoading = false
-                        endTime = Date.now()
-                        console.log("AnswersAndComments load time: " + (endTime - startTime))
-                    }
-                }
-            }
-            Item {
-                width: 1
-                height: Theme.paddingExtraLarge
             }
         }
         ScrollDecorator { }
         onAtYEndChanged: {
             //console.log("at END. " + contentY + "," + parent.height + "," + height + "," + atYEnd)
-            if (atYEnd && contentY >= parent.height && answersAndCommentsOpen) {
+            if (atYEnd && contentY >= parent.height && (rssFeedModel.answersListOpen || rssFeedModel.questionCommentsListOpen)) {
                 if (contentY > 0 && parent.height > 0) {
                     console.log("At end of page, load next answers/comments")
-                    rssFeedModel.fillRssModel(finalRssModel)
+                    if (!urlLoading)  // Important to prevent simultaneous loading with workerscript
+                        rssFeedModel.loadMoreAnswersOrComments()
                 }
             }
         }
+
         function ensureVisible(r)
         {
             if (searchBanner.opened) {

@@ -31,7 +31,7 @@ Page {
             if (loadRequest.status === WebView.LoadSucceededStatus) {
                 console.log("webview succeeded to load url " + url)
                 setUrlLoadding(false)
-                //webviewPage.forceActiveFocus()
+                //webview.forceActiveFocus()
                 if (callbacks !== null){
                     for (var i=0; i < callbacks.length; i++) {
                         console.log("run callback in webview")

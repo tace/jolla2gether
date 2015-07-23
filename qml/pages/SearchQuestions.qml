@@ -235,7 +235,6 @@ Dialog {
     Component.onCompleted: {
         sorting.set_value(questionsModel.sortingCriteriaQuestions)
         sortingOrder.set_value(questionsModel.sortingOrder)
-        searchBox.forceActiveFocus()
     }
 
     function getIncludedTags() {

@@ -199,7 +199,8 @@ ApplicationWindow
                 pageStack.currentPage.objectName === "FirstPage" ||
                 // In Questionspage webview attach not allowed when app is getting active
                 (pageStack.currentPage.objectName === "Questions" && attachRequestedByAppActive === undefined) ||
-                pageStack.currentPage.objectName === "QuestionViewPage") {
+                pageStack.currentPage.objectName === "QuestionViewPage" ||
+                pageStack.currentPage.objectName === "AnswerPage") {
             return true
         }
         return false
