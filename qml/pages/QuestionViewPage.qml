@@ -51,6 +51,10 @@ Page {
         var props = {
             "index": idx
         };
+        if (pageStack.currentPage.objectName === "AnswerPage") {
+            pageStack.navigateBack(PageStackAction.Immediate)
+            console.log("answerpage removed")
+        }
         questionsModel.loadQuestionViewpage(questionsModel.getQuestionIdOfIndex(idx),
                                             idx,
                                             true,

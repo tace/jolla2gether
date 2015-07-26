@@ -118,7 +118,8 @@ ApplicationWindow
         target: pageStack
         onCurrentPageChanged: {
             coverProxy.mode = pageStack.currentPage.objectName === "Questions" ||
-                    pageStack.currentPage.objectName === "QuestionViewPage"
+                              pageStack.currentPage.objectName === "QuestionViewPage" ||
+                              pageStack.currentPage.objectName === "AnswerPage"
                     ? coverProxy.mode_QUESTIONS
                     : coverProxy.mode_INFO
 

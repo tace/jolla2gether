@@ -104,7 +104,8 @@ Page {
     // and also we want signals to be executed if QuestionViewPage is active
     function activateCoverSignals() {
         if (status === PageStatus.Active ||
-                (pageStack.currentPage.objectName === "QuestionViewPage") && (pageStack.depth - pageCounter) === 2) {
+           (pageStack.currentPage.objectName === "QuestionViewPage") && (pageStack.depth - pageCounter) === 2 ||
+           (pageStack.currentPage.objectName === "AnswerPage")) {
             return true
         }
         return false
