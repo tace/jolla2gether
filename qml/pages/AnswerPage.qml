@@ -10,6 +10,7 @@ Page {
 
     property int questionIndex: 0
     property string answerId
+    property string answerUser
     property string text: ""
     property string pubDate
     property XmlListModel rssFeedModel
@@ -60,6 +61,7 @@ Page {
         if (status === PageStatus.Active) {
             console.log("answerpage active")
             attachWebview()
+            forwardNavigation = false
         }
         else if (status === PageStatus.Inactive) {
             console.log("answerpage Inactive")
@@ -149,7 +151,7 @@ Page {
                             id: userLabel
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.secondaryColor
-                            text: ""
+                            text: "<b>" + answerUser + "</b>"
                         }
                         Item {
                             height: 1
@@ -246,6 +248,10 @@ Page {
                     }
                 }
             }
+            Item {
+                width: 1
+                height: Theme.paddingLarge
+            }
 
             ShowRichTextWithLinkActions {
                 id: answerText
@@ -267,7 +273,7 @@ Page {
                 buttonActivated: rssFeedModel.answerCommentsListOpen && rssFeedModel.getAnswerCommentsCount() > 0
                 buttonLabelText: getButtonText()
                 repeaterModel: rssFeedModel.answerCommentsRssModel
-                repeaterDelegate: AnswersAndCommentsDelegate {}
+                repeaterDelegate: CommentsDelegate {}
                 onButtonPressed: {
                     rssFeedModel.openAnswersOrCommentsRssFeedList(false)
                 }

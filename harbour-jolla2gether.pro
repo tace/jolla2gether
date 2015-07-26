@@ -58,7 +58,9 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/components/CtrlPlusKeyPressed.qml \
     qml/components/RssFeedRepeater.qml \
     qml/pages/AnswerDelegate.qml \
-    qml/pages/AnswerPage.qml
+    qml/pages/AnswerPage.qml \
+    qml/pages/CommentsDelegate.qml \
+    qml/pages/AnswerAndCommentDelegateBase.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}

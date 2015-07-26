@@ -101,105 +101,6 @@ Page {
             infoBanner.showText(infoText)
         })
     }
-    function get_answer_data(answer_id, item) {
-        var script = "(function() { \
-                      var upvoteElem = document.getElementById('answer-img-upvote-" + answer_id + "'); \
-                      var upvoteOn = upvoteElem.getAttribute('class').split('answer-img-upvote post-vote upvote')[1]; \
-                      var downvoteElem = document.getElementById('answer-img-downvote-" + answer_id + "'); \
-                      var downvoteOn = downvoteElem.getAttribute('class').split('answer-img-downvote post-vote downvote')[1]; \
-                      var voteNumberElem = document.getElementById('answer-vote-number-" + answer_id + "'); \
-                      var votes = voteNumberElem.childNodes[0].nodeValue; \
-                      var answerPost = document.getElementById('post-id-" + answer_id + "'); \
-                      var images = answerPost.getElementsByTagName('img'); \
-                      var gravatarUrl = ''; \
-                      var userName = ''; \
-                      var flagUrl = ''; \
-                      for (var i = 0; i < images.length; i++) { \
-                          if (images[i].getAttribute('class') === 'gravatar' && gravatarUrl === '') { \
-                              gravatarUrl = images[i].getAttribute('src'); \
-                              userName = images[i].getAttribute('title'); \
-                          } \
-                          if (images[i].getAttribute('class') === 'flag' && flagUrl === '') { \
-                              flagUrl = images[i].getAttribute('src'); \
-                          } \
-                      } \
-                      var karma = 0; \
-                      var karmaElem = answerPost.getElementsByTagName('span')[0]; \
-                      if (karmaElem.getAttribute('class') === 'reputation-score') { \
-                          karma = karmaElem.childNodes[0].nodeValue; \
-                      } \
-                      var answerAccepted = false; \
-                      var answerAcceptedElem = document.getElementById('answer-img-accept-" + answer_id + "'); \
-                      if (answerAcceptedElem.getAttribute('title') === 'this answer has been selected as correct') { \
-                          answerAccepted = true; \
-                      } \
-                      return upvoteOn + ',' + downvoteOn + ',' + votes + ',' + gravatarUrl + ',' + flagUrl + ',' + userName + ',' + karma + ',' + answerAccepted \
-                      })()"
-        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
-            console.log("Answer: " + answer_id + ", result: " + result)
-            var answerData = result.split(',')
-            var upVote = false
-            var downVote = false
-            if (answerData[0].trim() !== '')
-                upVote = true
-            if (answerData[1].trim() !== '')
-                downVote = true
-            if (answerData[2].trim() !== '')
-                item.answerVotes = answerData[2].trim()
-            item.setAnswerVotingButtonsStatus(upVote, downVote)
-            item.setGravatarImagesUrls(answerData[3].trim(), answerData[4].trim())
-            item.setAnswerUserName(answerData[5].trim())
-            item.setKarma(answerData[6].trim())
-            item.setAcceptedAnswerFlag(answerData[7].trim() === "true")
-        })
-    }
-    function get_comment_data(comment_id, item, failCallback) {
-        var script = "(function() { \
-                      var commentElem = document.getElementById('comment-" + comment_id + "'); \
-                      var commentSubs = commentElem.getElementsByTagName('div'); \
-                      var numberOfVotes = 0; \
-                      var iHaveUpvoted = false; \
-                      for (var i = 0; i < commentSubs.length; i++) { \
-                          if (commentSubs[i].getAttribute('class') === 'upvote upvoted') { \
-                              iHaveUpvoted = true; \
-                              numberOfVotes = commentSubs[i].childNodes[0].nodeValue; \
-                          } \
-                          if (commentSubs[i].getAttribute('class') === 'upvote') { \
-                              numberOfVotes = commentSubs[i].childNodes[0].nodeValue; \
-                          } \
-                      } \
-                      if (numberOfVotes === '') { \
-                          numberOfVotes = 0; \
-                      } \
-                      return iHaveUpvoted + ',' + numberOfVotes; \
-                      })()"
-        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
-            if (result === undefined) {
-                console.log("Failed to get comment data..." + comment_id)
-                if (failCallback !== undefined) {
-                    failCallback(item)
-                    return
-                }
-            }
-            console.log("Comment: " + comment_id + ", result: " + result)
-            var commentData = result.split(',')
-            item.setCommentVotesData(commentData[0].trim() === "true",
-                                     commentData[1].trim())
-        })
-    }
-    function pressSeeMoreCommentsButton(item) {
-        var answer_id = item.getRelatedAnswerNumber()
-        var script = "(function() { \
-                      var addMoreButton = document.getElementById('add-comment-to-post-" + answer_id + "'); \
-                      if (addMoreButton.childNodes[0].nodeValue === 'see more comments') { \
-                          addMoreButton.click(); \
-                      } \
-                      })()"
-        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
-            console.log("add-comment-to-post- button pressed, update comment data again")
-            item.startWebTimer()
-        })
-    }
 
     function getPageTextFontSize() {
         //return Theme.fontSizeTiny
@@ -617,7 +518,7 @@ Page {
                 buttonActivated: rssFeedModel.questionCommentsListOpen && rssFeedModel.getQuestionCommentsCount() > 0
                 buttonLabelText: getButtonText()
                 repeaterModel: rssFeedModel.questionCommentsRssModel
-                repeaterDelegate: AnswersAndCommentsDelegate {}
+                repeaterDelegate: CommentsDelegate {}
                 onButtonPressed: {
                     rssFeedModel.openAnswersOrCommentsRssFeedList(false)
                 }

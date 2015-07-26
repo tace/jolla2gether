@@ -37,7 +37,7 @@ Column {
         border.width: 0
         gradient: Gradient {
             GradientStop { position: 0.0; color: "transparent" }
-            GradientStop { position: 1.0; color: Theme.highlightColor }
+            GradientStop { position: 1.0; color: Theme.secondaryHighlightColor }
         }
         MouseArea {
             id: commentsClicker
@@ -48,6 +48,9 @@ Column {
 
             onPressed: {
                 buttonText.font.bold = true
+            }
+            onExited: {
+                buttonText.font.bold = false
             }
             onClicked: {
                 buttonPressed()
@@ -119,7 +122,6 @@ Column {
 
     Repeater {
         id: commentsRepeater
-        property string commentRelatedToquestionOrAnswer: qid
         visible: buttonActivated
         width: parent.width
         height: childrenRect.height
@@ -130,8 +132,7 @@ Column {
         delegate: repeaterDelegate
         onItemAdded: {
             if (!item.isAnswer()) { // Comment
-                item.setRelatedAnswerNumber(commentRelatedToquestionOrAnswer)
-                get_comment_data(item.getAnswerOrCommentNumber(), item, pressSeeMoreCommentsButton)
+                item.get_comment_data(item.getAnswerOrCommentNumber(), item, item.pressSeeMoreCommentsButton)
             }
 
             if (rssFeedModel.pageSizeAmountItemsRead(repeaterModel, index)) {
