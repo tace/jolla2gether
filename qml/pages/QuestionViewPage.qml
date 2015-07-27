@@ -53,7 +53,6 @@ Page {
         };
         if (pageStack.currentPage.objectName === "AnswerPage") {
             pageStack.navigateBack(PageStackAction.Immediate)
-            console.log("answerpage removed")
         }
         questionsModel.loadQuestionViewpage(questionsModel.getQuestionIdOfIndex(idx),
                                             idx,
@@ -522,7 +521,8 @@ Page {
                 buttonActivated: rssFeedModel.questionCommentsListOpen && rssFeedModel.getQuestionCommentsCount() > 0
                 buttonLabelText: getButtonText()
                 repeaterModel: rssFeedModel.questionCommentsRssModel
-                repeaterDelegate: CommentsDelegate {}
+                repeaterDelegate: CommentsDelegate { loadCommentData: followedStatusLoaded
+                                                     relatedQuestionOrAnswerNumber: qid }
                 onButtonPressed: {
                     rssFeedModel.openAnswersOrCommentsRssFeedList(false)
                 }

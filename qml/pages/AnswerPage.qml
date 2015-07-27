@@ -273,7 +273,8 @@ Page {
                 buttonActivated: rssFeedModel.answerCommentsListOpen && rssFeedModel.getAnswerCommentsCount() > 0
                 buttonLabelText: getButtonText()
                 repeaterModel: rssFeedModel.answerCommentsRssModel
-                repeaterDelegate: CommentsDelegate {}
+                repeaterDelegate: CommentsDelegate { loadCommentData: answerDataLoaded
+                                                     relatedQuestionOrAnswerNumber: answerId}
                 onButtonPressed: {
                     rssFeedModel.openAnswersOrCommentsRssFeedList(false)
                 }

@@ -132,7 +132,7 @@ Column {
         delegate: repeaterDelegate
         onItemAdded: {
             if (!item.isAnswer()) { // Comment
-                item.get_comment_data(item.getAnswerOrCommentNumber(), item, item.pressSeeMoreCommentsButton)
+                //item.get_comment_data(item.getAnswerOrCommentNumber(), item, item.pressSeeMoreCommentsButton)
             }
 
             if (rssFeedModel.pageSizeAmountItemsRead(repeaterModel, index)) {

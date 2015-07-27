@@ -9,7 +9,6 @@ ListItem  {
     anchors.leftMargin: Theme.paddingLarge
     anchors.rightMargin: Theme.paddingMedium
     height: contentHeight
-    property string answerId
     property string answerUserName: "" // Relevant for answer wiki posts where answer updating user is set here
 
     function getTextSize() {

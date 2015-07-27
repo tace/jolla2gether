@@ -7,9 +7,10 @@ AnswerAndCommentDelegateBase  {
     contentHeight: commentsColumn.height
     _showPress: false // Disable normal list item highlighting
 
+    property bool loadCommentData: false
+    property string relatedQuestionOrAnswerNumber
     property bool upvotedThisComment: false
     property int numberOfCommentUpVotes: 0
-    property string relatedQuestionOrAnswerNumber: answerId !== undefined ? answerId : qid
 
     Timer {
         id: waitingWebResultsTimer
@@ -22,6 +23,12 @@ AnswerAndCommentDelegateBase  {
     function startWebTimer() {
         waitingWebResultsTimer.start()
         console.log("Started web timer for item: " + getAnswerOrCommentNumber())
+    }
+
+    onLoadCommentDataChanged: {
+        if (loadCommentData) {
+            get_comment_data(getAnswerOrCommentNumber(), commentItem, pressSeeMoreCommentsButton)
+        }
     }
 
     Column {
@@ -58,6 +65,7 @@ AnswerAndCommentDelegateBase  {
                     }
                     Rectangle {
                         id: commentVotingButton
+                        visible: loadCommentData
                         height: titleLabel.height
                         width: commentLikeRow.width + 10
                         border.width: 0
@@ -146,7 +154,8 @@ AnswerAndCommentDelegateBase  {
         return true
     }
     function pressSeeMoreCommentsButton(item) {
-        var answer_id = item.getRelatedAnswerNumber()
+        var answer_id = item.relatedQuestionOrAnswerNumber
+        console.log("Called pressSeeMoreCommentsButton for answer/question: " + answer_id)
         var script = "(function() { \
                       var addMoreButton = document.getElementById('add-comment-to-post-" + answer_id + "'); \
                       if (addMoreButton.childNodes[0].nodeValue === 'see more comments') { \
