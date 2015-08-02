@@ -106,12 +106,12 @@ XmlListModel {
         answerMode = true
         answerId = answerNumber
         answerCommentsListOpen = false
+        pagingModelAnswerComments.ready = false
     }
 
     function unloadAnswer() {
         answerMode = false
         answerId = "-1"
-        pagingModelAnswerComments.ready = false // to reload answer comments again
     }
 
     function triggerFeedWorker(filter, order) {
@@ -146,21 +146,15 @@ XmlListModel {
             answersListOpen = !answersListOpen
             if (answersListOpen) { // Only one of the list open at a time
                 questionCommentsListOpen = false
-                //questionCommentsRssModel.clear()
             }
-            //else
-            //    answersRssModel.clear()
         }
         else { // Comments
             if (!answerMode) {
                 questionCommentsListOpen = !questionCommentsListOpen
                 if (questionCommentsListOpen) { // Only one of the list open at a time
                     answersListOpen = false
-                    //answersRssModel.clear()
                 }
-                //else
-                //    questionCommentsRssModel.clear()
-                }
+            }
             else {
                 answerCommentsListOpen = !answerCommentsListOpen
             }

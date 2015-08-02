@@ -192,6 +192,7 @@ Page {
                     pageStack.navigateForward()
                 }
             }
+            rssFeedModel.unloadAnswer()
         }
     }
 

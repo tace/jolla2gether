@@ -23,53 +23,21 @@ Page {
         id: infoBanner
     }
 
-    function answerDataCallback(upVote,
-                                downVote,
-                                answerVotesValue,
-                                gravatarUrl,
-                                flagUrl,
-                                answerUsername,
-                                karma,
-                                answerAcceptedBool) {
-        answeredUserPic.source = "http:" + usersModel.changeImageLinkSize(gravatarUrl, 100)
-        if (flagUrl !== "")
-            answerFlagImage.source = siteBaseUrl + flagUrl
-        userLabel.text = "<b>" + answerUsername + "</b>"
-        karmaLabel.text = "Karma: " + karma
-        answerAccepted = answerAcceptedBool
-        answerVotes = answerVotesValue
-        voteUpButton.setVoteStatus(upVote)
-        voteDownButton.setVoteStatus(downVote)
-        answerDataLoaded = true
-    }
-    function getAnswerId() {
-        return answerId
-    }
-
-    function getPageTextFontSize() {
-        return appSettings.question_view_page_font_size_value
-    }
-
-
     Component.onCompleted: {
         console.log("answerId: " + answerId)
         rssFeedModel.loadInitialAnswersOrComments()
     }
 
-
     onStatusChanged: {
         if (status === PageStatus.Active) {
             console.log("answerpage active")
             attachWebview()
-            forwardNavigation = false
         }
         else if (status === PageStatus.Inactive) {
             console.log("answerpage Inactive")
-            rssFeedModel.unloadAnswer()
             unattachWebview()
         }
     }
-
 
     SilicaFlickable {
         id: contentFlickable
@@ -204,6 +172,20 @@ Page {
                             onClicked: {
                                 acceptAnswer(answerId)
                             }
+                        }
+                    }
+                    Column {
+                        BusyIndicator {
+                            id: busyIndicator
+                            size: BusyIndicatorSize.Small
+                            running: !answerDataLoaded
+                        }
+                        Label {
+                            id: answerPageLoadinLabel
+                            visible: !answerDataLoaded
+                            font.pixelSize: Theme.fontSizeTiny
+                            color: Theme.secondaryColor
+                            text: ""
                         }
                     }
                     Item {
@@ -342,6 +324,9 @@ Page {
         pageMainTextElement: answerText
         pageDynamicTextModelElement: commentsFeed
     }
+    function getPageTextFontSize() {
+        return appSettings.question_view_page_font_size_value
+    }
     function acceptAnswer(answer_id) {
         if (!isMyOwnQuestion()) {
             infoBanner.showText(qsTr("Sorry, only moderators or original author of the question can accept or unaccept the best answer"))
@@ -362,5 +347,135 @@ Page {
             return true
         return false
     }
+    function answerDataCallback(upVote,
+                                downVote,
+                                answerVotesValue,
+                                gravatarUrl,
+                                flagUrl,
+                                answerUsername,
+                                karma,
+                                answerAcceptedBool) {
+        answeredUserPic.source = "http:" + usersModel.changeImageLinkSize(gravatarUrl, 100)
+        if (flagUrl !== "")
+            answerFlagImage.source = siteBaseUrl + flagUrl
+        userLabel.text = "<b>" + answerUsername + "</b>"
+        karmaLabel.text = "Karma: " + karma
+        answerAccepted = answerAcceptedBool
+        answerVotes = answerVotesValue
+        voteUpButton.setVoteStatus(upVote)
+        voteDownButton.setVoteStatus(downVote)
+        answerDataLoaded = true
+    }
+    function getAnswerId() {
+        return answerId
+    }
 
+    function getAnswerDataFromWebViewCallback(runInWebviewCallback) {
+        var scriptToRun = "(function() { \
+                  var upvoteElem = document.getElementById('answer-img-upvote-" + answerId + "'); \
+                  var upvoteOn = upvoteElem.getAttribute('class').split('answer-img-upvote post-vote upvote')[1]; \
+                  var downvoteElem = document.getElementById('answer-img-downvote-" + answerId + "'); \
+                  var downvoteOn = downvoteElem.getAttribute('class').split('answer-img-downvote post-vote downvote')[1]; \
+                  var voteNumberElem = document.getElementById('answer-vote-number-" + answerId + "'); \
+                  var votes = voteNumberElem.childNodes[0].nodeValue; \
+                  var answerPost = document.getElementById('post-id-" + answerId + "'); \
+                  var images = answerPost.getElementsByTagName('img'); \
+                  var gravatarUrl = ''; \
+                  var userName = ''; \
+                  var flagUrl = ''; \
+                  for (var i = 0; i < images.length; i++) { \
+                      if (images[i].getAttribute('class') === 'gravatar' && gravatarUrl === '') { \
+                          gravatarUrl = images[i].getAttribute('src'); \
+                          userName = images[i].getAttribute('title'); \
+                      } \
+                      if (images[i].getAttribute('class') === 'flag' && flagUrl === '') { \
+                          flagUrl = images[i].getAttribute('src'); \
+                      } \
+                  } \
+                  var karma = 0; \
+                  var karmaElem = answerPost.getElementsByTagName('span')[0]; \
+                  if (karmaElem.getAttribute('class') === 'reputation-score') { \
+                      karma = karmaElem.childNodes[0].nodeValue; \
+                  } \
+                  var answerAccepted = false; \
+                  var answerAcceptedElem = document.getElementById('answer-img-accept-" + answerId + "'); \
+                  if (answerAcceptedElem.getAttribute('title') === 'this answer has been selected as correct') { \
+                      answerAccepted = true; \
+                  } \
+                  return upvoteOn + ',' + downvoteOn + ',' + votes + ',' + gravatarUrl + ',' + flagUrl + ',' + userName + ',' + karma + ',' + answerAccepted \
+                  })()"
+        var handleResult = function(result) {
+            if (result === undefined) {
+                loadNextAnswerPage()
+                return
+            }
+
+            console.log("Answer: " + answerId + ", result: " + result)
+            var answerData = result.split(',')
+            var upVote = false
+            var downVote = false
+            if (answerData[0].trim() !== '')
+                upVote = true
+            if (answerData[1].trim() !== '')
+                downVote = true
+            var answerVotes = "0"
+            if (answerData[2].trim() !== '')
+                answerVotes = answerData[2].trim()
+            var gravatarUrl = answerData[3].trim()
+            var flagUrl = answerData[4].trim()
+            var answerUsername = answerData[5].trim()
+            var karma = answerData[6].trim()
+            answerDataCallback(upVote,
+                               downVote,
+                               answerVotes,
+                               gravatarUrl,
+                               flagUrl,
+                               answerUsername,
+                               karma,
+                               answerData[7].trim() === "true")
+        }
+
+        if (runInWebviewCallback) {
+            console.log("return as callback to webview")
+            return function(webview) {
+                webview.evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
+            }
+        }
+        else {
+            console.log("call implicitly to find answer " + answerId)
+            pageStack.nextPage().evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
+        }
+    }
+    function loadNextAnswerPage() {
+        var script = "(function() { \
+                      var contentLeft = document.getElementById('ContentLeft'); \
+                      var divs = contentLeft.getElementsByTagName('div'); \
+                      var currentPage = ''; \
+                      var totalPages = ''; \
+                      for (var i = 0; i < divs.length; i++) { \
+                          if (divs[i].getAttribute('class') === 'paginator') { \
+                              var spans = divs[i].getElementsByTagName('span'); \
+                              for (var j = 0; j < spans.length; j++) { \
+                                  if (spans[j].getAttribute('class') === 'curr') { \
+                                      currentPage = spans[j].childNodes[0].nodeValue; \
+                                  } \
+                                  if (spans[j].getAttribute('class') === 'page') { \
+                                      totalPages = spans[j].getElementsByTagName('a')[0].childNodes[0].nodeValue; \
+                                  } \
+                                  if (spans[j].getAttribute('class') === 'next') { \
+                                      spans[j].getElementsByTagName('a')[0].click(); \
+                                  } \
+                              } \
+                              break; \
+                          } \
+                      } \
+                      return currentPage + ',' + totalPages; \
+                      })()"
+        pageStack.nextPage().evaluateJavaScriptOnWebPage(script,  function(result) {
+            var data = result.split(',')
+            var currentPageNum = parseInt(data[0].trim()) + 1
+            var totalPages = data[1].trim()
+            answerPageLoadinLabel.text = qsTr("Searching answer ") + currentPageNum + '/' + totalPages
+        })
+    }
 }

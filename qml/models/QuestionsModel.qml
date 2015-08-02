@@ -161,8 +161,7 @@ ListModel {
             callbacksList.push(getFollowedStatusFromWebViewCallback(pageStack.currentPage.followedStatusCallback))
         }
         if (pageStack.currentPage.objectName === "AnswerPage") {
-            callbacksList.push(getAnswerDataFromWebViewCallback(pageStack.currentPage.getAnswerId(),
-                                                                pageStack.currentPage.answerDataCallback))
+            callbacksList.push(pageStack.currentPage.getAnswerDataFromWebViewCallback(true))
         }
         if (callbacksList.length > 0) {
             properties = merge(props, {callbacks: callbacksList})
@@ -474,73 +473,6 @@ ListModel {
                     followedStatusCallback(true)
                 else
                     followedStatusCallback(false)
-            }
-            webview.evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
-        }
-    }
-
-    //
-    //
-    function getAnswerDataFromWebViewCallback(answer_id, answerDataCallback) {
-        return function(webview) {
-            var scriptToRun = "(function() { \
-                      var upvoteElem = document.getElementById('answer-img-upvote-" + answer_id + "'); \
-                      var upvoteOn = upvoteElem.getAttribute('class').split('answer-img-upvote post-vote upvote')[1]; \
-                      var downvoteElem = document.getElementById('answer-img-downvote-" + answer_id + "'); \
-                      var downvoteOn = downvoteElem.getAttribute('class').split('answer-img-downvote post-vote downvote')[1]; \
-                      var voteNumberElem = document.getElementById('answer-vote-number-" + answer_id + "'); \
-                      var votes = voteNumberElem.childNodes[0].nodeValue; \
-                      var answerPost = document.getElementById('post-id-" + answer_id + "'); \
-                      var images = answerPost.getElementsByTagName('img'); \
-                      var gravatarUrl = ''; \
-                      var userName = ''; \
-                      var flagUrl = ''; \
-                      for (var i = 0; i < images.length; i++) { \
-                          if (images[i].getAttribute('class') === 'gravatar' && gravatarUrl === '') { \
-                              gravatarUrl = images[i].getAttribute('src'); \
-                              userName = images[i].getAttribute('title'); \
-                          } \
-                          if (images[i].getAttribute('class') === 'flag' && flagUrl === '') { \
-                              flagUrl = images[i].getAttribute('src'); \
-                          } \
-                      } \
-                      var karma = 0; \
-                      var karmaElem = answerPost.getElementsByTagName('span')[0]; \
-                      if (karmaElem.getAttribute('class') === 'reputation-score') { \
-                          karma = karmaElem.childNodes[0].nodeValue; \
-                      } \
-                      var answerAccepted = false; \
-                      var answerAcceptedElem = document.getElementById('answer-img-accept-" + answer_id + "'); \
-                      if (answerAcceptedElem.getAttribute('title') === 'this answer has been selected as correct') { \
-                          answerAccepted = true; \
-                      } \
-                      return upvoteOn + ',' + downvoteOn + ',' + votes + ',' + gravatarUrl + ',' + flagUrl + ',' + userName + ',' + karma + ',' + answerAccepted \
-                      })()"
-            var handleResult = function(result) {
-                console.log("Answer: " + answer_id + ", result: " + result)
-                var answerData = result.split(',')
-                var upVote = false
-                var downVote = false
-                if (answerData[0].trim() !== '')
-                    upVote = true
-                if (answerData[1].trim() !== '')
-                    downVote = true
-                var answerVotes = "0"
-                if (answerData[2].trim() !== '')
-                    answerVotes = answerData[2].trim()
-                var gravatarUrl = answerData[3].trim()
-                var flagUrl = answerData[4].trim()
-                var answerUsername = answerData[5].trim()
-                var karma = answerData[6].trim()
-
-                answerDataCallback(upVote,
-                                   downVote,
-                                   answerVotes,
-                                   gravatarUrl,
-                                   flagUrl,
-                                   answerUsername,
-                                   karma,
-                                   answerData[7].trim() === "true")
             }
             webview.evaluateJavaScriptOnWebPage(scriptToRun, handleResult)
         }
