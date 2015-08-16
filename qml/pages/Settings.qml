@@ -11,10 +11,10 @@ QtObject {
     property int question_list_title_font_size_value: Settings.value(question_list_title_font_size, Theme.fontSizeSmall)
 
     property string question_list_show_tags: "question_list_show_tags"
-    property bool question_list_show_tags_value: Settings.value(question_list_show_tags, true) === "true"
+    property bool question_list_show_tags_value: Settings.value(question_list_show_tags, "true") === "true"
 
     property string question_list_show_separator_line: "question_list_show_separator_line"
-    property bool question_list_show_separator_line_value: Settings.value(question_list_show_separator_line, true) === "true"
+    property bool question_list_show_separator_line_value: Settings.value(question_list_show_separator_line, "true") === "true"
 
     property string question_view_page_font_size: "question_view_page_font_size"
     property int question_view_page_font_size_value: Settings.value(question_view_page_font_size, Theme.fontSizeSmall)
@@ -26,7 +26,7 @@ QtObject {
     property bool question_reset_search_on_listing_user_questions_value: Settings.value(question_reset_search_on_listing_user_questions, false) === "true"
 
     property string webview_swipe_back_enabled: "webview_swipe_back_enabled"
-    property bool webview_swipe_back_enabled_value: Settings.value(webview_swipe_back_enabled, false) === "true"
+    property bool webview_swipe_back_enabled_value: Settings.value(webview_swipe_back_enabled, "true") === "true"
 
     //
     // on value change callbacks

@@ -7,6 +7,8 @@ Dialog {
     property string newQuestionListTitleSpaceValue: appSettings.qUESTION_LIST_TITLE_SPACE_VALUE
     property bool newQuestionResetSearchOnListingUserQuestionsValue: appSettings.question_reset_search_on_listing_user_questions_value
     property bool newWebviewSwipeBackEnabledValue: appSettings.webview_swipe_back_enabled_value
+    property bool newQuestion_list_show_tags_value: appSettings.question_list_show_tags_value
+    property bool newQuestion_list_show_separator_line_value: appSettings.question_list_show_separator_line_value
     property int newQuestionListTitleFontSizeValue: appSettings.question_list_title_font_size_value
     property int newQuestionViewPageFontSizeValue: appSettings.question_view_page_font_size_value
     property int newQuestionViewPageAnswersAndCommentsFontSizeValue: appSettings.question_view_page_answers_and_comments_font_size_value
@@ -129,12 +131,12 @@ Dialog {
 
             TextSwitch {
                 id: showTags
-                checked: appSettings.question_list_show_tags_value
+                checked: newQuestion_list_show_tags_value
                 text: qsTr("Show tags")
             }
             TextSwitch {
                 id: showSeparatorLine
-                checked: appSettings.question_list_show_separator_line_value
+                checked: newQuestion_list_show_separator_line_value
                 text: qsTr("Show separator line between questions")
             }
 
@@ -294,25 +296,25 @@ Dialog {
                 id: swipeBackFromWebview
                 function set_value(value) {
                     var val = 0
-                    if (!value)
-                        val = 0
                     if (value)
+                        val = 0
+                    if (!value)
                         val = 1
                     swipeBackFromWebview.currentIndex = val
                 }
                 label: qsTr("Swipe back from webview")
                 menu: ContextMenu {
                     MenuItem {
-                        text: qsTr("Disabled (Default)")
-                        onClicked: {
-                            newWebviewSwipeBackEnabledValue = false
-                        }
-                    }
-                    MenuItem {
-                       text: qsTr("Enabled")
+                       text: qsTr("Enabled (Default)")
                        onClicked: {
                            newWebviewSwipeBackEnabledValue = true
                        }
+                    }
+                    MenuItem {
+                        text: qsTr("Disabled")
+                        onClicked: {
+                            newWebviewSwipeBackEnabledValue = false
+                        }
                     }
                 }
             }
