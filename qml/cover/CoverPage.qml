@@ -14,7 +14,11 @@ CoverBackground {
     }
 
     Image {
-        anchors.bottom: parent.bottom
+        width: parent.width
+        height: parent.height
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        fillMode: Image.PreserveAspectFit
         source: appicon
         opacity: 0.1
     }
@@ -60,35 +64,100 @@ CoverBackground {
             height: Theme.paddingSmall
         }
 
-        Label {
+        Row {
             width: parent.width
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeSmall
-            text: "Groups: " + infoModel.groups
+            Label {
+                id: groupsText
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: "Groups: "
+            }
+            Item {
+                width: parent.width - groupsText.width - groupsValue.width
+                height: 1
+            }
+            Label {
+                id: groupsValue
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: infoModel.groups
+            }
         }
-        Label {
+        Row {
             width: parent.width
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeSmall
-            text: "Users: " + infoModel.users
+            Label {
+                id: usersText
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: "Users: "
+            }
+            Item {
+                width: parent.width - usersText.width - usersValue.width
+                height: 1
+            }
+            Label {
+                id: usersValue
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: infoModel.users
+            }
         }
-        Label {
+        Row {
             width: parent.width
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeSmall
-            text: "Questions: " + infoModel.questions
+            Label {
+                id: questionsText
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: "Questions: "
+            }
+            Item {
+                width: parent.width - questionsText.width - questionsValue.width
+                height: 1
+            }
+            Label {
+                id: questionsValue
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: infoModel.questions
+            }
         }
-        Label {
+        Row {
             width: parent.width
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeSmall
-            text: "Answers: " + infoModel.answers
+            Label {
+                id: answersText
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: "Answers: "
+            }
+            Item {
+                width: parent.width - answersText.width - answersValue.width
+                height: 1
+            }
+            Label {
+                id: answersValue
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: infoModel.answers
+            }
         }
-        Label {
+        Row {
             width: parent.width
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeSmall
-            text: "Comments: " + infoModel.comments
+            Label {
+                id: commentsText
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: "Comments: "
+            }
+            Item {
+                width: parent.width - commentsText.width - commentsValue.width
+                height: 1
+            }
+            Label {
+                id: commentsValue
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: infoModel.comments
+            }
         }
     }
 

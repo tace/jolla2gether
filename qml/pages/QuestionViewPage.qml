@@ -37,6 +37,7 @@ Page {
     property var startTime
     property var endTime
     property int landScapeMode: phoneOrientation
+    property int userPicSize: page.width / 5
 
     InfoBanner {
         id: infoBanner
@@ -64,7 +65,7 @@ Page {
     // after answer got from asyncronous (get_user) http request.
     function setUserData(user_data) {
         userKarma = user_data.reputation
-        userAvatarUrl = usersModel.changeImageLinkSize(user_data.avatar_url, 100) //match this size to userPic size
+        userAvatarUrl = usersModel.changeImageLinkSize(user_data.avatar_url, userPicSize) //match this size to userPic size
         //console.log("avatar: "+userAvatarUrl)
     }
     function getLabelMaxWidth() {
@@ -259,8 +260,8 @@ Page {
                 anchors.right: pageHeader.right
                 anchors.rightMargin: Theme.paddingLarge
                 anchors.topMargin: Theme.paddingLarge
-                width: 100
-                height: 100
+                width: userPicSize
+                height: userPicSize
                 smooth: true
                 source: userAvatarUrl
                 MouseArea {
@@ -320,7 +321,7 @@ Page {
                 horizontalAlignment: Text.AlignLeft
                 width: parent.width
                 color: Theme.highlightColor
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeMedium
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 textFormat: Text.RichText
                 text: page.title

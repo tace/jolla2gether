@@ -13,10 +13,10 @@ Page {
 
     SilicaWebView {
         id: webview
+        width: parent.width
+        height: parent.height
         url: siteURL
         overridePageStackNavigation: true
-        width: webviewPage.orientation === Orientation.Portrait ? 540 : 960
-        height: webviewPage.orientation === Orientation.Portrait ? 960 : 540
         focus: true
         Keys.onEscapePressed: {
             pageStack.navigateBack()

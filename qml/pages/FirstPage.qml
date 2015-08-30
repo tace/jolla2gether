@@ -37,7 +37,7 @@ Page {
     objectName: "FirstPage"
     allowedOrientations: Orientation.All
     forwardNavigation: false
-    property int ownPicSize: 128
+    property int ownPicSize: togetherInfoStats.height
     property string userId: questionsModel.ownUserIdValue
 
     onUserIdChanged: {
@@ -99,8 +99,6 @@ Page {
                 y: Theme.itemSizeLarge/2 - height/2
                 Image{
                     source: "image://theme/icon-m-jolla"
-                    height: 70
-                    width: 70
                     fillMode: Image.PreserveAspectFit
                     smooth: true
                 }

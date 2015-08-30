@@ -5,7 +5,8 @@ ListItem  {
     id: background
     anchors.left: ListView.left
     anchors.right: ListView.right
-    contentHeight: Theme.itemSizeLarge
+    contentHeight: userPicSize
+    property int userPicSize: userPageLowestSizeSideValue / 5
     menu: contextMenu
     Keys.onReturnPressed: {
         clicked(MouseArea)
@@ -20,91 +21,80 @@ ListItem  {
         var color = Theme.primaryColor
         // If item selected either from list or Cover, make color highlighted
         if (background.highlighted ||
-            (usersListView.currentIndex === index)) {
+                (usersListView.currentIndex === index)) {
             color = Theme.highlightColor
         }
         return color
     }
 
-    Column{
-        Row{
-            id: imageRow
-            Image {
-                id: userPic
-                width: 110
-                height: 110
-                source: usersModel.changeImageLinkSize(avatar_url, 110)
+    Row {
+        width: parent.width
+        height: parent.height
+        Image {
+            id: userPic
+            width: userPicSize
+            height: userPicSize
+            source: usersModel.changeImageLinkSize(avatar_url, userPicSize)
+        }
+        Column {
+            width: parent.width - userPic.width
+            Row {
+                width: parent.width
+                Label {
+                    id: userLabel
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: getTitleColor()
+                    font.bold: model.url === siteURL
+                    text: " " + username
+                }
             }
-            Label {
-                id: userLabel
-                font.pixelSize: Theme.fontSizeSmall
-                color: getTitleColor()
-                font.bold: model.url === siteURL
-                text: " " + username
-            }
-
-            // Fill some space before statics rectangles
-            Rectangle {
-                id: fillRectangel
-                color: "transparent"
-                width: background.width - userPic.width - karmaRectangle.width - timesRectangle.width - userLabel.width
-                height: 40
-            }
-
-            Column {
-                Row {
-                    Rectangle {
-                        id: fillRectangel2
-                        color: "transparent"
-                        width: 1
-                        height: 40
+            Row {
+                width: parent.width
+                // Fill some space before statics rectangles
+                Item {
+                    id: fillRectangel
+                    width: parent.width - timesColumn.width - karmaRectangle.width
+                    height: 1
+                }
+                // Joined and last seen time strings
+                Column {
+                    id: timesColumn
+                    Label {
+                        visible: joined_at !== undefined
+                        font.pixelSize: Theme.fontSizeSmall
+                        text: "joined: " + joined_at + "  "
+                    }
+                    Label {
+                        visible: joined_at !== undefined
+                        font.pixelSize: Theme.fontSizeSmall
+                        text: "seen: " + last_seen_at + "  "
                     }
                 }
-                Row {
-                    // Joined and last seen time strings
-                    Rectangle {
-                        id: timesRectangle
-                        color: "transparent"
-                        smooth: true
-                        //border.width: 1
-                        width: 250
-                        height: 60
-                        radius: 10
+                // Karma
+                Rectangle {
+                    id: karmaRectangle
+                    color: "transparent"
+                    smooth: true
+                    border.width: 2
+                    border.color: Theme.secondaryHighlightColor
+                    width: karmaLabel.paintedWidth + 2 * Theme.paddingLarge
+                    height: karmaLabel.paintedHeight + reputationLabel.paintedHeight
+                    radius: 10
+                    Column {
+                        width: parent.width
+                        height: parent.height
+                        anchors.verticalCenter: parent.verticalCenter
                         Label {
-                            visible: joined_at !== undefined
-                            font.pixelSize: Theme.fontSizeSmall
-                            anchors.top: parent.top
-                            anchors.right: parent.right
-                            text: "joined: " + joined_at + "  "
-                        }
-                        Label {
-                            visible: joined_at !== undefined
-                            font.pixelSize: Theme.fontSizeSmall
-                            anchors.bottom: parent.bottom
-                            anchors.right: parent.right
-                            text: "  seen: " + last_seen_at + "  "
-                        }
-                    }
-                    // Karma
-                    Rectangle {
-                        id: karmaRectangle
-                        color: "transparent"
-                        smooth: true
-                        border.width: 1
-                        width: 85
-                        height: 60
-                        radius: 10
-                        Label {
-                            font.pixelSize: Theme.fontSizeSmall
+                            id: reputationLabel
                             anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.top: parent.top
+                            font.pixelSize: Theme.fontSizeSmall
                             color: "lightgreen"
                             text: reputation
                         }
                         Label {
-                            font.pixelSize: Theme.fontSizeSmall
+                            id: karmaLabel
                             anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottom: parent.bottom
+                            font.pixelSize: Theme.fontSizeSmall
                             text: "karma"
                         }
                     }
