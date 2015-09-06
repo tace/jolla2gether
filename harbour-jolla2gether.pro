@@ -60,7 +60,9 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/AnswerDelegate.qml \
     qml/pages/AnswerPage.qml \
     qml/pages/CommentsDelegate.qml \
-    qml/pages/AnswerAndCommentDelegateBase.qml
+    qml/pages/AnswerAndCommentDelegateBase.qml \
+    qml/components/VoteButton.qml \
+    qml/components/ButtonPanel.qml
 
 js.files = js
 js.path = /usr/share/$${TARGET}

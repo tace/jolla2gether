@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Column {
+    property alias feedRepeater: commentsRepeater
     property string buttonLabelText: ""
     property bool buttonActivated: false
     property var repeaterModel: null

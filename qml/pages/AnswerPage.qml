@@ -18,6 +18,21 @@ Page {
     property bool answerAccepted: false
     property int answerVotes
     property bool answerDataLoaded: false
+    property int userPicSize: pageSmallestSideLenght / 5
+    property int flagPicHeight: userLabel.height
+    property int flagPicWidth: flagPicHeight * 1.455
+
+    readonly property int pageSmallestSideLenght: getPageOriginalWidthOrHeighBasedOnOrientation()
+
+    function getPageOriginalWidthOrHeighBasedOnOrientation() {
+        if (phoneOrientation === Orientation.Landscape ||
+                phoneOrientation === Orientation.LandscapeInverted) {
+            return height
+        }
+        else {
+            return width
+        }
+    }
 
     InfoBanner {
         id: infoBanner
@@ -102,8 +117,8 @@ Page {
                 }
                 Image {
                     id: answeredUserPic
-                    width: 100
-                    height: 100
+                    width: userPicSize
+                    height: userPicSize
                     smooth: true
                     source: ""
                 }
@@ -129,8 +144,8 @@ Page {
                             id: answerFlagImage
                             anchors.verticalCenter: userLabel.verticalCenter
                             anchors.leftMargin: Theme.paddingMedium
-                            width: 16
-                            height: 11
+                            width: flagPicWidth
+                            height: flagPicHeight
                             smooth: true
                             source: ""
                         }
@@ -155,25 +170,61 @@ Page {
                     width: parent.width -
                            userStatsAndFlagColumn.width -
                            answeredUserPic.width -
-                           answerButtonsRow.width - Theme.paddingMedium * 2
+                           answerButtonsRow.width - Theme.paddingLarge * 3
                 }
                 Row {
                     id: answerButtonsRow
-                    Image {
-                        id: acceptAnswerButton
+                    Column {
+                        width: childrenRect.width + Theme.paddingMedium
                         visible: isMyOwnQuestion() || answerAccepted
-                        anchors.verticalCenter: votingButtonsColumn.verticalCenter
-                        width: 64
-                        height: 64
-                        source: answerAccepted ? "qrc:/qml/images/answer-accepted.png" : "qrc:/qml/images/answer-not-accepted.png"
-                        MouseArea {
-                            enabled: ! infoBanner.visible()
-                            anchors.fill: parent
-                            onClicked: {
-                                acceptAnswer(answerId)
+                        Rectangle {
+                            width: acceptAnswerButton.width - Theme.paddingMedium
+                            height: acceptAnswerButton.height - Theme.paddingMedium
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: "transparent"
+                            border.color: answerAccepted ? "green" : "transparent"
+                            border.width: acceptAnswerButton.width / 10
+                            radius: acceptAnswerButton.width / 2
+                            smooth: true
+                            IconButton {
+                                id: acceptAnswerButton
+                                enabled: ! infoBanner.visible()
+                                icon.source: "image://theme/icon-m-acknowledge"
+                                anchors.centerIn: parent
+                                onClicked: {
+                                    acceptAnswer(answerId)
+                                }
                             }
                         }
+                        Item {
+                            visible: acceptAnswerLabel.visible
+                            width: 1
+                            height: Theme.paddingSmall
+                        }
+                        Label {
+                            id: acceptAnswerLabel
+                            visible: text !== ""
+                            font.pixelSize: Theme.fontSizeTiny
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: answerAccepted ? qsTr("Answer accepted") : qsTr("Accept answer")
+                        }
                     }
+
+                    //                    Image {
+                    //                        id: acceptAnswerButton
+                    //                        //visible: isMyOwnQuestion() || answerAccepted
+                    //                        anchors.verticalCenter: votingButtonsColumn.verticalCenter
+                    //                        width: 64
+                    //                        height: 64
+                    //                        source: answerAccepted ? "qrc:/qml/images/answer-accepted.png" : "qrc:/qml/images/answer-not-accepted.png"
+                    //                        MouseArea {
+                    //                            enabled: ! infoBanner.visible()
+                    //                            anchors.fill: parent
+                    //                            onClicked: {
+                    //                                acceptAnswer(answerId)
+                    //                            }
+                    //                        }
+                    //                    }
                     Column {
                         BusyIndicator {
                             id: busyIndicator
@@ -196,10 +247,10 @@ Page {
                         id: votingButtonsColumn
                         visible: answerDataLoaded
                         height: childrenRect.height
-                        anchors.rightMargin: Theme.paddingMedium
-                        VotingButton {
+                        VoteButton {
                             id: voteUpButton
                             buttonType: voteUpButton.answer_vote_up
+                            buttonLabelText: ""
                             userNotifObject: infoBanner
                             userLoggedIn: questionsModel.isUserLoggedIn()
                             oppositeVoteButton: voteDownButton
@@ -216,9 +267,11 @@ Page {
                             bottomLabelText: qsTr("votes")
                             bottomLabelFontColor: Theme.secondaryColor
                         }
-                        VotingButton {
+                        VoteButton {
                             id: voteDownButton
+                            anchors.horizontalCenter: voteUpButton.horizontalCenter
                             buttonType: voteDownButton.answer_vote_down
+                            buttonLabelText: ""
                             userNotifObject: infoBanner
                             userLoggedIn: questionsModel.isUserLoggedIn()
                             oppositeVoteButton: voteUpButton
@@ -256,7 +309,7 @@ Page {
                 buttonLabelText: getButtonText()
                 repeaterModel: rssFeedModel.answerCommentsRssModel
                 repeaterDelegate: CommentsDelegate { loadCommentData: answerDataLoaded
-                                                     relatedQuestionOrAnswerNumber: answerId}
+                    relatedQuestionOrAnswerNumber: answerId}
                 onButtonPressed: {
                     rssFeedModel.openAnswersOrCommentsRssFeedList(false)
                 }
@@ -300,7 +353,6 @@ Page {
             if (searchBanner.opened) {
                 contentY += searchBanner.height
             }
-
             if (contentX >= r.x)
                 contentX = r.x;
             else if (contentX+width <= r.x+r.width)
@@ -322,7 +374,7 @@ Page {
         foreground: contentFlickable
         mainFlickable: contentFlickable
         pageMainTextElement: answerText
-        pageDynamicTextModelElement: commentsFeed
+        pageDynamicTextModelElement: commentsFeed.feedRepeater
     }
     function getPageTextFontSize() {
         return appSettings.question_view_page_font_size_value
@@ -355,7 +407,7 @@ Page {
                                 answerUsername,
                                 karma,
                                 answerAcceptedBool) {
-        answeredUserPic.source = "http:" + usersModel.changeImageLinkSize(gravatarUrl, 100)
+        answeredUserPic.source = "http:" + usersModel.changeImageLinkSize(gravatarUrl, userPicSize)
         if (flagUrl !== "")
             answerFlagImage.source = siteBaseUrl + flagUrl
         userLabel.text = "<b>" + answerUsername + "</b>"

@@ -2,7 +2,6 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Row {
-    property int parentWidth
     property bool timesVisible: true
     property bool createTimeVisible: true
     property bool votesVisible: true
@@ -11,13 +10,6 @@ Row {
     property int statsLabelsFontSize: Theme.fontSizeTiny
     property int rectangleHeightAdjustment: -5
 
-    // Fill some space before statics rectangles
-    Rectangle {
-        id: fillRectangel
-        color: "transparent"
-        width: getPaddingWidth()
-        height: 1
-    }
     StatsRectangle {
         id: timesRectangle
         visible: timesVisible
@@ -57,12 +49,5 @@ Row {
         bottomLabelText: qsTr("votes")
         bottomLabelFontColor: Theme.secondaryColor
         recHeightAdjustment: rectangleHeightAdjustment
-    }
-    function getPaddingWidth() {
-        return parentWidth -
-                (timesVisible ? timesRectangle.width : 0) -
-                (votesVisible ? votesRectangle.width : 0) -
-                (answersVisible ? answersRectangle.width : 0) -
-                (viewsVisible ? viewsRectangle.width : 0)
     }
 }

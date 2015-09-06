@@ -38,21 +38,16 @@ Page {
     allowedOrientations: Orientation.All
     property bool navigatedForward: false
     property bool userSearchActive: false
-    readonly property int userPageLowestSizeSideValue: getPageOriginalWidthOrHeighBasedOnOrientation()
+    readonly property int pageSmallestSideLenght: getPageOriginalWidthOrHeighBasedOnOrientation()
 
     function getPageOriginalWidthOrHeighBasedOnOrientation() {
         if (phoneOrientation === Orientation.Landscape ||
             phoneOrientation === Orientation.LandscapeInverted) {
-            console.log("it's landsscape")
-            return usersPage.height
+            return height
         }
         else {
-            console.log("it's portrait " + parent.width + "," + parent.height)
-            return usersPage.width
+            return width
         }
-    }
-    onUserPageLowestSizeSideValueChanged: {
-        console.log("the side lenght: " + userPageLowestSizeSideValue)
     }
 
 

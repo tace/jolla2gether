@@ -37,7 +37,19 @@ Page {
     property var startTime
     property var endTime
     property int landScapeMode: phoneOrientation
-    property int userPicSize: page.width / 5
+    property int userPicSize: pageSmallestSideLenght / 5
+
+    readonly property int pageSmallestSideLenght: getPageOriginalWidthOrHeighBasedOnOrientation()
+
+    function getPageOriginalWidthOrHeighBasedOnOrientation() {
+        if (phoneOrientation === Orientation.Landscape ||
+                phoneOrientation === Orientation.LandscapeInverted) {
+            return height
+        }
+        else {
+            return width
+        }
+    }
 
     InfoBanner {
         id: infoBanner
@@ -79,8 +91,7 @@ Page {
 
     function getVotingResultsCallback() {
         return function votingResultsCallback(up, down) {
-            voteDownButton.setVoteStatus(down)
-            voteUpButton.setVoteStatus(up)
+            actionButtons.setVoteStatuses(up, down)
             voteStatusLoaded = true
         }
     }
@@ -146,21 +157,21 @@ Page {
 
     onLandScapeModeChanged: {
         if (landScapeMode === Orientation.Landscape ||
-            landScapeMode === Orientation.LandscapeInverted) {
+                landScapeMode === Orientation.LandscapeInverted) {
             console.log("turning to landscape mode")
-            voteUpButton.anchors.bottom = undefined
-            voteUpButton.anchors.top = askedAdUpdatedTimesRec.top
+//            voteUpButton.anchors.bottom = undefined
+//            voteUpButton.anchors.top = askedAdUpdatedTimesRec.top
 
-            statsRow.anchors.bottom = undefined
-            statsRow.anchors.top = voteUpButton.bottom
+//            statsRow.anchors.bottom = undefined
+//            statsRow.anchors.top = voteUpButton.bottom
         }
         else {
             console.log("turning to normal mode")
-            statsRow.anchors.top = undefined
-            statsRow.anchors.bottom = askedAdUpdatedTimesRec.bottom
+//            statsRow.anchors.top = undefined
+//            statsRow.anchors.bottom = askedAdUpdatedTimesRec.bottom
 
-            voteUpButton.anchors.top = undefined
-            voteUpButton.anchors.bottom = statsRow.top
+//            voteUpButton.anchors.top = undefined
+//            voteUpButton.anchors.bottom = statsRow.top
         }
     }
 
@@ -235,6 +246,10 @@ Page {
 
         PageHeader {
             id: pageHeader
+            anchors.right: parent.right
+            height: userPic.height + Theme.paddingLarge
+            //width: userPic.width + (userNameLabel.width > userKarmaLabel.width ? userNameLabel.width : userKarmaLabel.width)
+            width: userPic.width + Theme.paddingMedium
             Label {
                 id: userNameLabel
                 anchors.top: pageHeader.top
@@ -273,8 +288,8 @@ Page {
                 }
             }
         }
-        PullDownMenu {
-            id: pullDownMenu
+//        PullDownMenu {
+//            id: pullDownMenu
             //
             // Disabled text selection feature as copy to system clipboard seems not to work constantly
             //
@@ -295,19 +310,19 @@ Page {
             //                }
             //            }
 
-            MenuItem {
-                text: qsTr("Search...")
-                onClicked: {
-                    searchBanner.show()
-                }
-            }
-        }
+//            MenuItem {
+//                text: qsTr("Search...")
+//                onClicked: {
+//                    searchBanner.show()
+//                }
+//            }
+//        }
         Item {
             id: questionTitleItem
-            anchors.top: pageHeader.bottom
+            anchors.top: pageHeader.verticalCenter
             anchors.topMargin: Theme.paddingLarge
             anchors.left: parent.left
-            anchors.right: voteUpButton.left
+            anchors.right: pageHeader.left
             anchors.leftMargin: Theme.paddingMedium
             anchors.rightMargin: Theme.paddingMedium
             height: childrenRect.height
@@ -389,67 +404,13 @@ Page {
                 text: updated
             }
         }
-
-        Image {
-            id: followedIcon
-            visible: followedStatusLoaded
-            anchors.left: askedAdUpdatedTimesRec.right
-            anchors.top: askedAdUpdatedTimesRec.top
-            anchors.leftMargin: Theme.paddingLarge - 5
-            source: followed ? "image://theme/icon-l-favorite"
-                             : "image://theme/icon-l-star"
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: ! infoBanner.visible()
-                onClicked: {
-                    if (amILoggedIn(qsTr("Please log in to follow/un-follow questions!")))
-                        followQuestion()
-                }
-            }
-        }
-
-        // Voting buttons
-        VotingButton {
-            id: voteUpButton
-            enabled: voteStatusLoaded
-            visible: voteStatusLoaded
-            anchors.bottom: statsRow.top
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.paddingLarge
-
-            buttonType: voteUpButton.question_vote_up
-            userLoggedIn: questionsModel.isUserLoggedIn()
-            userNotifObject: infoBanner
-            oppositeVoteButton: voteDownButton
-            initialVotes: votes
-            votingTargetId: qid
-        }
         StatsRow {
             id: statsRow
             timesVisible: false
-            parentWidth: parent.width -
-                         askedAdUpdatedTimesRec.width -
-                         followedIcon.width -
-                         Theme.paddingMedium    // left of askedAdUpdatedTimesRec
             anchors.bottom: askedAdUpdatedTimesRec.bottom
-            anchors.right: parent.right
+            anchors.left: askedAdUpdatedTimesRec.right
             anchors.rightMargin: Theme.paddingMedium
-        }
-        VotingButton {
-            id: voteDownButton
-            enabled: voteStatusLoaded
-            visible: voteStatusLoaded
-            anchors.top: statsRow.bottom
-            anchors.right: parent.right
-            anchors.rightMargin: Theme.paddingLarge
-
-            buttonType: voteUpButton.question_vote_down
-            userLoggedIn: questionsModel.isUserLoggedIn()
-            userNotifObject: infoBanner
-            oppositeVoteButton: voteUpButton
-            initialVotes: votes
-            votingTargetId: qid
+            anchors.leftMargin: Theme.paddingLarge * 2
         }
         Item {
             id: filler
@@ -464,15 +425,26 @@ Page {
             itemsArrayModel: tagsArray
             anchors.top: filler.bottom
             anchors.left: parent.left
-            anchors.right: voteDownButton.left
+            anchors.right: parent.right
         }
-
+        ButtonPanel {
+            id: actionButtons
+            width: parent.width
+            anchors.top: getTop()
+            anchors.topMargin: Theme.paddingLarge
+            anchors.bottomMargin: Theme.paddingLarge
+            anchors.leftMargin: Theme.paddingLarge * 3
+            anchors.rightMargin: Theme.paddingLarge * 3
+            function getTop() {
+                //console.log("tagsColumn.y: " + tagsColumn.y + tagsColumn.height + ", pageHeader.y: " + pageHeader.y + pageHeader.height)
+                return tagsColumn.y + tagsColumn.height > pageHeader.y + pageHeader.height ? tagsColumn.bottom : pageHeader.bottom
+            }
+        }
         Column {
             id: questionTextContentColumn
             width: parent.width
             height: childrenRect.height
-            anchors.top: (voteDownButton.y > tagsColumn.y) ? voteDownButton.bottom : tagsColumn.bottom
-
+            anchors.top: actionButtons.bottom
             Item {
                 width: 1
                 height: hasTags() ? Theme.paddingLarge : 0
@@ -524,7 +496,7 @@ Page {
                 buttonLabelText: getButtonText()
                 repeaterModel: rssFeedModel.questionCommentsRssModel
                 repeaterDelegate: CommentsDelegate { loadCommentData: followedStatusLoaded
-                                                     relatedQuestionOrAnswerNumber: qid }
+                    relatedQuestionOrAnswerNumber: qid }
                 onButtonPressed: {
                     rssFeedModel.openAnswersOrCommentsRssFeedList(false)
                 }
@@ -630,17 +602,17 @@ Page {
                     questionTitleItem.height +
                     titlePadding.height +
                     askedAdUpdatedTimesRec.height +
-                    voteUpButton.height +
-                    voteDownButton.height +
+                    actionButtons.height +
                     filler.height +
                     tagsColumn.height
         }
     }
+
     SearchBanner {
         id: searchBanner
         foreground: contentFlickable
         mainFlickable: contentFlickable
         pageMainTextElement: questionText
-        pageDynamicTextModelElement: answersAndCommentsList
+        pageDynamicTextModelElement: commentsFeed.feedRepeater
     }
 }

@@ -6,7 +6,7 @@ ListItem  {
     anchors.left: ListView.left
     anchors.right: ListView.right
     contentHeight: userPicSize
-    property int userPicSize: userPageLowestSizeSideValue / 5
+    property int userPicSize: pageSmallestSideLenght / 5
     menu: contextMenu
     Keys.onReturnPressed: {
         clicked(MouseArea)

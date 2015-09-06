@@ -62,7 +62,6 @@ Page {
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
         anchors.fill: parent
-        width: parent.width
         focus: true
         CtrlPlusKeyPressed {
             id: ctrlHandlerQuestions
@@ -170,6 +169,10 @@ Page {
             anchors.rightMargin: Theme.paddingMedium
             height: childrenRect.height
             width: parent.width
+            Item {
+                width: 1
+                height: 2 * Theme.paddingLarge
+            }
             Separator {
                 width: parent.width
                 horizontalAlignment: Qt.AlignCenter

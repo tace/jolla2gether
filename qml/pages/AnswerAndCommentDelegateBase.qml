@@ -19,15 +19,15 @@ ListItem  {
         //return Theme.fontSizeExtraLarge
         return appSettings.question_view_page_answers_and_comments_font_size_value
     }
-//    function getPlainText() {
-//        return answerCommentText.getPlainText()
-//    }
-//    function selectAndMovetoText(start, end) {
-//        return answerCommentText.selectAndMovetoText(start, end)
-//    }
-//    function resetSearchTextSelection() {
-//        answerCommentText.resetTextSelection()
-//    }
+    function getPlainText() {
+        return answerCommentText.getPlainText()
+    }
+    function selectAndMovetoText(start, end) {
+        return answerCommentText.selectAndMovetoText(start, end)
+    }
+    function resetSearchTextSelection() {
+        answerCommentText.resetTextSelection()
+    }
     function isAnswer() {
         if (category === rssFeedModel.answerFilter)
             return true

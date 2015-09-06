@@ -41,14 +41,14 @@ Drawer {
                 IconButton {
                     enabled: searchField.text.trim().length > 0 &&
                              previousButtonEnabled
-                    icon.source: "image://theme/icon-l-right"
-                    rotation: -180
+                    icon.source: "image://theme/icon-m-left"
+                    //rotation: -180
                     onClicked: {
                         makeSearch(searchField.text, true)
                     }
                 }
                 IconButton {
-                    icon.source: "image://theme/icon-l-cancel"
+                    icon.source: "image://theme/icon-m-reset"
                     onClicked: {
                         //resetMainSearch()
                         //resetModelSearch()
@@ -59,7 +59,7 @@ Drawer {
                 IconButton {
                     enabled: searchField.text.trim().length > 0 &&
                              nextButtonEnabled
-                    icon.source: "image://theme/icon-l-right"
+                    icon.source: "image://theme/icon-m-right"
                     onClicked: {
                         makeSearch(searchField.text)
                     }

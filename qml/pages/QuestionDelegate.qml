@@ -148,14 +148,13 @@ ListItem  {
         color: Theme.secondaryColor
         text: qsTr("(last updated by)")
     }
-
     StatsRow {
         id: staticticsRow
         createTimeVisible: questionsModel.pageHeader !== questionsModel.pageHeader_FOLLOWED_QUESTIONS ||
                            created !== ""
-        parentWidth: background.width - authorLabel.width
+        //parentWidth: background.width - authorLabel.width
         anchors.top: authorLabel.top
-        anchors.left: authorLabel.right
+        anchors.right: parent.right
     }
 
     Separator {
