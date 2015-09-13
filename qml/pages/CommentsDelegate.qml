@@ -43,7 +43,7 @@ AnswerAndCommentDelegateBase  {
         }
         Row {
             width: parent.width
-            height:  titleLabel.height
+            height:  titleLabel.height + Theme.paddingLarge
             Column {
                 id: commentTitleColumn
                 height: childrenRect.height
@@ -66,23 +66,21 @@ AnswerAndCommentDelegateBase  {
                     Rectangle {
                         id: commentVotingButton
                         visible: loadCommentData
-                        height: titleLabel.height
-                        width: commentLikeRow.width + 10
+                        height: commentLikeRow.height
+                        width: commentLikeRow.width
                         border.width: 0
                         color: "transparent"
                         Row {
                             id: commentLikeRow
-                            anchors.horizontalCenter: commentVotingButton.horizontalCenter
+                            anchors.centerIn: parent
                             Item {
                                 height: 1
                                 width: Theme.paddingSmall
-                            }
+                            }                            
                             Image {
                                 id: commentLikeImage
-                                width: 32
-                                height: 32
                                 smooth: true
-                                source: "image://theme/icon-s-like"
+                                source: "image://theme/icon-m-like"
                             }
                             Item {
                                 height: 1

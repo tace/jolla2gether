@@ -2,7 +2,6 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Column {
-    width: childrenRect.width + Theme.paddingMedium
     property int question_vote_up: 1
     property int question_vote_down: 2
     property int answer_vote_up: 3
@@ -11,7 +10,7 @@ Column {
     property alias buttonLabelText: voteButtonLabel.text
 
     property bool voteOn: false
-    property int initialVotes: 0
+    property string initialVotes
     property string votingTargetId
     property bool userLoggedIn: true
     property var userNotifObject: null

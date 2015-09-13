@@ -422,6 +422,7 @@ Page {
 
         ItemFlowColumn {
             id: tagsColumn
+            visible: hasTags()
             itemsArrayModel: tagsArray
             anchors.top: filler.bottom
             anchors.left: parent.left
@@ -429,12 +430,37 @@ Page {
         }
         ButtonPanel {
             id: actionButtons
+            visible: followedStatusLoaded
             width: parent.width
             anchors.top: getTop()
             anchors.topMargin: Theme.paddingLarge
             anchors.bottomMargin: Theme.paddingLarge
-            anchors.leftMargin: Theme.paddingLarge * 3
-            anchors.rightMargin: Theme.paddingLarge * 3
+//            anchors.leftMargin: Theme.paddingLarge * 3
+//            anchors.rightMargin: Theme.paddingLarge * 3
+
+            // Search button
+            customButton1.icon.source: "image://theme/icon-m-search"
+            customButton1.onClicked: {
+                searchBanner.show()
+            }
+            customButtom1LabelText: qsTr("Search")
+
+            // Followed button
+            customButton2.icon.source: followed ? "image://theme/icon-m-favorite-selected"
+                                                : "image://theme/icon-m-favorite"
+            customButton2.enabled: ! infoBanner.visible()
+            customButton2.onClicked: {
+                if (amILoggedIn(qsTr("Please log in to follow/un-follow questions!")))
+                    followQuestion()
+            }
+            customButtom2LabelText: qsTr("Follow")
+
+            // Vote buttons
+            voteButtonsTargetId: qid
+            voteButttonsInitialVote: votes
+            voteUpButton.buttonType: voteUpButton.question_vote_up
+            voteDownButton.buttonType: voteDownButton.question_vote_down
+
             function getTop() {
                 //console.log("tagsColumn.y: " + tagsColumn.y + tagsColumn.height + ", pageHeader.y: " + pageHeader.y + pageHeader.height)
                 return tagsColumn.y + tagsColumn.height > pageHeader.y + pageHeader.height ? tagsColumn.bottom : pageHeader.bottom
@@ -447,7 +473,7 @@ Page {
             anchors.top: actionButtons.bottom
             Item {
                 width: 1
-                height: hasTags() ? Theme.paddingLarge : 0
+                height: Theme.paddingLarge
             }
 
             // Show question status (closed/answered)

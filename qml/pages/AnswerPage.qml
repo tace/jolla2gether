@@ -93,15 +93,6 @@ Page {
             id: pageHeader
             title: qsTr("Answer")
         }
-        PullDownMenu {
-            id: pullDownMenu
-            MenuItem {
-                text: qsTr("Search...")
-                onClicked: {
-                    searchBanner.show()
-                }
-            }
-        }
 
         Column {
             id: answerContentColumn
@@ -170,61 +161,10 @@ Page {
                     width: parent.width -
                            userStatsAndFlagColumn.width -
                            answeredUserPic.width -
-                           answerButtonsRow.width - Theme.paddingLarge * 3
+                           votesRow.width - Theme.paddingLarge * 3
                 }
                 Row {
-                    id: answerButtonsRow
-                    Column {
-                        width: childrenRect.width + Theme.paddingMedium
-                        visible: isMyOwnQuestion() || answerAccepted
-                        Rectangle {
-                            width: acceptAnswerButton.width - Theme.paddingMedium
-                            height: acceptAnswerButton.height - Theme.paddingMedium
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            color: "transparent"
-                            border.color: answerAccepted ? "green" : "transparent"
-                            border.width: acceptAnswerButton.width / 10
-                            radius: acceptAnswerButton.width / 2
-                            smooth: true
-                            IconButton {
-                                id: acceptAnswerButton
-                                enabled: ! infoBanner.visible()
-                                icon.source: "image://theme/icon-m-acknowledge"
-                                anchors.centerIn: parent
-                                onClicked: {
-                                    acceptAnswer(answerId)
-                                }
-                            }
-                        }
-                        Item {
-                            visible: acceptAnswerLabel.visible
-                            width: 1
-                            height: Theme.paddingSmall
-                        }
-                        Label {
-                            id: acceptAnswerLabel
-                            visible: text !== ""
-                            font.pixelSize: Theme.fontSizeTiny
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: answerAccepted ? qsTr("Answer accepted") : qsTr("Accept answer")
-                        }
-                    }
-
-                    //                    Image {
-                    //                        id: acceptAnswerButton
-                    //                        //visible: isMyOwnQuestion() || answerAccepted
-                    //                        anchors.verticalCenter: votingButtonsColumn.verticalCenter
-                    //                        width: 64
-                    //                        height: 64
-                    //                        source: answerAccepted ? "qrc:/qml/images/answer-accepted.png" : "qrc:/qml/images/answer-not-accepted.png"
-                    //                        MouseArea {
-                    //                            enabled: ! infoBanner.visible()
-                    //                            anchors.fill: parent
-                    //                            onClicked: {
-                    //                                acceptAnswer(answerId)
-                    //                            }
-                    //                        }
-                    //                    }
+                    id: votesRow
                     Column {
                         BusyIndicator {
                             id: busyIndicator
@@ -247,40 +187,52 @@ Page {
                         id: votingButtonsColumn
                         visible: answerDataLoaded
                         height: childrenRect.height
-                        VoteButton {
-                            id: voteUpButton
-                            buttonType: voteUpButton.answer_vote_up
-                            buttonLabelText: ""
-                            userNotifObject: infoBanner
-                            userLoggedIn: questionsModel.isUserLoggedIn()
-                            oppositeVoteButton: voteDownButton
-                            votingTargetId: answerId
-                            onVoted: {
-                                answerVotes += 1
-                            }
-                        }
                         StatsRectangle {
                             id: votesRectangle
-                            anchors.horizontalCenter: voteUpButton.horizontalCenter
-                            topLabelText: answerVotes
+                            topLabelText: answerVotes.toString()
                             topLabelFontColor: "lightgreen"
+                            topLabelFontSize: Theme.fontSizeMedium
                             bottomLabelText: qsTr("votes")
                             bottomLabelFontColor: Theme.secondaryColor
-                        }
-                        VoteButton {
-                            id: voteDownButton
-                            anchors.horizontalCenter: voteUpButton.horizontalCenter
-                            buttonType: voteDownButton.answer_vote_down
-                            buttonLabelText: ""
-                            userNotifObject: infoBanner
-                            userLoggedIn: questionsModel.isUserLoggedIn()
-                            oppositeVoteButton: voteUpButton
-                            votingTargetId: answerId
-                            onVoted: {
-                                answerVotes -= 1
-                            }
+                            bottomLabelFontSize: Theme.fontSizeMedium
                         }
                     }
+                }
+            }
+            Item {
+                width: 1
+                height: Theme.paddingLarge
+            }
+            ButtonPanel {
+                id: actionButtons
+                visible: answerDataLoaded
+                //width: parent.width - 2 * Theme.paddingLarge
+
+                // Search button
+                customButton1.icon.source: "image://theme/icon-m-search"
+                customButton1.onClicked: {
+                    searchBanner.show()
+                }
+                customButtom1LabelText: qsTr("Search")
+
+                // AcceptAnswer button
+                customButton2.icon.source: "image://theme/icon-m-dot?" + (answerAccepted
+                                                                          ? "green"
+                                                                          : Theme.primaryColor)
+                customButton2.enabled: ! infoBanner.visible()
+                customButton2.onClicked: {
+                    acceptAnswer(answerId)
+                }
+                customButtom2LabelText: answerAccepted ? qsTr("Answer accepted") : qsTr("Accept answer")
+
+                voteButtonsTargetId: answerId
+                voteUpButton.buttonType: voteUpButton.answer_vote_up
+                voteDownButton.buttonType: voteDownButton.answer_vote_down
+                voteUpButton.onVoted: {
+                    answerVotes += 1
+                }
+                voteDownButton.onVoted: {
+                    answerVotes -= 1
                 }
             }
             Item {
@@ -298,7 +250,7 @@ Page {
 
             Item {
                 width: 1
-                height: Theme.paddingLarge * 3
+                height: Theme.paddingLarge * 2
             }
 
             RssFeedRepeater {
@@ -364,8 +316,7 @@ Page {
         }
         function heighBeforeTextContent() {
             return pageHeader.height +
-                    voteUpButton.height +
-                    voteDownButton.height
+                    actionButtons.height
         }
 
     }
@@ -413,9 +364,8 @@ Page {
         userLabel.text = "<b>" + answerUsername + "</b>"
         karmaLabel.text = "Karma: " + karma
         answerAccepted = answerAcceptedBool
-        answerVotes = answerVotesValue
-        voteUpButton.setVoteStatus(upVote)
-        voteDownButton.setVoteStatus(downVote)
+        answerVotes = parseInt(answerVotesValue)
+        actionButtons.setVoteStatuses(upVote, downVote)
         answerDataLoaded = true
     }
     function getAnswerId() {

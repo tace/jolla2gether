@@ -46,7 +46,17 @@ ApplicationWindow
     property string webviewBrowseBackText: "Back"
     property bool webviewWasActiveWhenUnattached: false
     property int phoneOrientation: deviceOrientation
+    property bool isLandscape: false
 
+    function setOrientation() {
+        if (phoneOrientation === Orientation.Landscape ||
+            phoneOrientation === Orientation.LandscapeInverted) {
+            isLandscape = true
+        }
+        else {
+            isLandscape = false
+        }
+    }
 
     Settings {
         id: appSettings

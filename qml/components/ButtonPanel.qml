@@ -3,6 +3,15 @@ import Sailfish.Silica 1.0
 
 Column {
     width: parent.width
+    property alias customButton1: customButton1
+    property alias customButtom1LabelText: customButton1Label.text
+    property alias customButton2: customButton2
+    property alias customButtom2LabelText: customButton2Label.text
+
+    property string voteButtonsTargetId
+    property alias voteDownButton: voteDownButton
+    property alias voteUpButton: voteUpButton
+    property string voteButttonsInitialVote
 
     Separator {
         width: parent.width
@@ -15,26 +24,20 @@ Column {
         height: Theme.paddingSmall
     }
     Row {
-        spacing: parent.width / (2 * 4 + 1)
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: childrenRect.width
         height: childrenRect.height
+        spacing: parent.width / (4 * (isLandscape ? 2 : 3)) + (isLandscape ? 10 : 7)
+        anchors.horizontalCenter: parent.horizontalCenter
 
         Column {
-            visible: followedStatusLoaded
-            width: childrenRect.width + Theme.paddingMedium
             Rectangle {
-                width: searchButton.width - Theme.paddingMedium
-                height: searchButton.height - Theme.paddingMedium
+                width: customButton1.width - Theme.paddingMedium
+                height: customButton1.height - Theme.paddingMedium
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "transparent"
                 IconButton {
-                    id: searchButton
+                    id: customButton1
                     anchors.centerIn: parent
-                    icon.source: "image://theme/icon-m-search"
-                    onClicked: {
-                        searchBanner.show()
-                    }
+                    icon.source: ""
                 }
             }
             Item {
@@ -42,29 +45,22 @@ Column {
                 height: Theme.paddingSmall
             }
             Label {
+                id: customButton1Label
                 font.pixelSize: Theme.fontSizeTiny
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Search")
+                text: ""
             }
         }
         Column {
-            visible: followedStatusLoaded
-            width: childrenRect.width + Theme.paddingMedium
             Rectangle {
-                width: followedIcon.width - Theme.paddingMedium
-                height: followedIcon.height - Theme.paddingMedium
+                width: customButton2.width - Theme.paddingMedium
+                height: customButton2.height - Theme.paddingMedium
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "transparent"
                 IconButton {
-                    id: followedIcon
+                    id: customButton2
                     anchors.centerIn: parent
-                    icon.source: followed ? "image://theme/icon-m-favorite-selected"
-                                          : "image://theme/icon-m-favorite"
-                    enabled: ! infoBanner.visible()
-                    onClicked: {
-                        if (amILoggedIn(qsTr("Please log in to follow/un-follow questions!")))
-                            followQuestion()
-                    }
+                    icon.source: ""
                 }
             }
             Item {
@@ -72,32 +68,29 @@ Column {
                 height: Theme.paddingSmall
             }
             Label {
+                id: customButton2Label
                 font.pixelSize: Theme.fontSizeTiny
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Follow")
+                text: ""
             }
         }
         VoteButton {
             id: voteDownButton
-            enabled: voteStatusLoaded
-            visible: voteStatusLoaded
             buttonType: voteUpButton.question_vote_down
             userLoggedIn: questionsModel.isUserLoggedIn()
             userNotifObject: infoBanner
             oppositeVoteButton: voteUpButton
-            initialVotes: votes
-            votingTargetId: qid
+            initialVotes: voteButttonsInitialVote
+            votingTargetId: voteButtonsTargetId
         }
         VoteButton {
             id: voteUpButton
-            enabled: voteStatusLoaded
-            visible: voteStatusLoaded
             buttonType: voteUpButton.question_vote_up
             userLoggedIn: questionsModel.isUserLoggedIn()
             userNotifObject: infoBanner
             oppositeVoteButton: voteDownButton
-            initialVotes: votes
-            votingTargetId: qid
+            initialVotes: voteButttonsInitialVote
+            votingTargetId: voteButtonsTargetId
         }
     }
     Item {
