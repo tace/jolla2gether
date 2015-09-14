@@ -527,6 +527,16 @@ ListModel {
         }
         return false
     }
+    // Return authorid as number
+    function getQuestionAuthor(questionIndex) {
+        return questionsModel.get(questionIndex).author_id
+    }
+    function isMyOwnQuestion(questionIndex) {
+        if (Number(questionsModel.ownUserIdValue) === getQuestionAuthor(questionIndex)) {
+            return true
+        }
+        return false
+    }
 
     function setUserLoginInfo(userId, userName, karma, badges) {
         questionsModel.ownUserIdValue = userId

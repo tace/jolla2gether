@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Column {
+    id: buttonPanel
     width: parent.width
     property alias customButton1: customButton1
     property alias customButtom1LabelText: customButton1Label.text
@@ -12,6 +13,7 @@ Column {
     property alias voteDownButton: voteDownButton
     property alias voteUpButton: voteUpButton
     property string voteButttonsInitialVote
+    property bool isMyOwnPost: false  // Own question or answer
 
     Separator {
         width: parent.width
@@ -82,6 +84,7 @@ Column {
             oppositeVoteButton: voteUpButton
             initialVotes: voteButttonsInitialVote
             votingTargetId: voteButtonsTargetId
+            isMyOwnPost: buttonPanel.isMyOwnPost
         }
         VoteButton {
             id: voteUpButton
@@ -91,6 +94,7 @@ Column {
             oppositeVoteButton: voteDownButton
             initialVotes: voteButttonsInitialVote
             votingTargetId: voteButtonsTargetId
+            isMyOwnPost: buttonPanel.isMyOwnPost
         }
     }
     Item {

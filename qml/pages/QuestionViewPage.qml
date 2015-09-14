@@ -159,19 +159,9 @@ Page {
         if (landScapeMode === Orientation.Landscape ||
                 landScapeMode === Orientation.LandscapeInverted) {
             console.log("turning to landscape mode")
-//            voteUpButton.anchors.bottom = undefined
-//            voteUpButton.anchors.top = askedAdUpdatedTimesRec.top
-
-//            statsRow.anchors.bottom = undefined
-//            statsRow.anchors.top = voteUpButton.bottom
         }
         else {
             console.log("turning to normal mode")
-//            statsRow.anchors.top = undefined
-//            statsRow.anchors.bottom = askedAdUpdatedTimesRec.bottom
-
-//            voteUpButton.anchors.top = undefined
-//            voteUpButton.anchors.bottom = statsRow.top
         }
     }
 
@@ -460,6 +450,7 @@ Page {
             voteButttonsInitialVote: votes
             voteUpButton.buttonType: voteUpButton.question_vote_up
             voteDownButton.buttonType: voteDownButton.question_vote_down
+            isMyOwnPost: questionsModel.isMyOwnQuestion(index)
 
             function getTop() {
                 //console.log("tagsColumn.y: " + tagsColumn.y + tagsColumn.height + ", pageHeader.y: " + pageHeader.y + pageHeader.height)

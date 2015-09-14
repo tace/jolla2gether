@@ -234,6 +234,7 @@ Page {
                 voteDownButton.onVoted: {
                     answerVotes -= 1
                 }
+                isMyOwnPost: isMyOwnAnswer()
             }
             Item {
                 width: 1
@@ -331,9 +332,9 @@ Page {
         return appSettings.question_view_page_font_size_value
     }
     function acceptAnswer(answer_id) {
-        if (!isMyOwnQuestion()) {
+        if (!questionsModel.isMyOwnQuestion(questionIndex)) {
             infoBanner.showText(qsTr("Sorry, only moderators or original author of the question can accept or unaccept the best answer"))
-            console.log("Question author " + questionsModel.get(questionIndex).author_id + " is different than your own id: " + questionsModel.ownUserIdValue)
+            console.log("Question author " + questionsModel.getQuestionAuthor(questionIndex) + " is different than your own id: " + questionsModel.ownUserIdValue)
             return
         }
         var script = "document.getElementById('answer-img-accept-" + answer_id + "').click();"
@@ -345,8 +346,8 @@ Page {
             infoBanner.showText(infoText)
         })
     }
-    function isMyOwnQuestion() {
-        if (questionsModel.ownUserIdValue === questionsModel.get(questionIndex).author_id)
+    function isMyOwnAnswer() {
+        if (questionsModel.ownUserName === answerUser)
             return true
         return false
     }

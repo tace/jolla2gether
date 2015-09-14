@@ -103,8 +103,7 @@ AnswerAndCommentDelegateBase  {
                             enabled: ! infoBanner.visible()
                             anchors.fill: parent
                             onClicked: {
-                                if (amILoggedIn(qsTr("Please log in to upvote comments!")))
-                                    voteUpComment(getAnswerOrCommentNumber())
+                                voteUpComment(getAnswerOrCommentNumber())
                             }
                         }
                     }
@@ -200,12 +199,25 @@ AnswerAndCommentDelegateBase  {
                                      commentData[1].trim())
         })
     }
+    function isMyOwnComment() {
+        if (getUser() === questionsModel.ownUserName)
+            return true
+        return false
+    }
+
     function voteUpComment(comment_id) {
+        if (!amILoggedIn(qsTr("Please log in to upvote comments!")))
+            return
         if (upvotedThisComment) {
             infoBanner.showText(qsTr("Already upvoted this comment!"))
             console.log("Already upvoted this comment")
             return
         }
+        if (isMyOwnComment()) {
+            infoBanner.showText(qsTr("Sorry, you cannot vote for your own posts"))
+            return
+        }
+
         var script = "var commentElem = document.getElementById('comment-" + comment_id + "'); \
                       var commentSubs = commentElem.getElementsByTagName('div'); \
                       for (var i = 0; i < commentSubs.length; i++) { \

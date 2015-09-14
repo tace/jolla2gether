@@ -7,6 +7,7 @@ Column {
     property int answer_vote_up: 3
     property int answer_vote_down: 4
     property int buttonType: question_vote_up
+    property bool isMyOwnPost: false  // Own question or answer
     property alias buttonLabelText: voteButtonLabel.text
 
     property bool voteOn: false
@@ -36,26 +37,29 @@ Column {
             icon.source: getVoteButtonImage()
             anchors.centerIn: parent
             onClicked: {
-                if (userLoggedIn) {
-                    if (!voteOn) {
-                        console.log("Voting " + (isUpOrDownButton() ? "UP" : "DOWN"))
-                        vote(votingTargetId)
-                    }
-                    else {
-                        if (userNotifObject !== null) {
-                            var msg = "";
-                            if (isUpOrDownButton())
-                                msg = qsTr("Already voted up!")
-                            else
-                                msg = qsTr("Already voted down!")
-                            userNotifObject.showText(msg)
-                        }
-                    }
-                }
-                else {
+                if (!userLoggedIn) {
                     if (userNotifObject !== null)
                         userNotifObject.showText(qsTr("Please log in to vote!"))
+                    return
                 }
+                if (isMyOwnPost) {
+                    if (userNotifObject !== null)
+                        userNotifObject.showText(qsTr("Sorry, you cannot vote for your own posts"))
+                    return
+                }
+                if (voteOn) {
+                    if (userNotifObject !== null) {
+                        var msg = "";
+                        if (isUpOrDownButton())
+                            msg = qsTr("Already voted up!")
+                        else
+                            msg = qsTr("Already voted down!")
+                        userNotifObject.showText(msg)
+                    }
+                    return
+                }
+                console.log("Voting " + (isUpOrDownButton() ? "UP" : "DOWN"))
+                vote(votingTargetId)
             }
         }
     }
