@@ -44,6 +44,27 @@
 #include "settings.h"
 #include "dateparser.h"
 
+#define debug_mode 0
+
+void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    switch (type)
+    {
+    case QtDebugMsg:
+        if (debug_mode)
+            QTextStream(stdout) << "Debug: " << context.file << ":" << context.line << " " << context.function << " " << msg << "\n";
+        break;
+    case QtWarningMsg:
+        QTextStream(stdout) << "Warning: " << context.file << ":" << context.line << " " << context.function << " " << msg << "\n";
+        break;
+    case QtCriticalMsg:
+        QTextStream(stdout) << "Critical: " << context.file << ":" << context.line << " " << context.function << " " << msg << "\n";
+        break;
+    case QtFatalMsg:
+        QTextStream(stdout) << "Fatal: " << context.file << ":" << context.line << " " << context.function << " " << msg << "\n";
+        abort();
+    }
+}
 
 /* Clears the web cache, because Qt 5.2 WebView chokes on caches from
  * older Qt versions.
@@ -95,6 +116,7 @@ int main(int argc, char *argv[])
 
     // return SailfishApp::main(argc, argv);
 
+    qInstallMessageHandler(messageHandler);
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     clearWebCache();
     QScopedPointer<QQuickView> view(SailfishApp::createView());
