@@ -35,7 +35,6 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/Settings.qml \
     qml/pages/QuestionViewPage.qml \
-    qml/pages/AnswersAndCommentsDelegate.qml \
     qml/pages/SelectTags.qml \
     qml/models/RssFeedModel.qml \
     qml/models/QuestionsModel.qml \
@@ -53,7 +52,6 @@ OTHER_FILES += qml/harbour-jolla2gether.qml \
     qml/components/StatsRectangle.qml \
     qml/components/StatsRow.qml \
     qml/components/SearchBanner.qml \
-    qml/components/VotingButton.qml \
     qml/components/QuestionTypeSelector.qml \
     qml/components/CtrlPlusKeyPressed.qml \
     qml/components/RssFeedRepeater.qml \

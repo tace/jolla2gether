@@ -33,7 +33,7 @@ Column {
     Rectangle {
         id: areaRec
         width: parent.width
-        height: 40
+        height: arrowButton.height
         color: "transparent"
         border.width: 0
         gradient: Gradient {
@@ -58,10 +58,11 @@ Column {
             }
 
             Image {
+                id: arrowButton
                 visible: buttonVisible
-                source: "qrc:/qml/images/arrow-right.png"
+                source: "image://theme/icon-m-down"
                 anchors.leftMargin: Theme.paddingMedium
-                rotation: buttonActivated > 0 ? +90 : 0
+                rotation: buttonActivated > 0 ? 0 : -90
                 anchors.left: parent.left
                 Behavior on rotation { NumberAnimation { duration: 300; } }
             }

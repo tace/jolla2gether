@@ -216,9 +216,9 @@ Page {
                 customButtom1LabelText: qsTr("Search")
 
                 // AcceptAnswer button
-                customButton2.icon.source: "image://theme/icon-m-dot?" + (answerAccepted
-                                                                          ? "green"
-                                                                          : Theme.primaryColor)
+                customButton2.icon.source: "image://theme/icon-m-acknowledge?" + (answerAccepted
+                                                                            ? "green"
+                                                                            : Theme.primaryColor)
                 customButton2.enabled: ! infoBanner.visible()
                 customButton2.onClicked: {
                     acceptAnswer(answerId)
