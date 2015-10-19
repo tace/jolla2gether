@@ -7,7 +7,7 @@ ListItem  {
     anchors.left: ListView.left
     anchors.right: ListView.right
     width: parent.width
-    contentHeight: getListItemContentHeight() + getTagsColumnHeight() + getSeparatorHeight()
+    contentHeight: getTagsColumnHeight() + staticticsRow.height + titleText.height
     menu: contextMenu
     property string tagsString: tags
     property var tagsArray: null
@@ -29,39 +29,6 @@ ListItem  {
                                             props)
     }
 
-    function getListItemContentHeight() {
-        var appsettingForTextSize = getTitleTextFontSize()
-        if (appsettingForTextSize >= Theme.fontSizeExtraLarge) {
-            if (titleText.lineCount > 1)
-                return Theme.itemSizeExtraLarge + 35
-            else
-                return Theme.itemSizeLarge - 2
-        }
-        if (appsettingForTextSize >= Theme.fontSizeLarge) {
-            if (titleText.lineCount > 1)
-                return Theme.itemSizeExtraLarge + 10
-            else
-                return Theme.itemSizeMedium - 5
-        }
-        if (appsettingForTextSize >= Theme.fontSizeMedium) {
-            if (titleText.lineCount > 1)
-                return Theme.itemSizeLarge + 15
-            else
-                return Theme.itemSizeSmall + 5
-        }
-        if (appsettingForTextSize >= Theme.fontSizeSmall) {
-            if (titleText.lineCount > 1)
-                return Theme.itemSizeLarge + 7
-            else
-                return Theme.itemSizeSmall + 1
-        }
-        if (titleText.lineCount > 1) {
-            return Theme.itemSizeSmall + 13
-        }
-        else {
-            return Theme.itemSizeSmall - 11
-        }
-    }
     function isTagsShown() {
         if ((tagsString !== "") && appSettings.question_list_show_tags_value)
             return true
@@ -163,7 +130,7 @@ ListItem  {
         anchors.top: staticticsRow.bottom
         horizontalAlignment: Qt.AlignCenter
         color: Theme.secondaryHighlightColor
-        //height: 1
+        height: 1
     }
 
 
