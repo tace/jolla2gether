@@ -3,7 +3,7 @@ Summary: Jolla Together client app
 Version: 0.18
 Release: 1
 Group: Qt/Qt
-URL: http://example.org/
+URL: https://github.com/tace/jolla2gether
 License: LICENSE
 Sources:
 - '%{name}-%{version}.tar.bz2'

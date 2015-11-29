@@ -47,10 +47,20 @@ Page {
         if (status === PageStatus.Active) {
             console.log("answerpage active")
             attachWebview()
-        }
-        else if (status === PageStatus.Inactive) {
-            console.log("answerpage Inactive")
-            unattachWebview()
+
+            if (questionsModel.externalUrl !== "") {
+                if (questionsModel.openExternalLinkOnWebview) {
+                    questionsModel.openExternalLinkOnWebview = false
+                    siteURL = questionsModel.externalUrl
+                    questionsModel.externalUrl = ""
+                    console.log("Opening external url from answerpage: " + siteURL)
+                    pageStack.navigateForward()
+                }
+            }
+            if (questionsModel.openQuestionlOnJolla2getherApp) {
+                // Move to questionViewpage to handle this...
+                pageStack.pop()
+            }
         }
     }
 

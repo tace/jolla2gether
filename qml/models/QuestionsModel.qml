@@ -58,10 +58,15 @@ ListModel {
     property string pageHeader_FOLLOWED_QUESTIONS:  qsTr("Followed questions")
     property string pageHeader: pageHeader_ALL_QUESTIONS
 
+    property bool loadingInProgress: false
+
+    // Clicking external links on any page
+    property string externalUrl: ""
+    property bool openExternalLinkOnWebview: false
+    property bool openQuestionlOnJolla2getherApp: false
     // Keep index and question ID of in-app clicked question
     property int indexOfInAppClickedQuestion: -1
     property string questionIdOfClickedTogetherLink: ""
-    property bool loadingInProgress: false
 
     function refresh(page, onLoadedCallback)
     {

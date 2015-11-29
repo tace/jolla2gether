@@ -25,9 +25,6 @@ Page {
     property var tagsArray: null
     property string userKarma: ""
     property string userAvatarUrl: ""
-    property bool openExternalLinkOnWebview: false
-    property string externalUrl: ""
-    property bool openQuestionlOnJolla2getherApp: false
     property bool upVoteOn: false
     property bool downVoteOn: false
     property bool voteStatusLoaded: false
@@ -167,10 +164,10 @@ Page {
 
 
     onStatusChanged: {
-        if (status === PageStatus.Active && (url !== "" || externalUrl !== ""))
+        if (status === PageStatus.Active && (url !== "" || questionsModel.externalUrl !== ""))
         {
-            if (openQuestionlOnJolla2getherApp) {
-                openQuestionlOnJolla2getherApp = false
+            if (questionsModel.openQuestionlOnJolla2getherApp) {
+                questionsModel.openQuestionlOnJolla2getherApp = false
                 var props = {
                     "index": questionsModel.getInAppClickedQuestionIndex()
                 }
@@ -186,10 +183,10 @@ Page {
                 attachWebview()
                 questionsModel.questionIdOfClickedTogetherLink = ""
 
-                if (openExternalLinkOnWebview) {
-                    openExternalLinkOnWebview = false
-                    siteURL = externalUrl
-                    externalUrl = ""
+                if (questionsModel.openExternalLinkOnWebview) {
+                    questionsModel.openExternalLinkOnWebview = false
+                    siteURL = questionsModel.externalUrl
+                    questionsModel.externalUrl = ""
                     console.log("Opening external url: " + siteURL)
                     pageStack.navigateForward()
                 }

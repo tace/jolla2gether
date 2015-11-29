@@ -8,15 +8,19 @@ Page {
     allowedOrientations: Orientation.All
     property string browseBackText: "Back"
     property bool showUrlLoadingProgressCircle: false
-    forwardNavigation: false
     property var callbacks: null
+
+    // work around Silica bug: don't let webview enable forward navigation
+    onForwardNavigationChanged: {
+        if (forwardNavigation)
+            forwardNavigation = false;
+    }
 
     SilicaWebView {
         id: webview
         width: parent.width
         height: parent.height
         url: siteURL
-        overridePageStackNavigation: true
         focus: true
         Keys.onEscapePressed: {
             pageStack.navigateBack()

@@ -7,6 +7,7 @@
   Can extend String or be used stand alone - just change the flag at the top of the script.
 */
 
+// https://code.google.com/p/pagedown/
 .import "Markdown.Converter.js" as Converter
 
 var converter = new Converter.Markdown.Converter();
