@@ -388,14 +388,14 @@ ListModel {
                     } \
                 } \
             }; \
-            return userId + ',' + userName + ',' + karma + ',' + badges; \
+            return userId + '##' + userName + '##' + karma + '##' + badges; \
             })()"
             var handleResult = function(result) {
-                var resData = result.split(',')
+                var resData = result.split('##')
                 setUserLoginInfo(resData[0].trim(), resData[1].trim(), resData[2].trim(), resData[3].trim())
                 console.log( "Got userId,userName,karma,badges from webview: "
-                            + questionsModel.ownUserIdValue + "," + questionsModel.ownUserName + "," + questionsModel.ownKarma
-                            + "," + questionsModel.ownBadges);
+                            + questionsModel.ownUserIdValue + "##" + questionsModel.ownUserName + "##" + questionsModel.ownKarma
+                            + "##" + questionsModel.ownBadges);
                 if (pageStack.currentPage.objectName === "WebView") {
                     if (questionsModel.isUserLoggedIn()) {
                         pageStack.currentPage.backNavigation = true
@@ -553,6 +553,7 @@ ListModel {
             }
         }
         questionsModel.ownKarma = karma
+        console.log("ORIG badges: " + badges)
         questionsModel.ownBadges = badges.split(questionsModel.ownUserName + " has ")[1]
     }
     function setUserIdSearchCriteria(userId) {
