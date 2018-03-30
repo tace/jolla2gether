@@ -672,6 +672,7 @@ ListModel {
     // Returns question status (closed/answered or both) as formatted text to be shown in ui
     function getQuestionClosedAnsweredStatusAsText(index_in_model) {
         var ret_text = ""
+        console.debug(get(index_in_model)) // Workaround for QT5.6.3 bug, see https://github.com/tace/jolla2gether/issues/12. This line can be removed ones Qt bug is fixed.
         if(get(index_in_model).closed) {
             ret_text = "<font color=\"lightgreen\" size=\"1\">[closed] </font>"
         }

@@ -50,6 +50,9 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 {
     switch (type)
     {
+    case QtInfoMsg:
+        QTextStream(stdout) << "Info: " << context.file << ":" << context.line << " " << context.function << " " << msg << "\n";
+        break;
     case QtDebugMsg:
         if (debug_mode)
             QTextStream(stdout) << "Debug: " << context.file << ":" << context.line << " " << context.function << " " << msg << "\n";
